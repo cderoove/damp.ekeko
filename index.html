@@ -1,0 +1,3142 @@
+<html>
+  <head>
+    <title>damp.ekeko - Ekeko API documentation</title>
+    <link href="static/favicon.png" rel="icon" />
+    <link href="static/favicon.png" rel="shortcut icon" />
+    <link media="all" type="text/css" href="static/clojure.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/wiki.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/internal.css" rel="stylesheet" />
+    <style>.menuWrapper{height: 36px;}</style>
+    <!--[if lte IE 6]>
+    <link rel="stylesheet" href="http://www.wikispaces.com/_/2009051601/s/internal_ie.css" type="text/css" />
+    <![endif]-->
+  </head>
+<!--
+This document was auto-generated from the source by the clojure autodoc system.
+To report errors or ask questions about the overall documentation structure, formatting,
+etc., contact Tom Faulhaber (google mail name: tomfaulhaber).
+For errors in the documentation of a particular namespace, contact the author of that
+namespace.
+-->
+  <body>
+    <div id="AllContentContainer">
+      <div id="Header">
+	<a id="Logo" href="index.html"><img alt="Clojure" height="100" width="100" src="static/clojure-icon.gif" /></a>
+	<h1><a title="page header title" id="page-header" href="index.html">Ekeko</a></h1>
+      </div>
+      <div id="leftcolumn"><div style="text-align: center;"></div>
+<div class="menu">
+  <div class="WikiCustomNav WikiElement wiki">
+    <span class="toc-header"><span id="project-name">Ekeko</span> <span id="version"></span> API</span><br />
+    <ul>
+      <li><a class="wiki_link" href="index.html">Overview</a></li>
+      <li><a class="wiki_link" href="api-index.html">API Index</a></li>
+    </ul>
+    
+    
+    <a href="http://clojure.org" class="wiki_link">Clojure Home</a>
+  </div>
+</div>
+</div>
+      <div id="rightcolumn">
+	<div id="Content">
+	  <div class="contentBox"><div class="innerContentBox">
+              <div id="content_view" class="wiki wikiPage">
+                <div id="right-sidebar"><div id="toc">
+  <h1 class="nopad">Table of Contents</h1>
+  <div style="margin-left: 1em;" class="toc-section">
+    <a href="#toc0">Overview</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko/ekeko">ekeko</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko/ekeko*">ekeko*</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko/ekeko-n*">ekeko-n*</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.ekekomodel">damp.ekeko.ekekomodel</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.ekekomodel/*queried-project-models*">*queried-project-models*</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.ekekomodel/all-project-models">all-project-models</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.ekekomodel/ekeko-model">ekeko-model</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.ekekomodel/queried-project-models">queried-project-models</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.gui">damp.ekeko.gui</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/eclipse-uithread-do">eclipse-uithread-do</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/eclipse-uithread-return">eclipse-uithread-return</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/get-active-workbench-window">get-active-workbench-window</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/get-workbench">get-workbench</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/open-barista-results-viewer*">open-barista-results-viewer*</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/select-workingset*">select-workingset*</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.gui/workbench-window-shell">workbench-window-shell</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.jdt.astnode">damp.ekeko.jdt.astnode</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.astnode/get-invisible-field">get-invisible-field</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.astnode/node-classes">node-classes</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.astnode/reifiers">reifiers</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.jdt.basic">damp.ekeko.jdt.basic</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-declaration-modifier">ast-declaration-modifier</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-encompassing-method">ast-encompassing-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-encompassing-method-non-failing">ast-encompassing-method-non-failing</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-encompassing-typedeclaration">ast-encompassing-typedeclaration</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-location">ast-location</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/ast-project">ast-project</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/field-variablebinding-declaring-typebinding">field-variablebinding-declaring-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/field-variablebinding-signature">field-variablebinding-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/import-declaration-imports-binding">import-declaration-imports-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/import-declaration-imports-package">import-declaration-imports-package</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-annotation?">is-binding-annotation?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-member-value-pair?">is-binding-member-value-pair?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-method?">is-binding-method?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-package?">is-binding-package?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-type?">is-binding-type?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-variable-field?">is-binding-variable-field?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-binding-variable?">is-binding-variable?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-methodbinding-from-binary?">is-methodbinding-from-binary?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-methodbinding-from-source?">is-methodbinding-from-source?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-typebinding-from-binary?">is-typebinding-from-binary?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-typebinding-from-source?">is-typebinding-from-source?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-typebinding-primitive?">is-typebinding-primitive?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/is-typebinding-reference?">is-typebinding-reference?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/methodbinding-declaring-typebinding">methodbinding-declaring-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/methodbinding-packagebinding">methodbinding-packagebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/methodbinding-signature">methodbinding-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-abstract">modifier-abstract</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-final">modifier-final</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-native">modifier-native</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-private">modifier-private</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-protected">modifier-protected</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-public">modifier-public</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-static">modifier-static</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-strictfp">modifier-strictfp</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-synchronized">modifier-synchronized</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-transient">modifier-transient</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/modifier-volatile">modifier-volatile</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/packagebinding-qualifiedname">packagebinding-qualifiedname</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-declaring-methodbinding">typebinding-declaring-methodbinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-declaring-typebinding">typebinding-declaring-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-erasurebinding">typebinding-erasurebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-extends-typebinding">typebinding-extends-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-implements-typebinding">typebinding-implements-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-javaelement">typebinding-javaelement</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-packagebinding">typebinding-packagebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-qualifiedname">typebinding-qualifiedname</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.basic/typebinding-simplename">typebinding-simplename</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.jdt.javaprojectmodel">damp.ekeko.jdt.javaprojectmodel</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/binding-to-declaration">binding-to-declaration</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/declaration-to-ielement">declaration-to-ielement</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/ekeko-javaprojects">ekeko-javaprojects</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/icu-to-ast">icu-to-ast</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/ielement-to-declaration">ielement-to-declaration</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/java-project-models">java-project-models</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/javaproject-name">javaproject-name</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/javaproject-packagefragmentroots">javaproject-packagefragmentroots</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/packagefragment-name">packagefragment-name</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-binary?">packagefragmentroot-binary?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-fragments">packagefragmentroot-fragments</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-has-subpackages?">packagefragmentroot-has-subpackages?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-source?">packagefragmentroot-source?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.javaprojectmodel/project-as-javaproject">project-as-javaproject</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.jdt.reification">damp.ekeko.jdt.reification</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast">ast</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-declaration">ast-declaration</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-declares-binding">ast-declares-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-expression-reference">ast-expression-reference</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-expression-typebinding">ast-expression-typebinding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-fieldaccess">ast-fieldaccess</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-fieldaccess-binding">ast-fieldaccess-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-invocation">ast-invocation</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-invocation-binding">ast-invocation-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-name-of-parameter">ast-name-of-parameter</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-parent">ast-parent</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-resolveable">ast-resolveable</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-resolveable-declaration">ast-resolveable-declaration</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-root">ast-root</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-type">ast-type</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-type-binding">ast-type-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/ast-typedeclaration-binding">ast-typedeclaration-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/binding-element">binding-element</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/child">child</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/child+">child+</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/element-binding">element-binding</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/has">has</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/itype-super-itype">itype-super-itype</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/method-cfg">method-cfg</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/method-cfg-entry">method-cfg-entry</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/method-cfg-exit">method-cfg-exit</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.reification/method-statements">method-statements</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.jdt.soot">damp.ekeko.jdt.soot</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-reference-model-soot-unit-local">ast-reference-model-soot-unit-local</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-reference-soot-model">ast-reference-soot-model</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-reference-soot-model-method">ast-reference-soot-model-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-reference-soot-model-points-to">ast-reference-soot-model-points-to</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-references-soot-model-local-must-alias">ast-references-soot-model-local-must-alias</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-references-soot-model-local-must-alias-strong">ast-references-soot-model-local-must-alias-strong</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-references-soot-model-may-alias">ast-references-soot-model-may-alias</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-soot-class">ast-soot-class</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-soot-field">ast-soot-field</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/ast-soot-method">ast-soot-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/field-signature">field-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-expression-soot-field-access-compatible-local-on-lhs?">is-ast-expression-soot-field-access-compatible-local-on-lhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-expression-soot-field-access-compatible-local-on-rhs?">is-ast-expression-soot-field-access-compatible-local-on-rhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-expression-soot-value-compatible-local-on-lhs?">is-ast-expression-soot-value-compatible-local-on-lhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-expression-soot-value-compatible-local-on-rhs?">is-ast-expression-soot-value-compatible-local-on-rhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-invocation-soot-value-compatible-name-args?">is-ast-invocation-soot-value-compatible-name-args?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-soot-name-local-compatible?">is-ast-soot-name-local-compatible?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-soot-unit-position-compatible?">is-ast-soot-unit-position-compatible?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-soot-value-type-compatible?">is-ast-soot-value-type-compatible?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-unit-assign-compatible-local-on-lhs?">is-ast-unit-assign-compatible-local-on-lhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-unit-assign-compatible-local-on-rhs?">is-ast-unit-assign-compatible-local-on-rhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-ast-unit-identity-or-assignment-compatible-local-on-lhs?">is-ast-unit-identity-or-assignment-compatible-local-on-lhs?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/is-soot-local-named-this?">is-soot-local-named-this?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/method-declaration-signature">method-declaration-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot">soot</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-class-constructor-method">soot-class-constructor-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-class-field">soot-class-field</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-class-initializer-method">soot-class-initializer-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-class-method">soot-class-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-class-name">soot-class-name</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-entry-method">soot-entry-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-field-signature">soot-field-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-body">soot-method-body</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-called-by-method">soot-method-called-by-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-called-by-unit">soot-method-called-by-unit</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-calls-method">soot-method-calls-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-cfg">soot-method-cfg</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-cfg-entry">soot-method-cfg-entry</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-cfg-exit">soot-method-cfg-exit</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-local-must-alias-analysis">soot-method-local-must-alias-analysis</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-local-must-alias-analysis-strong">soot-method-local-must-alias-analysis-strong</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-local-must-not-alias-analysis">soot-method-local-must-not-alias-analysis</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-name">soot-method-name</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-signature">soot-method-signature</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-unit-trailing-unit">soot-method-unit-trailing-unit</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-method-units">soot-method-units</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-model">soot-model</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-model-scene">soot-model-scene</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit">soot-unit</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit-assign-leftop">soot-unit-assign-leftop</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit-assign-rightop">soot-unit-assign-rightop</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit-calls-method">soot-unit-calls-method</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit-defbox">soot-unit-defbox</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-unit-usebox">soot-unit-usebox</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-value">soot-value</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-valuebox">soot-valuebox</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/soot-valuebox-value">soot-valuebox-value</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.jdt.soot/type-declaration-signature">type-declaration-signature</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.logic">damp.ekeko.logic</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/contains">contains</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/equals">equals</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/equals-without-exception">equals-without-exception</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/fails">fails</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/one">one</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/perform">perform</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/succeeds">succeeds</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/succeeds-without-exception">succeeds-without-exception</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/v+">v+</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.logic/v-">v-</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.util.jobs">damp.ekeko.util.jobs</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.util.jobs/as-synchronous-job">as-synchronous-job</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.util.jobs/make-eclipse-job">make-eclipse-job</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.util.jobs/promise-until-job-done">promise-until-job-done</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.util.jobs/schedule-job">schedule-job</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.util.text">damp.ekeko.util.text</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.util.text/ellipsis">ellipsis</a>
+    </div>
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.workspace.projectmodel">damp.ekeko.workspace.projectmodel</a>
+    
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.workspace.reification">damp.ekeko.workspace.reification</a>
+    
+    <br />
+  </div><div style="margin-left: 1em;" class="toc-section">
+    <a href="#damp.ekeko.workspace.workspace">damp.ekeko.workspace.workspace</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/eclipse-workspace">eclipse-workspace</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/ekeko-reduce-projects!">ekeko-reduce-projects!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/for-each-workspace-project">for-each-workspace-project</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-model">jdt-model</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-project-named">jdt-project-named</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-projects">jdt-projects</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-projects-names">jdt-projects-names</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-workingset-manager">jdt-workingset-manager</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/jdt-workingset-named">jdt-workingset-named</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/map-workspace">map-workspace</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/reduce-projects!">reduce-projects!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-close-projects!">workspace-close-projects!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-enable-ekeko-sequentially-and-do!">workspace-enable-ekeko-sequentially-and-do!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-close!">workspace-project-close!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-disable-ekeko!">workspace-project-disable-ekeko!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-ekeko-enabled?">workspace-project-ekeko-enabled?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-enable-ekeko!">workspace-project-enable-ekeko!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-open!">workspace-project-open!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-open?">workspace-project-open?</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-project-toggle-ekeko!">workspace-project-toggle-ekeko!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-projects">workspace-projects</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#damp.ekeko.workspace.workspace/workspace-wait-for-builds-to-finish">workspace-wait-for-builds-to-finish</a>
+    </div>
+    <br />
+  </div>
+</div>
+</div>
+                <div id="content-tag"><h1 id="overview">API for <span id="namespace-name">damp.ekeko</span>
+  - <span id="header-project">Ekeko</span> <span id="header-version"></span>
+  </h1>
+<span id="author-line">by <span id="author-name">Coen De Roover</span><br /></span>
+<br />Full namespace name: <span id="long-name">damp.ekeko</span>
+<p></p>
+<h2>Overview</h2>
+<pre id="namespace-docstr">Main Ekeko namespace.</pre>
+
+
+<br />
+<h2>Public Variables and Functions</h2>
+<div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="damp.ekeko/ekeko">ekeko</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (ekeko logicvars &amp; goals)
+</pre>
+  <pre id="var-docstr">Equivalent to core.logic's run* with disabled occurs check,
+but takes multiple logic variables as its first argument.
+
+Example usage:
+(ekeko [?inv ?child]
+  (ast :MethodInvocation ?inv) 
+  (child :arguments ?inv ?child))
+
+Will become a mere alias for run* in core.logic &gt; 0.8
+
+See also:
+ekeko* which opens a graphical view on the solutions.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko.clj#L18" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="damp.ekeko/ekeko*">ekeko*</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (ekeko* vars &amp; goals)
+</pre>
+  <pre id="var-docstr">Equivalent to core.logic's run* with disabled occurs check,
+  but takes multiple logic variables as its first argument
+  and opens an Eclipse view on the solutions.
+
+  Example usage:
+  (ekeko* [?inv ?child]
+    (ast :MethodInvocation ?inv) 
+    (child :arguments ?inv ?child))
+
+  See also:
+  ekeko which doesn't open a view on the solutions</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko.clj#L38" id="var-source">Source</a>
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="damp.ekeko/ekeko-n*">ekeko-n*</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (ekeko-n* n vars &amp; goals)
+</pre>
+  <pre id="var-docstr">Equivalent to core.logic's run with disabled occurs check,
+  hence computing at most the number of solutions indicated
+  by its first argument ,
+  but takes multiple logic variables as its second argument
+  and opens an Eclipse view on the solutions.
+
+  Example usage:
+  (ekeko-n* 100 [?inv ?child]
+    (ast :MethodInvocation ?inv) 
+    (child :arguments ?inv ?child))
+
+  See also:
+  ekeko which doesn't open a view on the solutions</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko.clj#L63" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.ekekomodel</h2>
+<pre id="namespace-docstr">Central point of access to the EkekoModel for reification relations.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.ekekomodel/*queried-project-models*">*queried-project-models*</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">Seq of ProjectModel instances that are to be queried. 
+
+       Will be used as the source for all reification predicates if
+       it is non-false, otherwise all Java project models are used 
+       (see all-project-models). 
+
+       Expected to be a subset of those on which the EkekoNature has been enabled.
+       
+       Example usage:
+       ;;temporarily query JHotDraw51 only:
+          (binding [*queried-project-models* 
+                     (filter (fn [project-model] 
+                        (= "JHotDraw51" (.getName (.getProject project-model))))
+                      (all-project-models))]
+            (ekeko* [?cu] (ast :CompilationUnit ?cu)))</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/ekekomodel.clj#L11" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.ekekomodel/all-project-models">all-project-models</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (all-project-models)
+</pre>
+  <pre id="var-docstr">Returns all ProjectModel instances managed by the EkekoModel.
+Corresponds to all IProjects that have the Ekeko nature enabled.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/ekekomodel.clj#L38" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.ekekomodel/ekeko-model">ekeko-model</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ekeko-model)
+</pre>
+  <pre id="var-docstr">Returns the current EkekoModel singleton.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/ekekomodel.clj#L32" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.ekekomodel/queried-project-models">queried-project-models</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (queried-project-models)
+</pre>
+  <pre id="var-docstr">Returns the Seq of ProjectModel instances that are to be queried.
+Defaults to all ProjectModel instances gathered by the EkekoModel
+(see all-project-models), unless dynamic variable *queried-project-models*
+is set.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/ekekomodel.clj#L45" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.gui</h2>
+<pre id="namespace-docstr">Utility functions for interacting with the Eclipse GUI and opening a Barista view on core.logic results.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/eclipse-uithread-do">eclipse-uithread-do</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (eclipse-uithread-do runnable)
+</pre>
+  <pre id="var-docstr">Calls its Runnable argument synchronously in the Eclipse UI thread.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L12" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/eclipse-uithread-return">eclipse-uithread-return</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (eclipse-uithread-return runnable)
+</pre>
+  <pre id="var-docstr">Returns the value of its Runnable argument, called synchronously in the Eclipse UI thread.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L18" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/get-active-workbench-window">get-active-workbench-window</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (get-active-workbench-window)
+</pre>
+  <pre id="var-docstr">Returns the active workbench window.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L37" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/get-workbench">get-workbench</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (get-workbench)
+</pre>
+  <pre id="var-docstr">Returns the Eclipse workbench.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L30" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/open-barista-results-viewer*">open-barista-results-viewer*</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (open-barista-results-viewer* querytxt logicvars resultsqc elapsed cnt)
+</pre>
+  <pre id="var-docstr">Opens and returns a Barista view on core.logic results.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L71" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/select-workingset*">select-workingset*</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (select-workingset*)
+</pre>
+  <pre id="var-docstr">Opens a WorkingSetSelectionDialog that returns the _single_, non-aggregate selected WorkingSet or nil.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L53" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.gui/workbench-window-shell">workbench-window-shell</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workbench-window-shell window)
+</pre>
+  <pre id="var-docstr">Returns the shell of the given window.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/gui.clj#L43" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.jdt.astnode</h2>
+<pre id="namespace-docstr"></pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.astnode/get-invisible-field">get-invisible-field</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (get-invisible-field klass field-name obj)
+</pre>
+  <pre id="var-docstr">Access to private or protected field.  field-name is a symbol or
+keyword.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/astnode.clj#L170" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.astnode/node-classes">node-classes</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (node-classes)
+</pre>
+  <pre id="var-docstr">Returns a Seq of all known ASTNode subclasses.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/astnode.clj#L25" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.astnode/reifiers">reifiers</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (reifiers this)
+</pre>
+  <pre id="var-docstr">Returns a map of keywords to reifier functions. The latter will return an Ekeko-specific child of the AST node.</pre>
+  
+  
+  
+</div>
+<h2 id="namespace-name">damp.ekeko.jdt.basic</h2>
+<pre id="namespace-docstr">Basic relations that are derived from the lower-level reification relations.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-declaration-modifier">ast-declaration-modifier</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-declaration-modifier ?key ?ast ?mod)
+</pre>
+  <pre id="var-docstr">Reifies the relation between a declaration AST node ?ast 
+of kind ?key and any of its modifiers ?mod.
+
+See also: 
+Ternary predicate ast/3</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L180" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-encompassing-method">ast-encompassing-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-encompassing-method ?ast ?m)
+</pre>
+  <pre id="var-docstr">Relation between ASTNode ?ast and the MethodDeclaration ?m that encompasses it.
+
+  Operationally, performs a recursive ascend.
+
+  See also: 
+  Predicate ast-encompassing-method-non-failing/2 unifies ?m with nil
+  if there is no encompassing method.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L75" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-encompassing-method-non-failing">ast-encompassing-method-non-failing</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-encompassing-method-non-failing ?ast ?m-or-nil)
+       (ast-encompassing-method-non-failing ?ast ?m ?ancestor)
+</pre>
+  <pre id="var-docstr">Relation between ASTNode ?ast and either the MethodDeclaration ?m that encompasses it, 
+  or nil if there is no encopassing MethodDeclaration.
+
+  Operationally, performs a recursive ascend.
+
+  See also: 
+  Predicate ast-encompassing-method/2 which fails if there is no encompassing method.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L54" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-encompassing-typedeclaration">ast-encompassing-typedeclaration</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-encompassing-typedeclaration ?ast ?t)
+       (ast-encompassing-typedeclaration ?ast ?t ?ancestor)
+</pre>
+  <pre id="var-docstr">Relation between ASTNode ?ast and the TypeDeclaration ?t that encompasses it.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L39" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-location">ast-location</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-location ?ast ?locationVector)
+</pre>
+  <pre id="var-docstr">Relation between ASTNode ?ast and Clojure vector ?locationVector 
+representing its location: [begin-character-index-in-file, 
+                            end-chararacter-index-in-file, 
+                            begin-line-number, 
+                            end-line-number]
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L21" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/ast-project">ast-project</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-project ?ast ?project)
+</pre>
+  <pre id="var-docstr">Relation between an ASTNode ?ast and the IJavaProject 
+in which it resides.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L210" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/field-variablebinding-declaring-typebinding">field-variablebinding-declaring-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (field-variablebinding-declaring-typebinding ?fvbinding ?tbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?tbinding with the ITypeBinding that 
+declares field IVariableBinding ?fvbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L438" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/field-variablebinding-signature">field-variablebinding-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (field-variablebinding-signature ?fvbinding ?sig)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?sig with the signature string of
+field IVariableBinding ?fvbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L447" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/import-declaration-imports-binding">import-declaration-imports-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (import-declaration-imports-binding ?import ?binding)
+</pre>
+  <pre id="var-docstr">Relation between an import declaration ASTNode ?import and 
+the IBinding ?binding it resolves to.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L456" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/import-declaration-imports-package">import-declaration-imports-package</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (import-declaration-imports-package ?import ?packagebinding)
+</pre>
+  <pre id="var-docstr">Relation between an import declaration ASTNode ?import 
+and the IPackageBinding it imports directly (for package 
+imports) or indirectly (for type imports and static 
+imports of a field or a method).</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L465" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-annotation?">is-binding-annotation?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-annotation? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IAnnotationBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L262" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-member-value-pair?">is-binding-member-value-pair?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-member-value-pair? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IMemerValuePairBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L269" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-method?">is-binding-method?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-method? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IMethodBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L255" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-package?">is-binding-package?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-package? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IPackageBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L226" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-type?">is-binding-type?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-type? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is a ITypeBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L233" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-variable-field?">is-binding-variable-field?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-variable-field? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IVariableBinding for a field.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L247" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-binding-variable?">is-binding-variable?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-binding-variable? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?binding is an IVariableBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L240" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-methodbinding-from-binary?">is-methodbinding-from-binary?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-methodbinding-from-binary? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies whether IMethodBinding ?binding
+originates from a binary file.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L421" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-methodbinding-from-source?">is-methodbinding-from-source?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-methodbinding-from-source? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies whether IMethodBinding ?binding 
+originates from a source file.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L412" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-typebinding-from-binary?">is-typebinding-from-binary?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-typebinding-from-binary? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ITypeBinding ?binding originates 
+from a binary file.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L370" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-typebinding-from-source?">is-typebinding-from-source?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-typebinding-from-source? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ITypeBinding ?binding originates 
+from a source file.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L362" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-typebinding-primitive?">is-typebinding-primitive?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-typebinding-primitive? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ITypeBinding ?binding represents 
+a primitive type.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L378" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/is-typebinding-reference?">is-typebinding-reference?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-typebinding-reference? ?binding)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ITypeBinding ?binding represents
+a reference type.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L386" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/methodbinding-declaring-typebinding">methodbinding-declaring-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (methodbinding-declaring-typebinding ?mbinding ?tbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?tbinding with the ITypeBinding that
+declares IMethodBinding ?mbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L394" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/methodbinding-packagebinding">methodbinding-packagebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (methodbinding-packagebinding ?mbinding ?pbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?pbinding with the IPackageBinding in
+which IMethodBinding ?mbinding is declared.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L403" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/methodbinding-signature">methodbinding-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (methodbinding-signature ?binding ?sig)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?sig with the signature string
+of IMethodBinding ?binding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L430" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-abstract">modifier-abstract</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-abstract ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword abstract.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L124" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-final">modifier-final</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-final ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword final.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L132" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-native">modifier-native</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-native ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword native.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L140" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-private">modifier-private</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-private ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword private.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L116" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-protected">modifier-protected</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-protected ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword protected.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L108" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-public">modifier-public</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-public ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword public.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L100" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-static">modifier-static</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-static ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword static.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L92" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-strictfp">modifier-strictfp</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-strictfp ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword strictfp.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L172" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-synchronized">modifier-synchronized</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-synchronized ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword synchronized.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L148" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-transient">modifier-transient</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-transient ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword transient.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L156" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/modifier-volatile">modifier-volatile</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (modifier-volatile ?mod)
+</pre>
+  <pre id="var-docstr">Reifies Modifier instances that correspond to the keyword volatile.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L164" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/packagebinding-qualifiedname">packagebinding-qualifiedname</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagebinding-qualifiedname ?bindingp ?name)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?name with the name of IPackageBinding ?bindingp.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L276" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-declaring-methodbinding">typebinding-declaring-methodbinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-declaring-methodbinding ?tbinding ?declaringb)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?declaringb with the IMethodBinding that
+declares ITypeBinding ?tbinding.
+Nil for top-level types.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L343" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-declaring-typebinding">typebinding-declaring-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-declaring-typebinding ?tbinding ?declaringb)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?declaringb with the ITypeBinding that 
+declares ITypeBinding ?tbinding.
+Nil for top-level types.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L334" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-erasurebinding">typebinding-erasurebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-erasurebinding ?tbinding ?erasedtbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?erasedtbinding with the erasure of
+ITypeBinding ?tbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L299" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-extends-typebinding">typebinding-extends-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-extends-typebinding ?tbinding ?supertbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?supertbinding with the super type 
+of ITypeBinding ?tbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L307" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-implements-typebinding">typebinding-implements-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-implements-typebinding ?tbinding ?interfacetbinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?interfacetbinding with one of the 
+interface ITypeBindings implemented by ITypeBinding ?tbinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L316" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-javaelement">typebinding-javaelement</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-javaelement ?tbinding ?itype)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?itype with the IType (a Java model element)
+corresponding to this ITypeBinding ?tbinding.
+Nil for top-level types.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L352" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-packagebinding">typebinding-packagebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-packagebinding ?bindingt ?bindingp)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?bindingp with the IPackageBinding 
+that declares ITypeBinding ?bindingt.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L325" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-qualifiedname">typebinding-qualifiedname</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-qualifiedname ?binding ?name)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?name with the fully qualified
+name of ITypeBinding ?binding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L283" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.basic/typebinding-simplename">typebinding-simplename</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (typebinding-simplename ?binding ?name)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?name with the unqualified name 
+of ITypeBinding ?binding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/basic.clj#L291" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.jdt.javaprojectmodel</h2>
+<pre id="namespace-docstr">Central point of access to JavaProjectModel instances managed by the EkekoModel for reification relations.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/binding-to-declaration">binding-to-declaration</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (binding-to-declaration b)
+</pre>
+  <pre id="var-docstr">Returns the ASTNode that declares the given IBinding.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L119" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/declaration-to-ielement">declaration-to-ielement</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (declaration-to-ielement t)
+</pre>
+  <pre id="var-docstr">Returns the IJavaElement corresponding to the given ASTNode.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L104" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/ekeko-javaprojects">ekeko-javaprojects</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ekeko-javaprojects)
+</pre>
+  <pre id="var-docstr">Returns all IJavaProject instances that have the Ekeko nature enabled.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L28" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/icu-to-ast">icu-to-ast</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (icu-to-ast icu)
+</pre>
+  <pre id="var-docstr">Returns the CompilationUnit ASTNode (i.e., the complete abstract syntax tree)
+for the given ICompilationUnit instance (i.e., a IJavaElement),
+provided ICompilationUnit resides in JavaProject managed by the EkekoModel.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L94" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/ielement-to-declaration">ielement-to-declaration</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ielement-to-declaration ije)
+</pre>
+  <pre id="var-docstr">Returns the ASTNode that declares the given IJavaElement.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L110" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/java-project-models">java-project-models</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (java-project-models)
+</pre>
+  <pre id="var-docstr">Returns all JavaProjectModel instances that are to be queried.
+Subset of (queried-project-models), which is itself 
+a subset of (all-project-models).</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L18" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/javaproject-name">javaproject-name</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (javaproject-name project)
+</pre>
+  <pre id="var-docstr">Returns the name of the given IJavaProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L46" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/javaproject-packagefragmentroots">javaproject-packagefragmentroots</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (javaproject-packagefragmentroots project)
+</pre>
+  <pre id="var-docstr">Returns the package fragment roots for the given IJavaProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L55" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/packagefragment-name">packagefragment-name</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagefragment-name p)
+</pre>
+  <pre id="var-docstr">Returns the name of the give package fragment.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L85" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-binary?">packagefragmentroot-binary?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagefragmentroot-binary? pr)
+</pre>
+  <pre id="var-docstr">Succeeds for package fragment roots that originate from a binary.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L61" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-fragments">packagefragmentroot-fragments</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagefragmentroot-fragments pr)
+</pre>
+  <pre id="var-docstr">Returns the package fragments in the given package fragment root.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L73" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-has-subpackages?">packagefragmentroot-has-subpackages?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagefragmentroot-has-subpackages? p)
+</pre>
+  <pre id="var-docstr">Succeeds for package fragments that have subpackages.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L79" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/packagefragmentroot-source?">packagefragmentroot-source?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (packagefragmentroot-source? pr)
+</pre>
+  <pre id="var-docstr">Succeeds for package fragment roots that originate from source.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L67" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.javaprojectmodel/project-as-javaproject">project-as-javaproject</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (project-as-javaproject project)
+</pre>
+  <pre id="var-docstr">Returns the IJavaProject for given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/javaprojectmodel.clj#L38" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.jdt.reification</h2>
+<pre id="namespace-docstr">Low-level relations of JDT ASTNodes, IJavaElements and IBindings.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast">ast</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast ?keyword ?node)
+</pre>
+  <pre id="var-docstr">Reifies the relation between ASTNode instances ?node
+ and their kind ?keyword.
+ In general, ?keyword is the keyword that corresponds 
+ to the capitalized, unqualified name of ?node's class.
+
+ Examples:
+ ;; all method declarations
+ (ekeko* [?node] (ast :MethodDeclaration ?node))
+ ;; all ast nodes of any kind
+ (ekeko* [?keyword ?node] (ast ?keyword ?node))
+ 
+ See also:
+ API documentation of org.eclipse.jdt.core.dom.ASTNode</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L30" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-declaration">ast-declaration</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-declaration ?key ?ast)
+</pre>
+  <pre id="var-docstr">Like binary ast/2 predicate, but ensures ?ast is
+ a declaration ASTNode instance.
+
+See also:
+Binary predicate ast/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L200" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-declares-binding">ast-declares-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-declares-binding ?n ?key ?binding)
+</pre>
+  <pre id="var-docstr">Relation between a declaration ASTNode ?n,
+the keyword ?key corresponding to its kind, and the IBinding it resolves to.
+
+Note that this relation is quite slow to compute.
+
+See also:
+binary predicate ast-typedeclaration-binding/2 
+which restricts ?n to TypeDeclaration instances</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L372" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-expression-reference">ast-expression-reference</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-expression-reference ?keyw ?ast)
+</pre>
+  <pre id="var-docstr">Relation between a reference-valued Expression instance ?ast and 
+the keyword ?keyw representing its kind.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L301" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-expression-typebinding">ast-expression-typebinding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-expression-typebinding ?key ?ast ?binding)
+</pre>
+  <pre id="var-docstr">Relation between an Expression instance ?ast,
+the keyword ?key representing its kind,
+and the ITypeBinding ?binding for its type.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L289" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-fieldaccess">ast-fieldaccess</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-fieldaccess ?key ?node)
+</pre>
+  <pre id="var-docstr">Like binary ast/2 predicate, but ensures ?ast is 
+an ASTNode that accesses a field.
+
+Note that ?ast can be an instance of FieldAccess, 
+SuperFieldAccess, SimpleName or QualifiedName.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L214" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-fieldaccess-binding">ast-fieldaccess-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-fieldaccess-binding ?key ?node ?binding)
+</pre>
+  <pre id="var-docstr">Relation between a field accessing ASTNode ?node, the keyword 
+?key corresponding to its kind, and the IVariableBinding it resolves to.
+
+See also: 
+binary predicate ast-fieldaccess/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L359" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-invocation">ast-invocation</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-invocation ?key ?node)
+</pre>
+  <pre id="var-docstr">Like binary ast/2, but ensures ?ast is an ASTNode 
+that invokes a method or constructor.
+
+Note that ?ast can be an instance of MethodInvocation, 
+SuperMethodInvocation, ClassInstanceCreation,
+ConstructorInvocation or SuperConstructorInvocation</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L267" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-invocation-binding">ast-invocation-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-invocation-binding ?key ?node ?binding)
+</pre>
+  <pre id="var-docstr">Relation between an ASTNode ?node that invokes a method or constructor, 
+the keyword ?key corresponding to its kind, 
+and the IMethodBinding it resolves to.
+
+See also: 
+binary predicate ast-invocation/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L410" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-name-of-parameter">ast-name-of-parameter</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-name-of-parameter ?keyw ?name)
+</pre>
+  <pre id="var-docstr">Like ast/2, but ensures ?name is the SimpleName 
+of a formal parameter declaration.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L241" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-parent">ast-parent</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-parent ?ast ?parent)
+</pre>
+  <pre id="var-docstr">Relation between an ASTNode instance ?ast and its parent node 
+?parent. Note that ?parent is nil when ?ast is the root AST node 
+(i.e., a CompilationUnit instance).
+
+See also:
+API documentation of org.eclipse.jdt.core.dom.ASTNode</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L160" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-resolveable">ast-resolveable</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-resolveable ?key ?ast)
+</pre>
+  <pre id="var-docstr">Like binary ast/2 predicate, but ensures ?ast is an ASTNode
+instance that can be resolved to an IBinding 
+(i.e., implements method resolveBinding).
+
+See also:
+Binary predicate ast/2
+API documentation of org.eclipse.jdt.core.dom.IBinding</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L185" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-resolveable-declaration">ast-resolveable-declaration</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-resolveable-declaration ?key ?ast)
+</pre>
+  <pre id="var-docstr">Like binary ast/2 predicate, but ensures ?ast 
+ is a resolveable declaration ASTNode instance.
+
+See also:
+Binary predicates ast-resolveable/2 and ast-declaration/2.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L255" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-root">ast-root</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-root ?ast ?cu)
+</pre>
+  <pre id="var-docstr">Relation between an ASTNode instance ?ast and the root of its tree ?cu,
+an instance of CompilationUnit.
+
+See also:
+API documentation of org.eclipse.jdt.core.dom.ASTNode</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L173" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-type">ast-type</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-type ?key ?type)
+</pre>
+  <pre id="var-docstr">Like ast/2, but ensures ?type is an 
+instance of one of the Type subclasses.
+Note that these are references to types within the source code, 
+rather than a canonical representation of a type.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L230" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-type-binding">ast-type-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-type-binding ?key ?type ?binding)
+</pre>
+  <pre id="var-docstr">Relation between a type ASTNode ?type, the keyword ?key 
+ corresponding to its kind, and the ITypeBinding it resolves to.
+
+See also: 
+binary predicate ast-type/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L314" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/ast-typedeclaration-binding">ast-typedeclaration-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-typedeclaration-binding ?typeDeclaration ?binding)
+</pre>
+  <pre id="var-docstr">Relation between a TypeDeclaration instance ?typeDeclaration
+and the ITypeBinding instance ?binding it resolves to.
+Note that ?binding is required to differ from ?nil. 
+
+See also:
+API documentation of org.eclipse.jdt.core.dom.TypeDeclaration
+and org.eclipse.jdt.core.dom.ITypeBinding</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L329" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/binding-element">binding-element</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (binding-element ?ibinding ?ijavaelement)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?ijavaelement with the IJavaElement
+ corresponding to the IBinding ?ibinding, if there is one.
+
+See also:
+Binary predicate element-binding/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L705" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/child">child</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (child ?keyword ?node ?child)
+</pre>
+  <pre id="var-docstr">Reifies the relation between an ASTNode instance ?node 
+ and its ASTNode children ?child that are either the value
+ of the child property or an element of the child list 
+ property named ?keyword. 
+ In contrast to has/3, ?child is therefore always an
+ instance of ASTNode. 
+
+ Note that ?keyword is the keyword that corresponds to 
+ the decapitalized name of the property's PropertyDescriptor.
+
+ Examples:
+ ;;?child is any of the arguments to the method invocation ?inv
+ (ekeko* [?inv ?child] (ast :MethodInvocation ?inv)
+                       (child :arguments ?inv ?child))
+
+ See also: 
+ Ternary predicate has/3 
+ API documentation of org.eclipse.jdt.core.dom.ASTNode 
+ and org.eclipse.jdt.core.dom.StructuralPropertyDescriptor</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L99" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/child+">child+</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (child+ ?node ?child)
+</pre>
+  <pre id="var-docstr">Transitive closure of the child relation.
+ In other words, ?child is an ASTNode instance that resides at
+ an arbitrary depth within the ASTNode instance ?node. 
+
+Operationally, a recursive descent is performed through ?node. 
+
+Examples:
+;;?exp is an expression within method declaration ?m
+(ekeko* [?m ?exp] (ast :MethodDeclaration ?m)
+                  (child+ ?m ?exp)
+                  (succeeds (actual-expression? ?exp)))   
+
+See also:
+Ternary predicate child/3</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L127" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/element-binding">element-binding</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (element-binding ?ijavaelement ?ibinding)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?ibinding with the IBinding 
+ corresponding to the IJavaElement ?ijavaelement, if there is one.
+
+See also:
+Binary predicate binding-element/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L692" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/has">has</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (has ?keyword ?node ?child)
+</pre>
+  <pre id="var-docstr">Reifies the relation between an ASTNode instance ?node 
+and the value ?child of its property named ?keyword.
+ 
+ Here, ?keyword is the keyword that corresponds to the
+ decapitalized name of the property's PropertyDescriptor. 
+ In general, ?child is either another ASTNode instance, 
+ a primitive value or an instance of ASTNode$NodeList. 
+
+ Examples:
+ ;; method invocations with an implicit receiver
+ (ekeko* [?inv] (ast :MethodInvocation ?inv) 
+                (has :expression ?inv nil)) 
+ ;; all properties of all compilation units 
+ (ekeko* [?cu ?key ?child] (ast :CompilationUnit ?cu) 
+                           (has ?key ?cu ?child))
+ 
+ See also: 
+ Ternary predicate child/3 
+ API documentation of org.eclipse.jdt.core.dom.ASTNode 
+ and org.eclipse.jdt.core.dom.StructuralPropertyDescriptor</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L60" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/itype-super-itype">itype-super-itype</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (itype-super-itype ?itype ?super-itype)
+</pre>
+  <pre id="var-docstr">Non-relational. Successively unifies ?itype with every 
+supertype of the given IType ?itype, in bottom-up order. 
+
+Note that the JDT does not consider java.lang.Object
+to be a supertype of any interface type.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L671" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/method-cfg">method-cfg</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (method-cfg ?m ?cfg)
+</pre>
+  <pre id="var-docstr">Relation between a MethodDeclaration ?m and its control
+  flow graph ?cfg, in a format suitable to be queried with
+  the regular path expressions provided by the damp.qwal libraries.
+
+ Examples:
+ ;;all methods of which all complete paths through their 
+ ;;control flow graph end in a ReturnStatement ?return that 
+ ;;is immediately preceded by exactly one other statement ?beforeReturn 
+  (ekeko* [?m ?cfg ?entry ?end]
+          (method-cfg ?m ?cfg) 
+          (method-cfg-entry ?m ?entry)
+          (fresh [?beforeReturn ?return]
+                 (project [?cfg]
+                          (qwal ?cfg ?entry ?end 
+                                []
+                                (qcurrent [currentStatement] (equals currentStatement ?beforeReturn))
+                                q=&gt;
+                                (qcurrent [currentStatement] (equals currentStatement ?return) (ast :ReturnStatement ?return))))))
+
+ See also:
+ Documentation of the damp.qwal library.
+ Predicates method-cfg-entry and method-cfg-exit which quantify 
+ over the symbolic entry and exit point of a method's control flow graph.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L465" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/method-cfg-entry">method-cfg-entry</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (method-cfg-entry ?m ?entry)
+</pre>
+  <pre id="var-docstr">Relation between MethodDeclaration ?m and the statement ?entry 
+that represents the entry point of its control flow graph.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L504" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/method-cfg-exit">method-cfg-exit</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (method-cfg-exit ?m ?exit)
+</pre>
+  <pre id="var-docstr">Relation between MethodDeclaration ?m and the Block ?exit that
+ represents the symbolic exit point of its control flow graph.
+
+See also:
+Predicate method-cfg/2 and documentation of the damp.qwal library.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L512" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.reification/method-statements">method-statements</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (method-statements ?m ?slist)
+</pre>
+  <pre id="var-docstr">Relation between a MethodDeclaration ?m and its
+ASTNode$NodeList list of statements ?slist in its body. 
+Note that abstract methods are not included in this relation, 
+but methods with en empty body are.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/reification.clj#L430" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.jdt.soot</h2>
+<pre id="namespace-docstr">Relations between JDT ASTNodes and SOOT whole-program analyses.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-reference-model-soot-unit-local">ast-reference-model-soot-unit-local</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">Relation between a JDT reference-valued Expression ?expression,
+the Ekeko model ?model in which it resides,
+its corresponding SootUnit ?unit and Local ?local. 
+
+Tabled.
+
+Using ?unit and ?local, the Soot program analyses in ?model
+can be queried about the results for ?expression.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L810" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-reference-soot-model">ast-reference-soot-model</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-reference-soot-model ?ast ?model)
+</pre>
+  <pre id="var-docstr">Relation between reference-valued JDT Expression instances ?ast
+and the Ekeko model ?model in which they reside.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L554" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-reference-soot-model-method">ast-reference-soot-model-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-reference-soot-model-method ?ast ?model ?sm)
+</pre>
+  <pre id="var-docstr">Relation between a reference-valued JDT Expression ?ast,
+the Ekeko model ?model in which it resides,
+and the SootMethod ?sm in which the corresponding Soot
+Unit is to be found.
+
+Note that ?sm can be a class initializer as well as
+a constructor.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L566" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-reference-soot-model-points-to">ast-reference-soot-model-points-to</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">Relation between a reference-valued JDT ASTNode ?ast, 
+the Ekeko model in which it resides,
+and the points-to set ?set of object approximations it might evaluate to
+at run-time.
+Tabled.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1004" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-references-soot-model-local-must-alias">ast-references-soot-model-local-must-alias</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-references-soot-model-local-must-alias ?ast1 ?ast2 ?model)
+</pre>
+  <pre id="var-docstr">Relation of two reference-valued JDT ASTNode instances
+?ast1 and ?ast2 in the same method, 
+that must alias according to the method's intra-procedural must alias analysis, 
+and the model ?model in which they reside.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1108" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-references-soot-model-local-must-alias-strong">ast-references-soot-model-local-must-alias-strong</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-references-soot-model-local-must-alias-strong ?ast1 ?ast2 ?model)
+</pre>
+  <pre id="var-docstr">Relation of two reference-valued JDT ASTNode instances
+?ast1 and ?ast2 in the same method, 
+that must alias according to the method's 
+strong intra-procedural must alias analysis, 
+and the model ?model in which they reside.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1123" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-references-soot-model-may-alias">ast-references-soot-model-may-alias</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-references-soot-model-may-alias ?ast1 ?ast2 ?model)
+</pre>
+  <pre id="var-docstr">Relation of two reference-valued JDT ASTNode instances ?ast1 and ?ast2
+that may alias each other (i.e., have a non-empty intersection of points-to sets)
+and the model ?model in which they reside.
+
+
+Examples:
+(ekeko-n* 100
+          [?ast1 ?ast2]
+          (fresh [?model]
+                 (ast-references-soot-model-may-alias ?ast1 ?ast2 ?model)))
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1020" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-soot-class">ast-soot-class</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-soot-class ?jdt ?soot)
+</pre>
+  <pre id="var-docstr">Relation between the JDT TypeDeclaration ?jdt
+and the corresponding SootClass ?soot.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L478" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-soot-field">ast-soot-field</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ast-soot-field ?declaration ?field ?soot)
+</pre>
+  <pre id="var-docstr">Relation between the JDT FieldDeclaration ?declaration,
+ one of its VariableDeclarationFragment instances ?field,
+ and the corresponding SootField ?soot.
+
+Note that a field declaration AST node can declare multiple fields.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L504" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/ast-soot-method">ast-soot-method</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">Relation between the JDT MethodDeclaration ?jdt
+and the corresponding SootMethod ?soot.
+Tabled.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L490" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/field-signature">field-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (field-signature ?ast ?signature)
+</pre>
+  <pre id="var-docstr">Relation between the JDT FieldDeclaration ?ast
+and its Soot signature string ?signature.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L468" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-expression-soot-field-access-compatible-local-on-lhs?">is-ast-expression-soot-field-access-compatible-local-on-lhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-expression-soot-field-access-compatible-local-on-lhs? ?fieldBinding ?expressionKeyw ?expression ?valKeyw ?value)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that JDT Expression ?expression of kind ?expressionKeyw 
+that accesses a field with binding ?fieldBinding, can feature on the RHS of
+a Soot Unit with SootValue ?value on its LHS of which ?valKeyw represents the kind.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L637" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-expression-soot-field-access-compatible-local-on-rhs?">is-ast-expression-soot-field-access-compatible-local-on-rhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-expression-soot-field-access-compatible-local-on-rhs? ?fieldBinding ?expressionKeyw ?expression ?valKeyw ?value)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that JDT Expression ?expression of kind ?expressionKeyw 
+that accesses a field with binding ?fieldBinding, can feature on the LHS of
+a Soot Unit with SootValue ?value on its RHS of which ?valKeyw represents the kind.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L711" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-expression-soot-value-compatible-local-on-lhs?">is-ast-expression-soot-value-compatible-local-on-lhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-expression-soot-value-compatible-local-on-lhs? ?keyw ?expression ?valkeyw ?value)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that JDT Expression ?expression of which ?keyw
+represents the kind, can feature on the RHS of a Soot Unit 
+with SootValue ?value on its LHS of which ?valKeyw represents the kind.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L662" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-expression-soot-value-compatible-local-on-rhs?">is-ast-expression-soot-value-compatible-local-on-rhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-expression-soot-value-compatible-local-on-rhs? ?keyw ?expression ?lvalkeyw ?lvalue)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that JDT Expression ?expression of kind ?expressionKeyw 
+that accesses a field with binding ?fieldBinding, can feature on the LHS of
+a Soot Unit with SootValue ?value on its RHS of which ?valKeyw represents the kind.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L737" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-invocation-soot-value-compatible-name-args?">is-ast-invocation-soot-value-compatible-name-args?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-invocation-soot-value-compatible-name-args? ?expression ?value)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that the names and argument counts of invocation-like
+JDT Expression instance ?expression and SootMethodRef ?value are compatible.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L624" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-soot-name-local-compatible?">is-ast-soot-name-local-compatible?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-soot-name-local-compatible? ?name ?local)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that JDT SimpleName instance ?name
+has the same identifier as Soot JimpleLocal ?local.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L593" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-soot-unit-position-compatible?">is-ast-soot-unit-position-compatible?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-soot-unit-position-compatible? ?ast ?unit)
+</pre>
+  <pre id="var-docstr">Relation of JDT ASTNode instances ?ast and Soot Unit instances ?unit
+that are compatible based on their respective line number information. </pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L544" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-soot-value-type-compatible?">is-ast-soot-value-type-compatible?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-soot-value-type-compatible? ?expression ?value)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that the declared type of JDT Expression instance ?expression
+and the declared type of Soot Value ?value have the same Soot signature string.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L604" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-unit-assign-compatible-local-on-lhs?">is-ast-unit-assign-compatible-local-on-lhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-unit-assign-compatible-local-on-lhs? ?expression ?unit)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?unit is a Soot assignment Unit
+with a JimpleLocal on the LHS and a Soot value compatible with
+JDT ASTNode ?expression on its RHS.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L759" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-unit-assign-compatible-local-on-rhs?">is-ast-unit-assign-compatible-local-on-rhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-unit-assign-compatible-local-on-rhs? ?expression ?unit)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?unit is a Soot assignment Unit
+with a JimpleLocal on the RHS and a Soot value compatible with
+JDT ASTNode ?expression on its LHS.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L775" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-ast-unit-identity-or-assignment-compatible-local-on-lhs?">is-ast-unit-identity-or-assignment-compatible-local-on-lhs?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-ast-unit-identity-or-assignment-compatible-local-on-lhs? ?expression ?unitkeyw ?unit)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?unit is a Soot JIdentityStmt or JAssignStmt
+with a JimpleLocal on its LHS that is compatible with the SimpleName or
+ThisExpression ?expression.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L790" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/is-soot-local-named-this?">is-soot-local-named-this?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (is-soot-local-named-this? ?local)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that Soot JimpleLocal ?local
+is named 'this'.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L614" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/method-declaration-signature">method-declaration-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (method-declaration-signature ?ast ?signature)
+</pre>
+  <pre id="var-docstr">Relation between the JDT MethodDeclaration ?ast
+and its Soot signature string ?signature.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L450" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot">soot</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot ?keyword ?node)
+</pre>
+  <pre id="var-docstr">Relation between a SootClass, SootMethod or SootField instance
+ ?node and a keyword ?keyword describing its kind. 
+ Keyword is one of :class, :method or :field. The instances
+ originate from the current Soot model available to Ekeko.
+
+Examples:
+;;all SootClass instances
+(ekeko* [?c] (soot :class ?c))
+;;all SootMethod instances
+(ekeko* [?m] (soot :method ?m))</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L58" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-class-constructor-method">soot-class-constructor-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-class-constructor-method ?class ?method)
+</pre>
+  <pre id="var-docstr">Relation between SootClass instances 
+and their SootMethod constructors.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L206" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-class-field">soot-class-field</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-class-field ?class ?field)
+</pre>
+  <pre id="var-docstr">Relation between SootClass instances ?class 
+ and their SootField instances ?field.
+
+Examples:
+;;for each class, all fields
+(ekeko* [?c ?f] (soot-class-field ?c ?f))
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L113" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-class-initializer-method">soot-class-initializer-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-class-initializer-method ?class ?method)
+</pre>
+  <pre id="var-docstr">Relation between SootClass instances and 
+their static initializer SootMethod.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L196" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-class-method">soot-class-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-class-method ?class ?method)
+</pre>
+  <pre id="var-docstr">Relation between SootClass instances ?class and 
+ their SootMethod instances ?method.
+
+Examples:
+;;for each class, all methods
+(ekeko* [?c ?m] (soot-class-method ?c ?m))
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L94" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-class-name">soot-class-name</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-class-name ?class ?name)
+</pre>
+  <pre id="var-docstr">Relation between SootClass instances ?class 
+and their fully qualified name string ?name.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L148" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-entry-method">soot-entry-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-entry-method ?method)
+</pre>
+  <pre id="var-docstr">Unifies ?method with the SootMethod instance that was 
+used as the entry point for Soot's whole-program analyses.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L187" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-field-signature">soot-field-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-field-signature ?field ?signature)
+</pre>
+  <pre id="var-docstr">Relation between SootField instances ?field 
+and their signature string ?signature.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L132" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-body">soot-method-body</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-body ?method ?body)
+</pre>
+  <pre id="var-docstr">Relation between active SootMethod 
+ instances and their JimpleBody.
+
+Examples: 
+;;all methods with an active jimple body
+(ekeko* [?m ?b] (soot-method-body ?m ?b))
+
+See also:
+API reference of soot.jimple.JimpleBody</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L217" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-called-by-method">soot-method-called-by-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-called-by-method ?m ?caller)
+</pre>
+  <pre id="var-docstr">Relation between SootMethod ?m and one of the SootMethod instances ?caller
+ that invoke ?m.
+
+ The relation is computed based on the points-to set of the receiver (i.e., based
+ on an approximation of the dynamic rather than the static type of the receiver). 
+
+ Note that library methods are not included. 
+
+ See also: 
+ Predicate soot-method-calls-method/2 is declaratively equivalent, 
+ but operationally more efficient when the caller is known and the callees aren't.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L930" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-called-by-unit">soot-method-called-by-unit</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-called-by-unit ?m ?unit)
+</pre>
+  <pre id="var-docstr">Relation between SootMethod ?m and one of the Unit instances ?unit 
+ it is invoked by.
+
+ The relation is computed based on the points-to set of the receiver (i.e., based
+ on an approximation of the dynamic rather than the static type of the receiver). 
+
+ Note that library methods are not included. 
+
+ See also: 
+ Predicate soot-unit-calls-method/2 is declaratively equivalent, 
+ but operationally more efficient when the unit is known and the method isn't.
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L952" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-calls-method">soot-method-calls-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-calls-method ?m ?callee)
+</pre>
+  <pre id="var-docstr">Relation between SootMethod ?m and one of the SootMethod instances ?callee
+ that are called from within ?m.
+
+ The relation is computed based on the points-to set of the receiver (i.e., based
+ on an approximation of the dynamic rather than the static type of the receiver). 
+
+ Note that library methods are not included. 
+
+ See also: 
+ Predicate soot-method-called-by-method/2 is declaratively equivalent, 
+ but operationally more efficient when the callee is known and the callers aren't.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L907" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-cfg">soot-method-cfg</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-cfg ?method ?cfg)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?method and its 
+   ExceptionUnitGraph control flow graph, in a 
+   format that is suitable for being queried 
+   using regular path expressions provided by
+   the damp.qwal library.
+  
+
+   Examples:
+   ;;all units on every path through a SOOT control flow graph from an entry point ?entry
+   ;;to an exit point ?exit where the exit point uses a value ?defval defined
+   ;;by a previous Soot statement ?unit that uses a value ?usedval of type ?keyw
+   (ekeko*  [?m ?entry ?exit ?unit ?keyw]
+            (fresh [?cfg ?defbox ?exitbox ?usebox ?defval ?usedval]
+                   (soot-method-cfg-entry ?m ?cfg ?entry)
+                   (soot-method-cfg-exit ?m ?cfg ?exit)
+                   (project [?cfg]
+                            (qwal ?cfg ?entry ?exit 
+                                  []
+                                  (q=&gt;*)
+                                  (qcurrent [curr] 
+                                    (equals curr ?unit) 
+                                    (soot-unit-defbox ?unit ?defbox) 
+                                    (soot-valuebox-value ?defbox ?defval) 
+                                    (soot-unit-usebox ?unit ?usebox)
+                                    (soot-valuebox-value ?usebox ?usedval) 
+                                    (soot-value ?keyw ?usedval))
+                                  (q=&gt;+)
+                                  (qcurrent [curr]
+                                    (equals curr ?exit) 
+                                    (soot-unit-usebox ?exit ?exitbox) 
+                                    (soot-valuebox-value ?exitbox ?defval))))))
+ See also:
+ Documentation of the damp.qwal library.
+ Predicates soot-method-cfg-entry and soot-method-cfg-exit which quantify over the 
+ Soot heads and tails of the control flow graph.
+ API reference of soot.toolkits.graph.ExceptionalUnitGraph</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L255" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-cfg-entry">soot-method-cfg-entry</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-cfg-entry ?method ?cfg ?entry)
+</pre>
+  <pre id="var-docstr">Relation between a Soot ExceptionalUnitGraph 
+ (in a format compatible with damp.qwal) and its entry points.
+
+ See also:
+ Binary predicate soot-method-cfg/2
+ API reference of soot.toolkits.graph.ExceptionalUnitGraph</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L304" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-cfg-exit">soot-method-cfg-exit</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-cfg-exit ?method ?cfg ?exit)
+</pre>
+  <pre id="var-docstr">Relational between a Soot ExceptionalUnitGraph
+ (in a format compatible with damp.qwal) and its exit points.
+
+ See also:
+ Binary predicate soot-method-cfg/2
+ API reference of soot.toolkits.graph.ExceptionalUnitGraph</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L318" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-local-must-alias-analysis">soot-method-local-must-alias-analysis</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-local-must-alias-analysis ?m ?a)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?m and 
+its intra-procedural must alias analysis ?a.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1078" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-local-must-alias-analysis-strong">soot-method-local-must-alias-analysis-strong</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-local-must-alias-analysis-strong ?m ?a)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?m and 
+its intra-procedural strong must alias analysis ?a.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1098" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-local-must-not-alias-analysis">soot-method-local-must-not-alias-analysis</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-local-must-not-alias-analysis ?m ?a)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?m and 
+its intra-procedural must-not alias analysis ?a.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L1088" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-name">soot-method-name</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-name ?method ?name)
+</pre>
+  <pre id="var-docstr">Relation between SootMethod instances ?method 
+and their short name string ?name.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L177" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-signature">soot-method-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-signature ?method ?signature)
+</pre>
+  <pre id="var-docstr">Relation between SootMethod instances ?method 
+and their signature string ?signature.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L163" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-unit-trailing-unit">soot-method-unit-trailing-unit</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-unit-trailing-unit ?m ?unit ?trailing)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?m and two of its units 
+such that unit ?trailing comes after ?unit in 
+the PatchingChain of its JimpleBody.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L346" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-method-units">soot-method-units</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-method-units ?m ?units)
+</pre>
+  <pre id="var-docstr">Relation between a SootMethod ?m and the PatchingChain of 
+units ?units in its active JimpleBody.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L337" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-model">soot-model</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-model ?model)
+</pre>
+  <pre id="var-docstr">Unifies ?model with the current Soot model available to Ekeko,
+or fails when there is currently none.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L33" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-model-scene">soot-model-scene</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-model-scene ?model ?scene)
+</pre>
+  <pre id="var-docstr">Relation between the current Soot model ?model and its scene.
+
+See also:
+API documentation of soot.Scene
+Unary predicate soot-model/1</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L42" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit">soot-unit</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit ?keyw ?u)
+</pre>
+  <pre id="var-docstr">Relation between soot unit ?u and a keyword ?keyw describing its kind.
+The instances originate from the current Soot model available to Ekeko.
+
+See also: 
+API documentation of soot.Unit</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L357" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit-assign-leftop">soot-unit-assign-leftop</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit-assign-leftop ?u ?local)
+</pre>
+  <pre id="var-docstr">Relation between the soot JAssignStmt unit ?u 
+and its left operand ?local.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L426" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit-assign-rightop">soot-unit-assign-rightop</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit-assign-rightop ?u ?local)
+</pre>
+  <pre id="var-docstr">Relation between the soot JAssignStmt unit ?u 
+and its right operand ?local.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L435" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit-calls-method">soot-unit-calls-method</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit-calls-method ?unit ?m)
+</pre>
+  <pre id="var-docstr">Relation between Unit ?unit and one of the SootMethod instances ?m
+ it may invoke. 
+
+ The relation is computed based on the points-to set of the receiver (i.e., based
+ on an approximation of the dynamic rather than the static type of the receiver). 
+
+ Note that library methods are not included. 
+
+ See also: 
+ Predicate soot-method-called-by-unit/2 is declaratively equivalent, 
+ but operationally more efficient when the method is known and the unit isn't.
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L976" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit-defbox">soot-unit-defbox</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit-defbox ?u ?b)
+</pre>
+  <pre id="var-docstr">Relation between a soot Unit ?u and one of the ValueBox instances it defines.
+
+See also:
+predicate soot-unit-userbox/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L375" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-unit-usebox">soot-unit-usebox</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-unit-usebox ?u ?b)
+</pre>
+  <pre id="var-docstr">Relation between a soot Unit ?u and one of the ValueBox instances it uses.
+
+See also:
+predicate soot-unit-userbox/2</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L387" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-value">soot-value</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-value ?keyw ?v)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?keyw with the keyword 
+that represents the kind of the soot Value ?v.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L414" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-valuebox">soot-valuebox</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-valuebox ?b)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that ?b is a soot ValueBox.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L399" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/soot-valuebox-value">soot-valuebox-value</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (soot-valuebox-value ?b ?v)
+</pre>
+  <pre id="var-docstr">Non-relational. Unifies ?v with the Value inside the ValueBox ?b.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L406" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.jdt.soot/type-declaration-signature">type-declaration-signature</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (type-declaration-signature ?ast ?signature)
+</pre>
+  <pre id="var-docstr">Relation between the JDT TypeDeclaration ?ast
+and its Soot signature string ?signature.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/jdt/soot.clj#L459" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.logic</h2>
+<pre id="namespace-docstr">Auxiliary logic goals, most of which are currently non-relational.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/contains">contains</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (contains c e)
+</pre>
+  <pre id="var-docstr">Relation between a collection (seq c) and one of its elements e.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L80" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/equals">equals</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (equals lvar exp &amp; rest)
+</pre>
+  <pre id="var-docstr">Non-relational. Projects all logic variables on the right-hand side
+that start with a question mark (e.g., ?x), evaluates the resulting
+Clojure expression and unifies the result with the left hand-side. </pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L23" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/equals-without-exception">equals-without-exception</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (equals-without-exception lvar exp)
+</pre>
+  <pre id="var-docstr">Like equals/2, but catches Exception thrown by exp.
+Fails if an exception is thrown.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L55" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/fails">fails</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (fails goal)
+</pre>
+  <pre id="var-docstr">Succeeds if argument fails. Implements negation as failure.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L101" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/one">one</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (one g)
+</pre>
+  <pre id="var-docstr">If g succeeds, succeeds once.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L109" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/perform">perform</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (perform exp)
+</pre>
+  <pre id="var-docstr">Non-relational. Projects all logic variables on the right-hand side
+that start with a question mark (e.g., ?x) and evaluates the resulting
+Clojure expression.
+
+See also: 
+equals/2 if the value of the expression is needed.
+suceeds/2 if the expressions should evaluate to true.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L34" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/succeeds">succeeds</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (succeeds exp)
+</pre>
+  <pre id="var-docstr">Non-relational. Projects all logic variables on the right-hand side
+that start with a question mark (e.g., ?x) and verifies that 
+the resulting Clojure expression evaluates to true.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L47" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/succeeds-without-exception">succeeds-without-exception</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (succeeds-without-exception exp)
+</pre>
+  <pre id="var-docstr">Like succeeds/2, but catches Exception thrown by exp.
+Fails if an exception is thrown.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L67" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/v+">v+</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (v+ v)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that logic variable v is ground.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L88" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.logic/v-">v-</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (v- v)
+</pre>
+  <pre id="var-docstr">Non-relational. Verifies that logic variable v is not ground.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/logic.clj#L94" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.util.jobs</h2>
+<pre id="namespace-docstr">Utilities for launching and waiting for Eclipse Jobs.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.util.jobs/as-synchronous-job">as-synchronous-job</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (as-synchronous-job label f)
+</pre>
+  <pre id="var-docstr">Schedules a job and blocks until it is done.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/util/jobs.clj#L63" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.util.jobs/make-eclipse-job">make-eclipse-job</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (make-eclipse-job label f)
+       (make-eclipse-job label taskcomplete taskunitf)
+</pre>
+  <pre id="var-docstr">2 args: Creates a job with given label that will, when run,
+  apply f to the ProgressMonitor associated with the job.
+
+ 3 args: Creates a job with given label that will, when run,
+ apply taskunitf taskcomplete times. Taskunitf is given the current 
+ index in [i, taskcomplete] applications.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/util/jobs.clj#L11" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.util.jobs/promise-until-job-done">promise-until-job-done</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (promise-until-job-done value job)
+       (promise-until-job-done value job user?)
+</pre>
+  <pre id="var-docstr">Schedules a job to be run asynchronously and returns a promise until the job is done.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/util/jobs.clj#L46" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.util.jobs/schedule-job">schedule-job</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (schedule-job job)
+       (schedule-job job user?)
+</pre>
+  <pre id="var-docstr">Schedules the given job.
+
+ Examples:
+ (schedule-job (make-eclipse-job "Counting till 10000" 10000 (fn [i] (println (str i))))) 
+</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/util/jobs.clj#L33" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.util.text</h2>
+<pre id="namespace-docstr"></pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.util.text/ellipsis">ellipsis</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ellipsis txt)
+       (ellipsis txt len)
+</pre>
+  <pre id="var-docstr">Ensures the string txt is no longer than 150 (or the given len)  
+of characters. Adds ... at the end.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/util/text.clj#L4" id="var-source">Source</a>
+</div>
+<h2 id="namespace-name">damp.ekeko.workspace.projectmodel</h2>
+<pre id="namespace-docstr">Central point of access to ProjectModel instances managed by EkekoModel for reification relations.</pre>
+
+
+<br />
+
+<h2 id="namespace-name">damp.ekeko.workspace.reification</h2>
+<pre id="namespace-docstr">Low-level ProjectModel reification relations.</pre>
+
+
+<br />
+
+<h2 id="namespace-name">damp.ekeko.workspace.workspace</h2>
+<pre id="namespace-docstr">Utilities for accessing and interacting with the Eclipse workspace.</pre>
+
+
+<br />
+<div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/eclipse-workspace">eclipse-workspace</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (eclipse-workspace)
+</pre>
+  <pre id="var-docstr">Returns the Eclipse workspace.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L16" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/ekeko-reduce-projects!">ekeko-reduce-projects!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (ekeko-reduce-projects! f initval projects)
+</pre>
+  <pre id="var-docstr">Like reduce-projects!, but also enables the Ekeko nature
+before the application of f.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L183" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/for-each-workspace-project">for-each-workspace-project</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (for-each-workspace-project f)
+</pre>
+  <pre id="var-docstr">Applies f to each IProject in the workspace.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L137" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-model">jdt-model</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-model)
+</pre>
+  <pre id="var-docstr">Returns the Eclipse JDT IJavaModel.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L23" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-project-named">jdt-project-named</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-project-named name)
+</pre>
+  <pre id="var-docstr">Returns the JDT IJavaProject with the given name.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L40" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-projects">jdt-projects</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-projects)
+</pre>
+  <pre id="var-docstr">Returns the JDT IJavaProjects in the JDT IJavaModel</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L34" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-projects-names">jdt-projects-names</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-projects-names)
+</pre>
+  <pre id="var-docstr">Returns a seq with the names of the JDT IJavaProjects in the workspace.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L47" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-workingset-manager">jdt-workingset-manager</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-workingset-manager)
+</pre>
+  <pre id="var-docstr">Returns the Eclipse working set manager.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L57" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/jdt-workingset-named">jdt-workingset-named</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (jdt-workingset-named name)
+</pre>
+  <pre id="var-docstr">Returns the Eclipse working set with the given name.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L64" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/map-workspace">map-workspace</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (map-workspace f)
+</pre>
+  <pre id="var-docstr">Applies f to each IProject in the workspace, 
+returns a map from project name to the result of f.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L151" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/reduce-projects!">reduce-projects!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (reduce-projects! f initval projects)
+</pre>
+  <pre id="var-docstr">Clojure reduce over all projects in the workspace.
+Destructive as it opens and closes each project sequentially.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L167" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-close-projects!">workspace-close-projects!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-close-projects!)
+</pre>
+  <pre id="var-docstr">Closes all projects in the workspace.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L144" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-enable-ekeko-sequentially-and-do!">workspace-enable-ekeko-sequentially-and-do!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-enable-ekeko-sequentially-and-do! f)
+</pre>
+  <pre id="var-docstr">Sequentially:
+ - opens
+ - enables Ekeko nature
+ - waits for build to finish
+ - applies f 
+ - disables Ekeko nature
+ - closes
+each project in the Eclipse workspace. 
+Useful for scripting queries over a large workspace.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L201" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-close!">workspace-project-close!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-close! p)
+</pre>
+  <pre id="var-docstr">Closes the given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L100" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-disable-ekeko!">workspace-project-disable-ekeko!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-disable-ekeko! p)
+</pre>
+  <pre id="var-docstr">Disables the Ekeko nature on the given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L129" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-ekeko-enabled?">workspace-project-ekeko-enabled?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-ekeko-enabled? p)
+</pre>
+  <pre id="var-docstr">Succeeds when the given IProject is managed by the EkekoModel 
+(i.e., has the Ekeko nature enabled).</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L108" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-enable-ekeko!">workspace-project-enable-ekeko!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-enable-ekeko! p)
+</pre>
+  <pre id="var-docstr">Enables the Ekeko nature on the given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L121" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-open!">workspace-project-open!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-open! p)
+</pre>
+  <pre id="var-docstr">Opens the given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L92" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-open?">workspace-project-open?</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-open? p)
+</pre>
+  <pre id="var-docstr">Succeeds when the given IProject is open.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L86" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-project-toggle-ekeko!">workspace-project-toggle-ekeko!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-project-toggle-ekeko! p)
+</pre>
+  <pre id="var-docstr">Toggles the Ekeko nature on the given IProject.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L115" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-projects">workspace-projects</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-projects)
+</pre>
+  <pre id="var-docstr">Returns a Seq of all IProjects in the Eclipse workspace.
+This includes projects not managed by the EkekoModel
+as well as non-Java projects.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L74" id="var-source">Source</a>
+</div><div id="var-entry">
+  <hr />
+  <h2 id="damp.ekeko.workspace.workspace/workspace-wait-for-builds-to-finish">workspace-wait-for-builds-to-finish</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (workspace-wait-for-builds-to-finish)
+</pre>
+  <pre id="var-docstr">Asks the current thread to wait for all builds in the workspace to finish.
+Important to ensure the EkekoModel is fully populated when
+querying large workspaces.</pre>
+  
+  
+  <a href="http://github.com/cderoove/damp.ekeko/blob/e0fe4afbf9e4a8917ec08f7bc495112dfe8d83ff/EkekoPlugin/src/damp/ekeko/workspace/workspace.clj#L158" id="var-source">Source</a>
+</div>
+
+
+</div>
+              </div>
+            </div>
+          </div>
+	</div>
+	<div id="foot">
+	  <div style="text-align: center;" id="copyright">(c) 2012 Ekeko Contributors</div>
+	</div>
+      </div>
+      <div id="DesignedBy">Logo &amp; site design by <a title="Visit Tom Hickey's website." href="http://www.tomhickey.com">Tom Hickey</a>.<br />
+      Clojure auto-documentation system by Tom Faulhaber.</div>
+    </div>
+    <!-- /AllContentContainer -->
+  </body>
+
+</html>

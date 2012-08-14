@@ -16,7 +16,7 @@ Coen De Roover:
 Carlos Noguera 
 - Barista graphical user interface
 Reinout Stevens 
-- damp.ekeko.workspace.reification relations
+- damp.ekeko.workspace.reification
    </copyright>
 
    <license url="http://www.eclipse.org/org/documents/epl-v10.html">
@@ -34,8 +34,9 @@ External dependencies:
    </license>
 
    <url>
-      <discovery label="Counterclockwise Update Site" url="http://ccw.cgrand.net/updatesite"/>
-      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site"/>
+      <update label="Ekeko Update Site" url="http://soft.vub.ac.be/eclipse/update-3.7/"/>
+      <discovery label="Counterclockwise Update Site" url="http://ccw.cgrand.net/updatesite/"/>
+      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site/"/>
    </url>
 
    <requires>

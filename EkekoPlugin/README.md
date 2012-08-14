@@ -22,7 +22,12 @@ Alternatively, the plugin can also be built from [EclipsePlugin](https://github.
 
 ## Documentation
 
+See the [damp.ekeko wiki](https://github.com/cderoove/damp.ekeko/wiki) for information on:  
 
+* [how to get started](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko)
+* [example queries](https://github.com/cderoove/damp.ekeko/wiki/Example-Ekeko-Queries)
+
+See the [damp.ekeko API documentation](http://cderoove.github.com/damp.ekeko/) for an overview of all relations and functions that are included.
 
 ## License  
 

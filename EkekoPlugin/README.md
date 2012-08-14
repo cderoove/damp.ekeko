@@ -14,6 +14,8 @@ Ekeko is meant as the successor to the [SOUL logic program query language](http:
 Install the prebuilt Ekeko plugin from the Eclipse update site: 
 [http://soft.vub.ac.be/eclipse/update-3.7/](http://soft.vub.ac.be/eclipse/update-3.7/) 
 
+See [Installing New Software](http://help.eclipse.org/juno/topic/org.eclipse.platform.doc.user/tasks/tasks-124.htm) for help on installing Eclipse plugins from an update site. 
+
 Ekeko has been tested against [Eclipse Juno (4.2)](http://www.eclipse.org)
 
 Plugin dependencies [org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php) and [Counterclockwise](http://code.google.com/p/counterclockwise/) should be installed automatically.

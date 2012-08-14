@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="damp.ekeko.feature"
+      label="Ekeko"
+      version="1.0.3">
+
+   <description>
+      Ekeko is an environment for querying and transforming Eclipse workspaces using causally-connected applicative logic meta-programs. Ekeko is based on the core.logic (https://github.com/clojure/core.logic) port to Clojure (http://clojure.org/) of the applicative logic programming language Kanren (http://kanren.sourceforge.net/). Ekeko is meant as the successor to the SOUL logic program query language (http://soft.vub.ac.be/SOUL/), which still hosts links
+to academic papers about logic program querying.
+   </description>
+
+   <copyright>
+      (c) 2012 Ekeko contributors
+Coen De Roover:
+- initial design, implementation and documentation
+Carlos Noguera 
+- Barista graphical user interface
+Reinout Stevens 
+- damp.ekeko.workspace.reification relations
+   </copyright>
+
+   <license url="http://www.eclipse.org/org/documents/epl-v10.html">
+      Distributed under the Eclipse Public License.
+      
+Included dependencies:
+- Clojure&apos;s logic programming library &quot;core.logic&quot;: https://github.com/clojure/core.logic/ (Eclipse Public License)
+- Reinout Stevens&apos; regular path expression library &quot;damp.qwal&quot; (Eclipse Public License): https://github.com/ReinoutStevens/damp.qwal 
+- Anders Hessellund&apos;s intra-procedural JDT control flow graph &quot;dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph&quot; (Apache license): http://www.itu.dk/people/hessellund/smartemf/index.php
+- Sable&apos;s Java Optimization Framework &quot;Soot&quot; (LGPL): http://www.sable.mcgill.ca/soot/
+
+External dependencies:
+- Eclipse Plugin &quot;org.eclipse.jdt.astview&quot; (Eclipse Public License): http://www.eclipse.org/jdt/ui/astview/index.php 
+- Eclipse Plugin &quot;Counterclockwise&quot; (Eclipse Public License): http://code.google.com/p/counterclockwise/
+   </license>
+
+   <url>
+      <discovery label="Counterclockwise Update Site" url="http://ccw.cgrand.net/updatesite"/>
+      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.jdt.astview" version="1.1.8" match="greaterOrEqual"/>
+      <import feature="ccw.feature"/>
+      <import plugin="clojure.osgi"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="ccw.clojure"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="ccw.core"/>
+      <import plugin="org.eclipse.jdt.launching"/>
+      <import plugin="org.clojure.tools.nrepl"/>
+      <import plugin="ccw.util"/>
+   </requires>
+
+   <plugin
+         id="damp.ekeko.plugin"
+         download-size="0"
+         install-size="0"
+         version="1.0.3"
+         unpack="false"/>
+
+</feature>

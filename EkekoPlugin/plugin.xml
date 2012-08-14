@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="ekeko.projectModelFactory" name="ekeko.projectModelFactory" schema="schema/ekeko.projectModelFactory.exsd"/>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Ekeko Commands Category"
+            id="damp.ekeko.commands.category">
+      </category>
+      <command
+            name="Start ekeko-hosted nREPL"
+            categoryId="damp.ekeko.commands.category"
+            id="damp.ekeko.commands.nreplCommand">
+      </command>
+      <command
+            categoryId="damp.ekeko.commands.category"
+            id="damp.ekeko.commands.enableNatureOnAll"
+            name="Include all Projects in Queries">
+      </command>
+      <command
+            categoryId="damp.ekeko.commands.category"
+            id="damp.ekeko.commands.disableNatureOnAll"
+            name="Exclude all Projects from Queries">
+      </command>
+      <command
+            categoryId="damp.ekeko.commands.category"
+            id="damp.ekeko.commands.showWholeProgramAnalysesSettings"
+            name="Configure whole-program analyses...">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="damp.ekeko.commands.nreplCommand"
+            class="damp.ekeko.NReplCommandHandler">
+      </handler>
+      <handler
+            class="damp.ekeko.EnableNatureOnAllHandler"
+            commandId="damp.ekeko.commands.enableNatureOnAll">
+      </handler>
+      <handler
+            class="damp.ekeko.DisableNatureOnAllHandler"
+            commandId="damp.ekeko.commands.disableNatureOnAll">
+      </handler>
+      <handler
+            class="damp.ekeko.SootProjectSelectionHandler"
+            commandId="damp.ekeko.commands.showWholeProgramAnalysesSettings">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="Ekeko"
+               mnemonic="EK"
+               id="damp.ekeko.menus.sampleMenu">
+            <command
+                  commandId="damp.ekeko.commands.nreplCommand"
+                  label="Start nREPL"
+                  tooltip="Start Ekeko-hosted nREPL server">
+            </command>
+            <command
+                  commandId="damp.ekeko.commands.enableNatureOnAll"
+                  label="Include all Projects in Queries"
+                  tooltip="Includes all Open Projects in Ekeko Queries">
+            </command>
+            <command
+                  commandId="damp.ekeko.commands.disableNatureOnAll"
+                  label="Exclude all Projects from Queries"
+                  tooltip="Excludes all Open Projects from Ekeko Queries">
+            </command>
+            <command
+                  commandId="damp.ekeko.commands.showWholeProgramAnalysesSettings"
+                  label="Configure whole-program analyses..."
+                  tooltip="Opens Ekeko configuration for whole-program analyses.">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:BaristaUI.TreeResultsMenu">
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="baristaui.menus.ResultMarkerPopup"
+            locationURI="popup:#AbstractTextEditorRulerContext?after=additions">
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="EkekoBaristaUI"
+            name="EkekoBarista">
+      </category>
+      <view
+            allowMultiple="true"
+            category="EkekoBarista"
+            class="baristaui.views.queryResult.QueryView"
+            id="ekeko.BaristaUI.queryResults"
+            name="Ekeko Query Results"
+            restorable="false">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="EkekoPlugin.addNatureIProjectContribution"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="damp.ekeko.ToggleEkekoNatureAction"
+               icon="icons/ekeko16.png"
+               id="EkekoPlugin.AddNatureAction"
+               label="Include in Ekeko Queries"
+               menubarPath="org.eclipse.ui.projectConfigure/additions">
+          </action>
+
+
+       <visibility>
+          <not><objectState name="nature" value="damp.ekeko.plugin.ekekoNature" /></not>
+       </visibility>
+
+      </objectContribution>
+      
+       <objectContribution
+            adaptable="true"
+            id="EkekoPlugin.removeNatureIProjectContribution"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="damp.ekeko.ToggleEkekoNatureAction"
+               icon="icons/ekeko16.png"
+               id="EkekoPlugin.RemoveNatureAction"
+               label="Exclude from Ekeko Queries"
+               menubarPath="org.eclipse.ui.projectConfigure/additions">
+         </action>
+
+       <visibility>
+          <objectState name="nature" value="damp.ekeko.plugin.ekekoNature" />
+       </visibility>
+
+
+
+
+      </objectContribution>
+       <objectContribution
+             adaptable="false"
+             id="BaristaUI.popUp"
+             objectClass="baristaui.views.queryResult.tree.TreeResultContentProvider$Node">
+          <action
+                class="baristaui.actions.OpenNodeInEditor"
+                enablesFor="1"
+                icon="icons/ekeko16.png"
+                id="BaristaUI.openInEditor"
+                label="Find node in Editor"
+                menubarPath="popup:BaristaUI.TreeResultsMenu">
+          </action>
+          <action
+                class="baristaui.actions.InspectAction"
+                enablesFor="1"
+                icon="icons/ekeko16.png"
+                id="BaristaUI.inspect"
+                label="Inspect"
+                menubarPath="popup:BaristaUI.TreeResultsMenu">
+          </action>
+       </objectContribution>
+       <objectContribution
+             adaptable="false"
+             id="BaristaUI.markerPopup"
+             objectClass="org.eclipse.core.resources.IMarker">
+       </objectContribution>
+      
+   </extension>
+   
+
+   
+   
+   <extension
+         id="ekekoNature"
+         name="Ekeko Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="damp.ekeko.EkekoNature">
+         </run>
+      </runtime>
+      <builder
+            id="damp.ekeko.plugin.ekekoBuilder">
+      </builder>
+      <!-- <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature> -->
+   </extension>
+   <extension
+         id="ekekoBuilder"
+         name="Ekeko Java Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="damp.ekeko.EkekoBuilder">
+         </run></builder>
+   </extension>
+   <extension
+         id="BaristaUI.EkekoResultBinding"
+         name="BaristaUI.EkekoResultBinding"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <attribute
+            name="BaristaUI.OtherBindings">
+      </attribute>
+      <attribute
+            name="BaristaUI.Binding">
+      </attribute>
+      <attribute
+            name="BaristaUI.Query">
+      </attribute>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerImageProviders">
+      <imageprovider
+            icon="icons/ekeko16.png"
+            id="BaristaUI.EkekoResultBindingImage"
+            markertype="org.eclipse.core.resources.marker">
+      </imageprovider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+     
+	<decorator   id="damp.ekeko.projectdecorator"   
+			label="Ekeko Project Decorator"   
+			state="true"   
+			class= "damp.ekeko.EkekoProjectDecorator"   
+			adaptable="true"   
+			lightweight="true">   
+		<enablement>
+			<objectClass name="org.eclipse.core.resources.IProject"/>   
+		</enablement>  
+	</decorator>
+     
+     
+     
+   </extension>
+  
+   
+<extension point="org.eclipse.ui.propertyPages"> 
+    <page 
+        id="damp.ekeko.IJavaProjectPropertyPage" 
+        name="Ekeko Properties" 
+        class="damp.ekeko.EkekoProjectPropertyPage" 
+        > 
+        <enabledWhen>
+            <instanceof
+                value="org.eclipse.jdt.core.IJavaProject">
+            </instanceof>
+        </enabledWhen>
+    </page>
+    <page 
+        id="com.example.FilePropertyPage" 
+        name="Ekeko Properties" 
+        class="damp.ekeko.EkekoProjectPropertyPage" 
+        > 
+        <enabledWhen>
+            <instanceof
+                value="org.eclipse.core.resources.IProject">
+            </instanceof>
+        </enabledWhen>
+    </page>
+</extension>
+
+</plugin>

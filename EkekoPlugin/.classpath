@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="classes" sourcepath="classes"/>
+	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jasminclasses.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/java_cup.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/polyglot.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/sootclasses.jar" sourcepath="/Users/cderoove/Downloads/sootsrc-2.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.7.5.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,7 +1,7 @@
 (ns 
-  damp.ekeko.util.jobs
-    ^{:doc "Utilities for launching and waiting for Eclipse Jobs."
+  ^{:doc "Utilities for launching and waiting for Eclipse Jobs."
     :author "Coen De Roover"}
+  damp.ekeko.util.jobs
   (:import [org.eclipse.core.runtime.jobs Job IJobChangeListener JobChangeAdapter IJobChangeEvent]
             [org.eclipse.core.runtime Status IProgressMonitor]
             [org.eclipse.swt.widgets Display]

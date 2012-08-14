@@ -1,9 +1,9 @@
 (ns 
- ^{:doc "Auxiliary logic goals, most of which are currently non-relational."
-   :author "Coen De Roover"}
-  damp.ekeko.logic 
+  ^{:doc "Auxiliary logic goals, most of which are currently non-relational."
+    :author "Coen De Roover"}
+   damp.ekeko.logic 
   (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic]))
+   (:use [clojure.core.logic]))
 
 (defn- 
   ekeko-lvar-sym?

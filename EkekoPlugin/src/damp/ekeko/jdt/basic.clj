@@ -1,7 +1,7 @@
 (ns 
-  damp.ekeko.jdt.basic
   ^{:doc "Basic relations that are derived from the lower-level reification relations."
     :author "Coen De Roover"}
+   damp.ekeko.jdt.basic
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic])
   (:use [damp.ekeko.logic])

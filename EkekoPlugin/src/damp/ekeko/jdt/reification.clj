@@ -1,7 +1,7 @@
 (ns 
-  damp.ekeko.jdt.reification
   ^{:doc "Low-level relations of JDT ASTNodes, IJavaElements and IBindings."
     :author "Coen De Roover"}
+  damp.ekeko.jdt.reification
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic])
   (:use [damp.ekeko logic])

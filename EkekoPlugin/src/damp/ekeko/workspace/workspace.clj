@@ -1,13 +1,14 @@
-(ns damp.ekeko.workspace.workspace
-     ^{:doc "Utilities for accessing and interacting with the Eclipse workspace."
-      :author "Coen De Roover"}
-      (:import [org.eclipse.core.resources ResourcesPlugin IWorkspace]
-               [org.eclipse.jdt.core  IMember IJavaElement ITypeHierarchy JavaCore IType IJavaModel IJavaProject IPackageFragment ICompilationUnit]
-               [org.eclipse.ui PlatformUI IWorkingSet IWorkingSetManager]
-               [org.eclipse.core.runtime.jobs Job]
-               [org.eclipse.core.runtime Status]
-               [damp.ekeko EkekoModel JavaProjectModel ProjectModel])
-      (require [damp.ekeko [ekekomodel :as ekekomodel]]))
+(ns 
+  ^{:doc "Utilities for accessing and interacting with the Eclipse workspace."
+    :author "Coen De Roover"}
+  damp.ekeko.workspace.workspace
+  (:import [org.eclipse.core.resources ResourcesPlugin IWorkspace]
+           [org.eclipse.jdt.core  IMember IJavaElement ITypeHierarchy JavaCore IType IJavaModel IJavaProject IPackageFragment ICompilationUnit]
+           [org.eclipse.ui PlatformUI IWorkingSet IWorkingSetManager]
+           [org.eclipse.core.runtime.jobs Job]
+           [org.eclipse.core.runtime Status]
+           [damp.ekeko EkekoModel JavaProjectModel ProjectModel])
+  (require [damp.ekeko [ekekomodel :as ekekomodel]]))
 
 ; JDT 
 ; ---

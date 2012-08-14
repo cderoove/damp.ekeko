@@ -1,11 +1,11 @@
 (ns 
-  damp.ekeko.ekekomodel
   ^{:doc "Central point of access to the EkekoModel for reification relations."
     :author "Coen De Roover"}
+  damp.ekeko.ekekomodel
   (:import 
-           [org.eclipse.jdt.core  IMember IJavaElement ITypeHierarchy JavaCore IType IJavaModel IJavaProject IPackageFragment ICompilationUnit]
-           [org.eclipse.jdt.core.dom ConstructorInvocation SuperConstructorInvocation ClassInstanceCreation SuperMethodInvocation IMethodBinding AnonymousClassDeclaration IBinding MethodDeclaration MethodInvocation ASTParser AST ASTRequestor CompilationUnit ASTNode TypeDeclaration]
-           [damp.ekeko EkekoModel JavaProjectModel ProjectModel]))
+    [org.eclipse.jdt.core  IMember IJavaElement ITypeHierarchy JavaCore IType IJavaModel IJavaProject IPackageFragment ICompilationUnit]
+    [org.eclipse.jdt.core.dom ConstructorInvocation SuperConstructorInvocation ClassInstanceCreation SuperMethodInvocation IMethodBinding AnonymousClassDeclaration IBinding MethodDeclaration MethodInvocation ASTParser AST ASTRequestor CompilationUnit ASTNode TypeDeclaration]
+    [damp.ekeko EkekoModel JavaProjectModel ProjectModel]))
 
 
 (def #^{:dynamic true

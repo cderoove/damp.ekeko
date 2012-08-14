@@ -1,6 +1,7 @@
-(ns damp.ekeko.jdt.javaprojectmodel
-    ^{:doc "Central point of access to JavaProjectModel instances managed by the EkekoModel for reification relations."
+(ns 
+ ^{:doc "Central point of access to JavaProjectModel instances managed by the EkekoModel for reification relations."
     :author "Coen De Roover"}
+  damp.ekeko.jdt.javaprojectmodel
   (:require [damp.ekeko [ekekomodel :as ekekomodel]])
   (:import 
     [damp.ekeko JavaProjectModel]

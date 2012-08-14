@@ -1,6 +1,7 @@
-(ns damp.ekeko.workspace.reification
-    ^{:doc "Low-level ProjectModel reification relations."
+(ns 
+  ^{:doc "Low-level ProjectModel reification relations."
     :author "Reinout Stevens"}
+  damp.ekeko.workspace.reification
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic])
   (require 

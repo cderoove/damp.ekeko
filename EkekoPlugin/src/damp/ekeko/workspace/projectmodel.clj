@@ -1,6 +1,7 @@
-(ns damp.ekeko.workspace.projectmodel
-  ^{:doc "Central point of access to ProjectModel instances managed by EkekoModel for reification relations."
-    :author "Reinout Stevens"}
+(ns 
+ ^{:doc "Central point of access to ProjectModel instances managed by EkekoModel for reification relations."
+   :author "Reinout Stevens"}
+  damp.ekeko.workspace.projectmodel
   (:require [damp.ekeko [ekekomodel :as ekekomodel]]))
 
 ; Eclipse Projects

@@ -2,7 +2,7 @@
   ^{:doc "Low-level relations of JDT ASTNodes, IJavaElements and IBindings."
     :author "Coen De Roover"}
   damp.ekeko.jdt.reification
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== type])
   (:use [clojure.core.logic])
   (:use [damp.ekeko logic])
   (:require 
@@ -10,15 +10,20 @@
     [damp.ekeko.jdt [javaprojectmodel :as javaprojectmodel] [astnode :as astnode]])
   (:import 
     [java.util Map]
-    [clojure.core.logic LVar]
     [damp.ekeko JavaProjectModel]
+    [damp.ekeko EkekoModel]
     [dk.itu.smartemf.ofbiz.analysis ControlFlowGraph]
-    [org.eclipse.jdt.core IJavaElement ITypeHierarchy]
+    [org.eclipse.core.runtime IProgressMonitor]
+    [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
+     IJavaProject WorkingCopyOwner IMethod]
     [org.eclipse.jdt.core.dom Expression IVariableBinding ASTParser AST IBinding Type TypeDeclaration 
-     QualifiedName SimpleName ITypeBinding
+     QualifiedName SimpleName ITypeBinding MethodDeclaration
      MethodInvocation ClassInstanceCreation SuperConstructorInvocation SuperMethodInvocation
      SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit]))
-          
+     
+(set! *warn-on-reflection* true)
+
+
 (declare nodes-of-type)
 
 ;TODO: implement variant of defne that takes modes for variables 
@@ -442,10 +447,10 @@
 
 (defn- 
   jdt-method-cfg [m]
-  (let [cu (.getRoot m)]
-    (when-let [el (.getJavaElement cu)]
+  (let [cu (.getRoot ^MethodDeclaration m)]
+    (when-let [el (.getJavaElement ^CompilationUnit cu)]
       (when-let [ijp (.getJavaProject el)]
-        (when-let [ejpm (.getJavaProjectModel (damp.ekeko.ekekomodel/ekeko-model) ijp)]
+        (when-let [ejpm (.getJavaProjectModel ^EkekoModel (damp.ekeko.ekekomodel/ekeko-model) ijp)]
           (.getControlFlowGraph ejpm m))))))
 
 (defn-
@@ -656,7 +661,7 @@
   itype-supertypehierarchy ;TODO: same for complete hierarchy, but those are presumably more expensive to construct and maintain
   [?itype ?typeHierarchy]
   (all
-    (equals ?typeHierarchy (.getSupertypeHierarchy ^damp.ekeko.EkekoModel (ekekomodel/ekeko-model) ?itype))))
+    (equals ?typeHierarchy (.getTypeHierarchy ^damp.ekeko.EkekoModel (ekekomodel/ekeko-model) ?itype))))
 
 
 ;Note that the JDT does not consider java.lang.Object to be a supertype of any interface type.
@@ -669,7 +674,7 @@
          (equals ?supers (.getAllSupertypes ^ITypeHierarchy ?hierarchy ?itype))))
 
 (defn 
-  itype-super-itype
+  type-super-type
   "Non-relational. Successively unifies ?itype with every 
    supertype of the given IType ?itype, in bottom-up order. 
 
@@ -715,5 +720,363 @@
     (equals ?ijavaelement (.getJavaElement ^IBinding ?ibinding))))
 
 
+;; Java Model Reification
+;; ----------------------
 
+(defn
+  packagefragmentroot
+  "Relation of IPackageFragmentRoot instances ?r."
+  [?r]
+  (let [roots (mapcat javaprojectmodel/javaproject-packagefragmentroots
+                      (javaprojectmodel/ekeko-javaprojects))]
+    (all
+      (contains roots ?r))))
+  
+(defn 
+  packagefragmentroot-from-binary
+  "Relation of IPackageFragmentRoot instances ?r that originate from byte code."
+  [?r]
+  (all
+    (packagefragmentroot ?r)
+    (succeeds (javaprojectmodel/packagefragmentroot-binary? ?r))))
+
+
+(defn 
+  packagefragmentroot-from-source
+  "Relation of IPackageFragmentRoot instances ?r that originate from source code."
+  [?r]
+  (all
+    (packagefragmentroot ?r)
+    (succeeds (javaprojectmodel/packagefragmentroot-source? ?r))))
+
+
+(defn
+  packagefragmentroot-fragment
+  "Relation between a IPackageFragmentRoot ?r and one of its IPckageFragment instances ?p." 
+  [?r ?f]
+  (all 
+    (packagefragmentroot ?r)
+    (contains (javaprojectmodel/packagefragmentroot-fragments ?r) ?f)))
+
+
+(defn
+  packagefragment 
+  "Relation of IPackageFragment instances."
+  [?f]
+  (fresh [?r]
+         (packagefragmentroot-fragment ?r ?f)))
+
+(defn
+  packagefragment-name
+  "Relation between an IPackageFragment ?f and its name String ?n." 
+  [?f ?n]
+  (fresh [?r]
+         (packagefragmentroot-fragment ?r ?f)
+         (equals ?n (javaprojectmodel/packagefragment-name ?f))))
+  
+
+(defn 
+  packagefragment-classfile
+  "Relation between an IPackageFragment ?f and one of its IClassFile instances ?c."
+  [?f ?c]
+  (all
+    (packagefragment ?f)
+    (contains (.getClassFiles ^IPackageFragment ?f) ?c)))
+
+(defn 
+  classfile
+  "Relation of IClassFile instances ?c."
+  [?c]
+  (fresh [?p]
+         (packagefragment-classfile ?p ?c)))
+
+(defn 
+  packagefragment-compilationunit
+  "Relation between an IPackageFragment ?f and one of its ICompilationUnit instances ?c."
+  [?f ?c]
+  (all
+    (packagefragment ?f)
+    (contains (.getCompilationUnits ^IPackageFragment ?f) ?c)))
+
+(defn 
+  compilationunit
+  "Relation of ICompilationUnit instances ?c"
+  [?c]
+  (fresh [?p]
+         (packagefragment-compilationunit ?p ?c)))
+
+(defn 
+  classfile-type
+  "Relation between an IClassFile ?c and the IType ?t it declares."
+  [?c ?t]
+  (all
+    (classfile ?c)
+    (equals ?t (.getType ^IClassFile ?c))))
+
+(defn 
+  compilationunit-type
+  "Relation between an ICompilationUnit ?c and one of the top-level IType instances ?t it declares."
+  [?c ?t]
+  (all
+    (compilationunit ?c)
+    (contains (.getTypes ^ICompilationUnit ?c) ?t)))
+
+
+
+(declare type-membertype)
+
+(defn
+  type
+  "Relation of IType instances ?t." 
+  [?t]
+  (conda [(v+ ?t) 
+          (succeeds (instance? IType ?t))]
+         [(v- ?t) 
+          (conde
+            [(fresh [?classfile]
+                    (classfile-type ?classfile ?t))]
+            [(fresh [?compilationunit ?toplevelt]
+                    (compilationunit-type ?compilationunit ?toplevelt)
+                    (conde [(== ?toplevelt ?t)]
+                           [(type-membertype ?toplevelt ?t)]))])]))
+
+
+(defn
+  type-from-source
+  "Relation of IType instances ?t that originate from a source file."
+  [?t]
+  (all 
+    (type ?t)
+    (equals false (.isBinary ^IType ?t))))
+
+(defn
+  type-from-binary
+  "Relation of IType instances ?t that originate from a binary file."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isBinary ^IType ?t))))
+
+
+(defn
+  type-membertype
+  "Relation of IType ?t and one of its immediate member types ?mt."
+  [?t ?mt]
+  (all
+    (type ?t)
+    (contains (.getTypes ^IType ?t) ?mt)))
+
+(defn
+  type-simplename
+  "Relation of IType ?t and its simple name String ?n."
+  [?t ?n]
+  (all
+    (type ?t)
+    (equals ?n (.getElementName ^IType ?t))))
+
+
+(defn
+  type-fullyqualifiedname
+  "Relation of IType ?t and its fully qualified name String ?n."
+  [?t ?n]
+  (conda 
+    [(v+ ?t)
+     (succeeds (instance? IType ?t))
+     (equals ?n (.getElementName ^IType ?t))]
+    [(v- ?t)
+     (conda [(v- ?n) 
+             (type ?t)
+             (type-fullyqualifiedname ?t ?n)]
+             [(v+ ?n)
+              (fresh [?types]
+                     (equals ?types (map 
+                                      (fn [p]
+                                        (let [^WorkingCopyOwner wco nil
+                                              ^IProgressMonitor pm nil]
+                                          (.findType ^IJavaProject p ^String ?n wco pm)))
+                                      (javaprojectmodel/ekeko-javaprojects)))
+                     (contains ?types ?t)
+                     (!= nil ?t))])]))
+
+(defn 
+  ast-type-type
+  "Relation between a type ASTNode ?ast, its keyword kind ?key, and the IType ?type it refers to.
+
+  See also:
+  ast-type-binding/3 which resolves a type ASTNode to an ITypeBinding."
+  [?key ?ast ?type]
+  (fresh [?binding]
+         (ast-type-binding ?key ?ast ?binding)
+         (binding-element ?binding ?type)))
+
+
+(defn
+  type-initializer
+  "Relation between an IType ?t and one of its IInitializer initializers ?i.
+
+   Note that their are none for binary types."
+  [?t ?i]
+  (all
+    (type ?t)
+    (contains (.getInitializers ^IType ?t) ?t)))
+
+(defn
+  initializer
+  "Relation of type initializers."
+  [?i]
+  (fresh [?t]
+         (type-initializer ?t ?i)))
+
+
+(defn
+  type-method
+  "Relation between IType ?t and one if its declared IMethod instances ?m."
+  [?t ?m]
+  (all
+    (type ?t)
+    (contains (.getMethods ^IType ?t) ?m)))
+
+(defn 
+  method
+  "Relation of IMethod instances.
+
+  See also: 
+  method-from-source/1 and method-from-binary/1."
+  [?m]
+  (fresh [?t]
+         (type-method ?t ?m)))
+
+(defn
+  method-from-source
+  "Relation of IMethod instances declared in a source type.
+
+  Note that (ast :MethodDeclaration ?m) is much more efficient
+  and corresponds to the relation of method ASTs."
+  [?m]
+  (fresh [?t]
+         (type-from-source ?t)
+         (type-method ?t ?m)))
+
+(defn 
+  method-from-binary
+  "Relation of IMethod instances declared in a binary type."
+  [?m]
+  (fresh [?t]
+         (type-from-binary ?t)
+         (type-method ?t ?m)))
+
+
+
+(defn
+  type-field
+  "Relation between IType ?t and one if its declared IField instances ?f."
+  [?t ?f]
+  (all
+    (type ?t)
+    (contains (.getFields ^IType ?t) ?f)))
+
+(defn 
+  field
+  "Relation of IField instances.
+
+  See also: 
+  field-from-source/1 and field-from-binary/1."
+  [?f]
+  (fresh [?t]
+         (type-field ?t ?f)))
+
+(defn
+  field-from-source
+  "Relation of IField instances declared in a source type."
+  [?f]
+  (fresh [?t]
+         (type-from-source ?t)
+         (type-field ?t ?f)))
+
+(defn 
+  field-from-binary
+  "Relation of IField instances declared in a binary type."
+  [?f]
+  (fresh [?t]
+         (type-from-binary ?t)
+         (type-field ?t ?f)))
+
+
+;TODO: method, field names
+
+
+
+(defn 
+  element
+  "Relation of IJavaElement instances ?element and the keyword ?key representing their kind."
+  [?key ?element]
+  (conda
+    [(v+ ?element)
+     (succeeds (instance? IJavaElement ?element))
+     (equals ?key (astnode/ekeko-keyword-for-class-of ?element))]
+    [(v- ?element)
+     (conda
+       [(== ?key :PackageFragmentRoot)
+        (packagefragmentroot ?element)]
+       [(== ?key :PackageFragment)
+        (fresh [?root]
+               (packagefragmentroot ?root)
+               (packagefragmentroot-fragment ?root ?element))]
+       [(== ?key :CompilationUnit)
+        (compilationunit ?element)]
+        [(== ?key :ClassFile)
+         (classfile ?element)]
+        [(== ?key :Type)
+         (type ?element)]
+        [(== ?key :Initializer)
+         (initializer ?element)]
+        [(== ?key :Method)
+         (method ?element)]
+        [(== ?key :Field)
+         (field ?element)]
+        )]))
+       
+(defn
+  type-typeparameters 
+  "Relation between an IType ?t and its formal type parameters ITypeParameter[] ?ps."
+  [?t ?ps]
+  (all
+    (type ?t)
+    (equals ?ps (.getTypeParameters ^IType ?t))))
+
+(declare method)
+(defn
+  method-typeparameters
+  "Relation between an IMethod ?m and its formal type parameters ITypeParameter[] ?ps."
+  [?m ?ps]
+  (all
+    (method ?m)
+    (equals ?ps (.getTypeParameters ^IMethod ?m))))
+
+
+(defn
+  element-typeparameter
+  "Relation of an IMethod or IType element ?e and one its formal ITypeParameter instances ?t."
+  [?e ?t]
+  (fresh [?ts]
+         (conde [(type-typeparameters ?e ?ts)]
+                [(method-typeparameters ?e ?ts)])
+         (contains ?ts ?t)))
+
+
+
+;(defn 
+;  packagefragment
+;  "Relation between a IPackageFragmentRoot ?r and its IPckageFragment instances ?p." 
+;  [?r ?f]
+;  (all
+;    (packagefragmentroot ?r)
+;    (package
+;  )
+
+;(defn
+;  element
+;  [?key ?element]
+;  (
+    
 

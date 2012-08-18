@@ -1,5 +1,5 @@
 (ns damp.ekeko.jdt.grinder
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
   (:use [damp.ekeko logic ekekomodel])
   (:use [damp.ekeko.jdt astnode reification basic soot])

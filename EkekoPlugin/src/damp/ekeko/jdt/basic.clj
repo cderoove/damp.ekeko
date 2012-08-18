@@ -2,7 +2,7 @@
   ^{:doc "Basic relations that are derived from the lower-level reification relations."
     :author "Coen De Roover"}
    damp.ekeko.jdt.basic
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== type])
   (:use [clojure.core.logic])
   (:use [damp.ekeko.logic])
   (:use [damp.ekeko.jdt.reification])
@@ -190,7 +190,7 @@
     (ast-declaration ?key ?ast)
     (child :modifiers ?ast ?mod)))
           
-         
+
 
 ;; Relation between ASTNodes and IJavaElements from the Eclipse Java Model
 ;; -----------------------------------------------------------------------
@@ -216,8 +216,7 @@
     (ast-root ?ast ?root)
     (equals ?project (.getJavaProject ^ICompilationUnit (.getJavaElement ^CompilationUnit ?root)))))
 
-                 
-
+            
 ;; IBinding
 ;; --------
 ; these predicates are non-relational as it is difficult to quantify over all possible IBindings
@@ -483,5 +482,71 @@
 
 
 
+;; Java Model Elements
+;; -------------------
+
+(defn
+  type-representing-annotation
+  "Relation of IType instances ?t that represent an annotation type."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isAnnotation ^IType ?t))))
+
+(defn
+  type-representing-anonymous
+  "Relation of IType instances ?t that represent an anonymous type."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isAnonymous ^IType ?t))))
+
+(defn
+  type-representing-class
+  "Relation of IType instances ?t that represent a class."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isClass ^IType ?t))))
+
+(defn
+  type-representing-enum
+  "Relation of IType instances ?t that represent an enumeration class."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isEnum ^IType ?t))))
+
+(defn
+  type-representing-interface
+  "Relation of IType instances ?t that represent an interface."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isInterface ^IType ?t))))
+
+(defn
+  type-representing-local
+  "Relation of IType instances ?t that represent a local type."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isLocal ^IType ?t))))
+
+(defn
+  type-representing-member
+  "Relation of IType instances ?t that represent a member type."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isMember ^IType ?t))))
+
+(defn
+  type-representing-resvoled
+  "Relation of IType instances ?t that represent a resolved type."
+  [?t]
+  (all 
+    (type ?t)
+    (succeeds (.isResolved ^IType ?t))))
 
 

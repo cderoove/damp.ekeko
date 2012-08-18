@@ -2,15 +2,13 @@
   ^{:doc "Main Ekeko namespace."
     :author "Coen De Roover"}
   damp.ekeko
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
   (:use [damp.ekeko logic gui])
   (:use [damp.ekeko.jdt reification basic soot])
   (:use [damp.qwal])
   (:import [org.eclipse.core.runtime.jobs Job]
            [org.eclipse.core.resources ResourcesPlugin]))
-
-(set! *warn-on-reflection* true)
 
 ;TODO: (core.logic 0.8 enables multiple variables in run)
 ;(def #^{:macro true} ekeko #'run)

@@ -52,5 +52,8 @@ Export-Package: damp.ekeko;
    org.eclipse.jdt.core.dom.rewrite,
    org.eclipse.jface.dialogs,
    damp.util",
+ damp.ekeko.jdt,
+ damp.ekeko.util,
+ damp.ekeko.workspace,
  damp.util
 Eclipse-BuddyPolicy: registered

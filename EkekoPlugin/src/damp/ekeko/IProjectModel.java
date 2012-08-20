@@ -11,5 +11,5 @@ public interface IProjectModel {
 	abstract public void populate(IProgressMonitor monitor) throws CoreException;
 
 	abstract public void processDelta(IResourceDelta delta, IProgressMonitor monitor) throws CoreException;
-	
+
 }

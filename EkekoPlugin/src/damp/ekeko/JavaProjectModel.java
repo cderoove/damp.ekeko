@@ -369,11 +369,11 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			}
 		}
 	}
-	
-	
+
 	
 	public void processDelta(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
-			delta.accept(new EkekoJavaProjectDeltaVisitor());	
+		super.processDelta(delta,monitor);	
+		delta.accept(new EkekoJavaProjectDeltaVisitor());	
 	}
 		
 	private void processNewCompilationUnit(ICompilationUnit icu) {

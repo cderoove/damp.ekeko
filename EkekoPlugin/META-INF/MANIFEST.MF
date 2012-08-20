@@ -32,7 +32,11 @@ Bundle-ClassPath: .,
  libs/sootclasses.jar,
  libs/qwal-1.0.0-SNAPSHOT.jar,
  libs/core.logic-0.7.5.jar
-Export-Package: damp.ekeko;
+Export-Package: baristaui.util,
+ clojure.core,
+ clojure.core.logic,
+ damp,
+ damp.ekeko;
   uses:="org.eclipse.core.runtime,
    org.eclipse.jface.resource,
    org.eclipse.ui,

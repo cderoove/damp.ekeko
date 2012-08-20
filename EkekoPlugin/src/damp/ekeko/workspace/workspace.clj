@@ -164,6 +164,7 @@
   (.join (Job/getJobManager) (ResourcesPlugin/FAMILY_AUTO_BUILD) nil))
 
 
+
 (defn 
   reduce-projects!
   "Clojure reduce over all projects in the workspace.

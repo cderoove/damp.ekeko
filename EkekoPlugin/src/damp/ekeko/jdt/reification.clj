@@ -162,6 +162,7 @@
 ;                [(tabled-child+ ?ch ?child)]))))    
   
 
+
 (defn
   ast-parent
   "Relation between an ASTNode instance ?ast and its parent node 
@@ -673,15 +674,19 @@
          (itype-supertypehierarchy ?itype ?hierarchy)
          (equals ?supers (.getAllSupertypes ^ITypeHierarchy ?hierarchy ?itype))))
 
+
+(declare type)
+
 (defn 
   type-super-type
-  "Non-relational. Successively unifies ?itype with every 
+  "Successively unifies ?itype with every 
    supertype of the given IType ?itype, in bottom-up order. 
 
    Note that the JDT does not consider java.lang.Object
    to be a supertype of any interface type."
   [?itype ?super-itype]
   (fresh [?supers]
+     (type ?itype)
      (itype-super-itypes ?itype ?supers)
      (contains ?supers ?super-itype)))
 
@@ -876,7 +881,7 @@
 
 
 (defn
-  type-fullyqualifiedname
+  type-qualifiedname
   "Relation of IType ?t and its fully qualified name String ?n."
   [?t ?n]
   (conda 
@@ -886,15 +891,16 @@
     [(v- ?t)
      (conda [(v- ?n) 
              (type ?t)
-             (type-fullyqualifiedname ?t ?n)]
+             (type-qualifiedname ?t ?n)]
              [(v+ ?n)
               (fresh [?types]
-                     (equals ?types (map 
-                                      (fn [p]
-                                        (let [^WorkingCopyOwner wco nil
-                                              ^IProgressMonitor pm nil]
-                                          (.findType ^IJavaProject p ^String ?n wco pm)))
-                                      (javaprojectmodel/ekeko-javaprojects)))
+                     (equals ?types (into #{}
+                                          (map 
+                                            (fn [p]
+                                              (let [^WorkingCopyOwner wco nil
+                                                    ^IProgressMonitor pm nil]
+                                                (.findType ^IJavaProject p ^String ?n wco pm)))
+                                            (javaprojectmodel/ekeko-javaprojects))))
                      (contains ?types ?t)
                      (!= nil ?t))])]))
 
@@ -1063,20 +1069,5 @@
                 [(method-typeparameters ?e ?ts)])
          (contains ?ts ?t)))
 
-
-
-;(defn 
-;  packagefragment
-;  "Relation between a IPackageFragmentRoot ?r and its IPckageFragment instances ?p." 
-;  [?r ?f]
-;  (all
-;    (packagefragmentroot ?r)
-;    (package
-;  )
-
-;(defn
-;  element
-;  [?key ?element]
-;  (
     
 

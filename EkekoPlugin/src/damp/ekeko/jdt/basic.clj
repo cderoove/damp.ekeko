@@ -542,7 +542,7 @@
     (succeeds (.isMember ^IType ?t))))
 
 (defn
-  type-representing-resvoled
+  type-representing-resolved
   "Relation of IType instances ?t that represent a resolved type."
   [?t]
   (all 

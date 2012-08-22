@@ -272,4 +272,11 @@
 
 
 
+;;Methods
+(defn has-same-body? [method1 method2]
+  (.subtreeMatch
+    method1
+    (new org.eclipse.jdt.core.dom.ASTMatcher)
+    method2))
+
 

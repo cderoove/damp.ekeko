@@ -14,7 +14,7 @@
 	<classpathentry exported="true" kind="lib" path="libs/java_cup.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/polyglot.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/sootclasses.jar" sourcepath="/Users/cderoove/Downloads/sootsrc-2.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.1-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.7.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

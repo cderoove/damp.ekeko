@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,11 +57,8 @@ public class EkekoModel {
 		}
 	}
 	
-	
-	
-	
-	
 	private EkekoModel() {
+		listeners = new HashSet<IEkekoModelUpdateListener>();
 		clean();
 	}
 	
@@ -78,6 +76,8 @@ public class EkekoModel {
     private Multimap<IProject, IProjectModel> projectModels = HashMultimap.create();
     
 	private IProject wholeProgramAnalysisProject;
+
+	private Set<IEkekoModelUpdateListener> listeners;
 	
 	public IProject getWholeProgramAnalysisProject() {
 		return wholeProgramAnalysisProject;
@@ -125,11 +125,13 @@ public class EkekoModel {
 	
 	public void removeProjectModel(IProject ip)  {
 		System.out.println("Removing an existing project from the model: " + ip.toString());
+		Collection<IProjectModel> removed = projectModels.get(ip);
 		projectModels.removeAll(ip);
 		if(hasWholeProgramAnalysisProject() 
-				&& getWholeProgramAnalysisProject().equals(ip))
+				&& getWholeProgramAnalysisProject().equals(ip)) 
 			wholeProgramAnalysisProject = null;
-	
+		for(IProjectModel m : removed)
+			notifyListeners(new EkekoModelRemovedEvent(m));
 	}
 	
 	public Collection<IProjectModel> getProjectModel(IResource rsc) {
@@ -228,8 +230,8 @@ public class EkekoModel {
 				projectModels.remove(project, m);
 			}
 		}	
-		projectModels.put(project,model); 
-		
+		projectModels.put(project,model); 	
+		notifyListeners(new EkekoModelAddedEvent(model));
 	}
 	
 	public void incrementalProjectBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
@@ -254,8 +256,22 @@ public class EkekoModel {
 		System.out.println("Updating a project in the model: " + ip.toString());
 		for (IProjectModel ipm : getProjectModel(ip)) {
 			ipm.processDelta(delta, monitor);
+			notifyListeners(new EkekoModelChangedEvent(ipm));
 		}
 	}
+	
+	public boolean addListener(IEkekoModelUpdateListener l) {
+		return listeners.add(l);
+	}
+
+	public boolean removeListener(IEkekoModelUpdateListener l) {
+		return listeners.remove(l);
+	}
+	
+	public void notifyListeners(EkekoModelUpdateEvent e) {
+		for(IEkekoModelUpdateListener listener : listeners)
+			listener.projectModelUpdated(e);
+	}	
 }
 
 	

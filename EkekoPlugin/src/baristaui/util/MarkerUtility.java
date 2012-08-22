@@ -47,7 +47,24 @@ public class MarkerUtility {
 		return instance;
 	}
 	
-	public Handle createMarker(ASTNode node) throws CoreException{
+	public IMarker tempNewMarker(ASTNode node) throws CoreException{
+		ASTNode root = node.getRoot();		
+		if (root instanceof CompilationUnit) {
+			CompilationUnit cu = (CompilationUnit) root;
+			int nodeLineNum = cu.getLineNumber(node.getStartPosition());
+			IMarker newMarker = cu.getJavaElement().getCorrespondingResource().createMarker(IResultMarkerType);
+			
+			newMarker.setAttribute(IMarker.LINE_NUMBER, nodeLineNum);
+			newMarker.setAttribute(IMarker.CHAR_START,node.getStartPosition());
+			newMarker.setAttribute(IMarker.CHAR_END, node.getStartPosition() + node.getLength());
+				
+			return newMarker;
+		}
+		return null;
+	}
+	
+public Handle createMarker(ASTNode node) throws CoreException{
+		
 		Handle handle= new Handle();
 		
 		ASTNode root = node.getRoot();
@@ -68,6 +85,7 @@ public class MarkerUtility {
 		
 		return handle;
 	}
+
 
 
 	private void registerNewMarker(Handle handle, IMarker newMarker) {

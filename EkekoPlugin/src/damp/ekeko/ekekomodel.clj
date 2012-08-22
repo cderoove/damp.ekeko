@@ -55,6 +55,19 @@
     (all-project-models)))
 
 
+(defn 
+  register-listener
+  "Registers EkekoModelUpdateListener ?l."
+  [?l]
+  (.addListener (ekeko-model) ?l))
+  
+(defn
+  unregister-listener
+  "Unregisters EkekoModelUpdateListener ?l."
+  [?l]
+  (.removeListener (ekeko-model) ?l))
+
+
 
 
 

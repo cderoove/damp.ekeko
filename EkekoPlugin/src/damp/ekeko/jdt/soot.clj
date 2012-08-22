@@ -2,7 +2,7 @@
   ^{:doc "Relations between JDT ASTNodes and SOOT whole-program analyses."
     :author "Coen De Roover"}
   damp.ekeko.jdt.soot
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== type])
   (:use [clojure.core.logic])
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.jdt reification basic])

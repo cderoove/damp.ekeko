@@ -17,5 +17,7 @@
 (defn deep-memberso [mems]
   (membero mems (mapcat projectmodel/get-deep-members (ekekomodel/queried-project-models))))
 
-   
 
+(defn file-extensiono [extension]
+  (let [extensions (seq (set (mapcat projectmodel/file-extensions (ekekomodel/queried-project-models))))]
+    (membero extension extensions)))

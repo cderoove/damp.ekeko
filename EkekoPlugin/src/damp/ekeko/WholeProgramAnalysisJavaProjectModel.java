@@ -73,14 +73,14 @@ public class WholeProgramAnalysisJavaProjectModel extends JavaProjectModel {
 	private String[] sootMainArguments() {
 		//mind the separators (i.e., a single space), see split statement
 
-		String geometricString = "-soot-classpath " + classPathForBaseProgram() + ":" + classPathForJavaRTE() +
+		String geometricString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
 				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
 				"-p cg.spark geom-pta:true,geom-trans:false -p jap.npc on -main-class "//,geom-eval:2 for some stats
 				+ entryPoint()
 				+ " " 
 				+ entryPoint();
 		
-		String refinementString = "-soot-classpath " + classPathForBaseProgram() + ":" + classPathForJavaRTE() +
+		String refinementString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
 				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
 				"-p cg.spark cs-demand:true -p jap.npc on -main-class "// lazy-pts:true
 				+ entryPoint()
@@ -98,16 +98,22 @@ public class WholeProgramAnalysisJavaProjectModel extends JavaProjectModel {
 			return "";
 		}
 	}
-
-	private String classPathForJavaRTE() {
+	
+	private String getClassPathSeparator() {
+		return System.getProperty("path.separator");
+	}
+	
+ 	private String classPathForJavaRTE() {
 		try {
 			IVMInstall vmInstall = JavaRuntime.getVMInstall(getJavaProject());
 			LibraryLocation[] locs = JavaRuntime.getLibraryLocations(vmInstall);
 			String[] stringlocs = new String[locs.length];
 			int i=0;
+			
 			for(LibraryLocation loc : locs)
 				stringlocs[i++]=loc.getSystemLibraryPath().toOSString();
-			return Joiner.on(":").join(stringlocs);
+			
+			return Joiner.on(getClassPathSeparator()).join(stringlocs);
 		} catch (CoreException e) {
 			e.printStackTrace();
 			return "";
@@ -116,7 +122,7 @@ public class WholeProgramAnalysisJavaProjectModel extends JavaProjectModel {
 
 	private String classPathForBaseProgram() {
 		try {
-			return Joiner.on(":").join(JavaRuntime.computeDefaultRuntimeClassPath(getJavaProject()));
+			return Joiner.on(getClassPathSeparator()).join(JavaRuntime.computeDefaultRuntimeClassPath(getJavaProject()));
 		} catch(CoreException e) {
 			e.printStackTrace();
 			return "";

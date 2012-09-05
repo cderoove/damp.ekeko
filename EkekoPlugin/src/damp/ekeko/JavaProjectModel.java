@@ -201,19 +201,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 
 	public CompilationUnit[] parse(ICompilationUnit[] icus, IProgressMonitor monitor) {
-		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
-		parser = ASTParser.newParser(AST.JLS4); //seems better than reusing the existing one (ran out of memory on azureus otherwise)
-			
 		final CompilationUnit[] compilationUnits = new CompilationUnit[icus.length];
-		
-		/*
-		ASTRequestor requestor = new ASTRequestor() { 
-			private int current=0;
-			public void acceptAST(ICompilationUnit source, CompilationUnit ast){
-				compilationUnits[current++] = ast;
-			};
-		};
-		*/
 		
 		//Normally, would parse entire batch of ICompilationUnits
 		//But there is an annoying known bug:
@@ -223,29 +211,23 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		//The following is a lot slower, but seems to work fine
 		//TODO: upon new JDT release, check whether bug has been resolved
 		int i = 0;
-		for(ICompilationUnit icu : icus) {
-			parser.setResolveBindings(true);
-			parser.setKind(ASTParser.K_COMPILATION_UNIT);
-			parser.setProject(javaProject);
-		    parser.setStatementsRecovery(false);
-		    parser.setBindingsRecovery(false);
-		    parser.setSource(icu);
-		    compilationUnits[i++] = (CompilationUnit) parser.createAST(monitor);
-		}
-			
+		for(ICompilationUnit icu : icus) 
+		    compilationUnits[i++] = parse(icu, monitor);
 		return compilationUnits;
 	}
 	
 	public CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
-		ICompilationUnit[] icus = {icu};
-		return (parse(icus, monitor))[0];
-		
-				
+		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
+		parser = ASTParser.newParser(AST.JLS4); //seems better than reusing the existing one (ran out of memory on azureus otherwise)			
+		parser.setResolveBindings(true);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		parser.setProject(javaProject);
+		parser.setStatementsRecovery(false);
+		parser.setBindingsRecovery(false);
+		parser.setSource(icu);
+		return (CompilationUnit) parser.createAST(monitor);
 	}
 	
-	
-			
-
 
 	public void clean() {
 		super.clean();
@@ -291,8 +273,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	}
 	
-	
-	
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
 		System.out.println("Populating JavaProjectModel for: " + javaProject.getElementName());
@@ -311,7 +291,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		for(CompilationUnit cu : icu2ast.values()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
-		System.out.println("Gathered information from compilation units in " + duration + "ms");	
+		System.out.println("Gathered information from JDT compilation units in " + duration + "ms");	
 	}
 
 	

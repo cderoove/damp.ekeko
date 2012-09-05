@@ -13,7 +13,8 @@
                               Annotation
                               IBinding
                               Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
-                              DoStatement SynchronizedStatement TryStatement WhileStatement]
+                              DoStatement SynchronizedStatement TryStatement WhileStatement
+                              MethodDeclaration]
                               ))
 
 
@@ -270,10 +271,8 @@
       (instance? SwitchStatement node)))
 
 
-
-
 ;;Methods
-(defn has-same-body? [method1 method2]
+(defn has-same-body? [^MethodDeclaration method1 ^MethodDeclaration method2]
   (.subtreeMatch
     method1
     (new org.eclipse.jdt.core.dom.ASTMatcher)

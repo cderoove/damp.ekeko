@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,23 +124,33 @@ public class EkekoModel {
 		return getProjectModel(ip) != null;
 	}
 	
-	public void removeProjectModel(IProject ip)  {
+	public void removeProjectModels(IProject ip)  {
 		System.out.println("Removing an existing project from the model: " + ip.toString());
 		Collection<IProjectModel> removed = projectModels.get(ip);
 		projectModels.removeAll(ip);
-		if(hasWholeProgramAnalysisProject() 
-				&& getWholeProgramAnalysisProject().equals(ip)) 
+		if(hasWholeProgramAnalysisProject() && getWholeProgramAnalysisProject().equals(ip)) 
 			wholeProgramAnalysisProject = null;
 		for(IProjectModel m : removed)
 			notifyListeners(new EkekoModelRemovedEvent(m));
 	}
 	
+	public void removeProjectModel(IProject ip, IProjectModel m)  {
+		Collection<IProjectModel> models = projectModels.get(ip);
+		models.remove(m);	
+		if(hasWholeProgramAnalysisProject() && getWholeProgramAnalysisProject().equals(ip)) 
+			wholeProgramAnalysisProject = null;
+		notifyListeners(new EkekoModelRemovedEvent(m));
+	}
+	
 	public Collection<IProjectModel> getProjectModel(IResource rsc) {
 		return getProjectModel(rsc.getProject());
 	}
-	
+
 	public JavaProjectModel getJavaProjectModel(IJavaProject p) {
-		IResource rsc = p.getResource();
+		return getJavaProjectModel(p.getResource());
+	}
+	
+	public JavaProjectModel getJavaProjectModel(IResource rsc) {
 		if(rsc == null)
 			return null;
 		//return (JavaProjectModel) getProjectModel(rsc);
@@ -165,8 +176,6 @@ public class EkekoModel {
 			return null;
 		return jpm.getTypeHierarchy(type);
 	}
-	
-
 	
 	public void clean() {
 		System.out.println("Cleaning the model.");
@@ -224,13 +233,18 @@ public class EkekoModel {
 	}
 
 	private void addProjectModel(IProject project, IProjectModel model){
+		//remove existing project models of the same class as model
 		Collection<IProjectModel> models = projectModels.get(project);
-		for(IProjectModel m: models){
-			if(m.getClass().equals(model.getClass())){
-				projectModels.remove(project, m);
-			}
-		}	
+		Iterator<IProjectModel> i = models.iterator();
+		while(i.hasNext()) {
+			IProjectModel m = i.next();
+			if(m.getClass().equals(model.getClass()))
+				i.remove(); //safe
+		}		
 		projectModels.put(project,model); 	
+		//notify the model it has been added 
+		model.addedToEkekoModel(this, models);
+		//notify listeners
 		notifyListeners(new EkekoModelAddedEvent(model));
 	}
 	
@@ -241,7 +255,7 @@ public class EkekoModel {
 		if(resourceType == IResource.PROJECT) {
 			if (!ip.hasNature(EkekoNature.NATURE_ID)) {
 				System.out.println("Removing project from model as nature was removed: " + ip.toString());
-				removeProjectModel(ip);
+				removeProjectModels(ip);
 				return;
 			}					
 			switch (delta.getKind()) {
@@ -249,7 +263,7 @@ public class EkekoModel {
 				fullProjectBuild(ip, monitor);
 				return;
 			case IResourceDelta.REMOVED:
-				removeProjectModel(ip);
+				removeProjectModels(ip);
 				return;
 			}
 		}

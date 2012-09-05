@@ -49,7 +49,7 @@ public class EkekoNature implements IProjectNature {
 				project.setDescription(description, null);
 				System.out.println("Ekeko project nature removed from: " + project.getName());
 				//Doesn't happen automatically
-				EkekoModel.getInstance().removeProjectModel(project);
+				EkekoModel.getInstance().removeProjectModels(project);
 				return;
 			}
 		}

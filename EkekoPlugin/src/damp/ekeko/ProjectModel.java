@@ -1,5 +1,7 @@
 package damp.ekeko;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -22,14 +24,15 @@ public class ProjectModel implements IProjectModel {
 	}
 	
 	public void clean() {
-		
 	}
 	
 	public void populate(IProgressMonitor monitor) throws CoreException {
 	}
 
 	public void processDelta(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
-		
+	}
+	
+	public void addedToEkekoModel(EkekoModel m, Collection<IProjectModel> projectModels) {
 	}
 
 }

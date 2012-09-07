@@ -200,24 +200,38 @@ public class EkekoModel {
 			return Arrays.asList(new WholeProgramAnalysisJavaProjectModel(p));
 		
 		String[] natures = p.getDescription().getNatureIds();
-		ArrayList<IProjectModelFactory> applicableFactories = new ArrayList<IProjectModelFactory>();
+		Set<IProjectModelFactory> applicableFactories = new HashSet<IProjectModelFactory>();
 		for(int i = 0; i < natures.length; ++i){
-			for(IProjectModelFactory fac : factories){
-				if(fac.applicableNatures().contains(natures[i])){
+			for(IProjectModelFactory fac : factories){				
+				if(fac.applicableNatures().contains(natures[i])) {
 					applicableFactories.add(fac);
 				}
 			}
 		}
-		if(applicableFactories.isEmpty()){
+
+		
+		//each factory is given the applicable factories for the project
+		//are allowed to filter out factories they conflict with
+		//intersection of all approved factories is the final one
+		Set<IProjectModelFactory> approvedFactories = new HashSet<IProjectModelFactory>();
+		approvedFactories.addAll(applicableFactories);
+		for(IProjectModelFactory fac : applicableFactories) 
+			approvedFactories.removeAll(fac.conflictingFactories(p, applicableFactories));
+	
+		
+		if(approvedFactories.isEmpty()){
 			return Arrays.asList(new ProjectModel(p));
 		} else {
-			ArrayList<IProjectModel> applicableProjectModels = new ArrayList<IProjectModel>(applicableFactories.size());
-			for (IProjectModelFactory iProjectModelFactory : applicableFactories) {
+			ArrayList<IProjectModel> applicableProjectModels = new ArrayList<IProjectModel>(approvedFactories.size());
+			for (IProjectModelFactory iProjectModelFactory : approvedFactories) {
 				applicableProjectModels.add(iProjectModelFactory.createModel(p));
 			}
 			return applicableProjectModels;
 		}
 	}
+	
+	
+	
 	
 	
 	public void fullProjectBuild(IProject project, IProgressMonitor monitor) throws CoreException {

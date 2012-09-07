@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import org.aspectj.org.eclipse.jdt.core.dom.*;
@@ -154,6 +155,9 @@ public class AspectJProjectModel extends JavaProjectModel {
 				&& ((JavaProjectModel) m).getProject().equals(getProject());
 	}
 	
+	/*
+	 CME-safe version relies on factories to veto other factories 
+	 
 	@Override
 	public void addedToEkekoModel(final EkekoModel em,
 			Collection<IProjectModel> projectModels) {
@@ -185,5 +189,11 @@ public class AspectJProjectModel extends JavaProjectModel {
 			}
 		});
 	}
+	*/
 
+	@Override
+	protected void addControlFlowGraphInformationForMethodDeclaration(MethodDeclaration m) {
+	}
+	
+	
 }

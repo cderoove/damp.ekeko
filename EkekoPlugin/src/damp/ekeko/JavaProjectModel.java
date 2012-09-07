@@ -561,10 +561,8 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			if(key != null)
 				methodDeclarations.put(key,m);
 			else 
-				methodDeclarationsWithoutBinding.add(m);
-			ControlFlowGraph cfg = newControlFlowGraph(m);
-			if(cfg != null)
-				controlFlowGraphs.put(m,cfg);
+				methodDeclarationsWithoutBinding.add(m);			
+			addControlFlowGraphInformationForMethodDeclaration(m);
 		}
 		
 		for(FieldDeclaration f : v.fieldDeclarations) 
@@ -619,7 +617,13 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 	}	
 		
-	
+
+	protected void addControlFlowGraphInformationForMethodDeclaration(MethodDeclaration m) {
+		ControlFlowGraph cfg = newControlFlowGraph(m);
+		if(cfg != null)
+			controlFlowGraphs.put(m,cfg);
+		
+	}
 
 	protected void removeInformationFromVisitor(TableGatheringVisitor v) {
 		for(Expression e : v.expressions)

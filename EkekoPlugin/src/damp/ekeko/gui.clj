@@ -5,7 +5,7 @@
    (:import [org.eclipse.ui IWorkbench PlatformUI IWorkbenchPage IWorkingSet IWorkingSetManager]
             [org.eclipse.swt.widgets Display]
             [org.eclipse.jface.window Window]
-            [baristaui.views.queryResult QueryView]))
+            [baristaui.views.queryResult QueryView SOULLabelProvider]))
 
 ;; UI thread helpers
 ;; -----------------
@@ -68,9 +68,13 @@
 ;; ----------------------
 (def viewer-cnt (atom 0))
 
+
+(def label-provider-class SOULLabelProvider)
+
 (defn 
   open-barista-results-viewer* 
-  "Opens and returns a Barista view on core.logic results."
+  "Opens and returns a Barista view on core.logic results. 
+   Creates an instance of damp.ekeko.gui/label-provider-class as the label provider for the results."
   [querytxt logicvars resultsqc elapsed cnt]
   (let [tomap 
         (fn [sqc]
@@ -93,6 +97,9 @@
     (swap! viewer-cnt inc)
     (.setViewID viewpart uniqueid)
     (.setQuery viewpart querytxt)
+    (.setLabelProvider viewpart (clojure.lang.Reflector/invokeConstructor 
+                                  label-provider-class
+                                  (to-array [])))
     (.updateResultViews viewpart resultmap elapsed cnt)
     viewpart))
 

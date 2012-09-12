@@ -55,7 +55,7 @@ public class QueryView extends ViewPart {
 
 	// private IEvaluator evaluator;
 	private TableViewer tableViewer;
-	private TableViewerConfigurator tableConf = new TableViewerConfigurator();
+	private TableViewerConfigurator tableConf;  
 	private TabItem tableResultViewTab;
 	private TabItem columnResultViewTab;
 	private TabFolder views;
@@ -72,7 +72,6 @@ public class QueryView extends ViewPart {
 
 	private TabItem treeResultView;
 
-	private TreeViewerConfigurator conf = new TreeViewerConfigurator();
 
 	private Button nextResult;
 
@@ -92,12 +91,34 @@ public class QueryView extends ViewPart {
 
 	private String viewID;
 
+	private SOULLabelProvider provider;
+	
+	private TreeViewerConfigurator conf;
+
+
 	public String getViewID() {
 		return viewID;
 	}
 
 	public QueryView() {
+		provider = new SOULLabelProvider();
+		conf = new TreeViewerConfigurator(provider);
+		tableConf = new TableViewerConfigurator(provider);
 	}
+	
+	public void setLabelProvider(SOULLabelProvider p) {
+		provider = p;
+		conf = new TreeViewerConfigurator(provider);
+		tableConf = new TableViewerConfigurator(provider);
+	}
+	
+	/*
+	public void updateLabelProvider(SOULLabelProvider p) {
+		provider = p;
+		String elapsed = timeElapsed.getText();
+		updateResultViews(currentResults, Integer.valueOf(elapsed.substring(0, elapsed.length() - 3)),  Integer.valueOf(totalResults.getText()));
+	}
+	*/
 
 	public void updateResultViews(Map<String, List<Object>> resultmap, long elapsed, long total) {
 		totalResults.setText("" + total);
@@ -455,7 +476,7 @@ public class QueryView extends ViewPart {
 		columnView.setLayout(new GridLayout(variables.length, true));
 		TableViewer[] columns = new TableViewer[variables.length];
 		TreeResultContentProvider trcp = new TreeResultContentProvider(variables);
-		SOULTreeLabelProvider labelProvider = new SOULTreeLabelProvider();
+		SOULTreeLabelProvider labelProvider = new SOULTreeLabelProvider(provider);
 		IContentProvider provider = new ArrayContentProvider();
 		GridData columnLayout = new GridData(SWT.FILL, SWT.FILL, true, true);
 		// columnLayout.widthHint = 200;

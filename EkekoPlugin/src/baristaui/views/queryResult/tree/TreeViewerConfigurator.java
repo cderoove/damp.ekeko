@@ -6,15 +6,22 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import barista.IResults;
+import baristaui.views.queryResult.SOULLabelProvider;
 
 public class TreeViewerConfigurator {
 
 	private TreeViewer viewer;
 
+	private SOULLabelProvider provider;
+	
+	public TreeViewerConfigurator(SOULLabelProvider p) {
+		super();
+		provider = p;
+	}
 	
 	public void configureFor(Map<String, List<Object>> results, String[] variables){
 		viewer.setContentProvider(new TreeResultContentProvider(variables));
-		viewer.setLabelProvider(new SOULTreeLabelProvider());
+		viewer.setLabelProvider(new SOULTreeLabelProvider(provider));
 		
 		viewer.setInput(results);
 	}

@@ -9,18 +9,23 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TableColumn;
 
 import barista.IResults;
+import baristaui.views.queryResult.SOULLabelProvider;
 
 public class TableViewerConfigurator {
 	
 	private TableViewer viewer;
 
+	private SOULLabelProvider provider;
 	
+	public TableViewerConfigurator(SOULLabelProvider p) {
+		provider = p;
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void configureFor(Map<String,List<Object>> results, String[] variables){
 		for (int i = 0; i < variables.length; i++) {
 			TableViewerColumn column = createTableViewerColumn(variables[i], 100, i);
-			column.setLabelProvider(new SOULTableLabelProvider(variables[i]));
+			column.setLabelProvider(new SOULTableLabelProvider(variables[i], provider));
 		}
 		
 		getViewer().setContentProvider(new IResultContentProvider(results,variables));

@@ -22,7 +22,7 @@ public class SOULLabelProvider extends LabelProvider {
 	}
 	
 	
-	String prettyPrint(Object object) {
+	public String prettyPrint(Object object) {
 		if(object == null) {
 			return "nil";
 		}

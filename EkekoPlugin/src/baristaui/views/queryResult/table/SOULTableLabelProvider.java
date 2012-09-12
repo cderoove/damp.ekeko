@@ -17,14 +17,17 @@ import baristaui.views.queryResult.SOULLabelProvider;
 public class SOULTableLabelProvider extends ColumnLabelProvider {
 
 	private String key;
-	private SOULLabelProvider soulProvider = new SOULLabelProvider();
-		
-	public SOULTableLabelProvider(String key) {
+	
+	private SOULLabelProvider soulProvider;
+	
+	public SOULTableLabelProvider(String key, SOULLabelProvider p) {
 		super();
+		soulProvider = p;
 		this.key = key;
+
 	}
 
-	
+			
 	@Override
 	public Image getImage(Object element) {
 		Object object = null;

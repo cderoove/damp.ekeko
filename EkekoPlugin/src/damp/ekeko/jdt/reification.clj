@@ -644,8 +644,6 @@
 ; Reification of Eclipse Java Model
 ; ---------------------------------
 
-; TODO: properly reify IJavaElement(s) so these become relational!
-
 
 (defn- 
   element-ekeko-model 

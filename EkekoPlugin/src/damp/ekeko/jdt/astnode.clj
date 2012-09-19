@@ -1,4 +1,5 @@
 (ns damp.ekeko.jdt.astnode
+  (:require [damp.util [interop :as interop]])
   (:import 
     [java.lang Class]
     [java.lang.reflect Field]
@@ -167,27 +168,19 @@
     (zipmap (map (fn [^StructuralPropertyDescriptor p] (keyword (property-descriptor-id p))) descriptors)
             (map (fn [^StructuralPropertyDescriptor p] (fn [] (node-property-value n p))) descriptors))))
 
-;from former (ns clojure.contrib.reflect)
-(defn get-invisible-field
-  "Access to private or protected field.  field-name is a symbol or
-  keyword."
-  [klass field-name obj]
-  (-> ^Class klass ^Field (.getDeclaredField (name field-name))
-      (doto (.setAccessible true))
-      (.get obj)))
 
 (defn owner [n-or-nlist]
   (if 
     (instance? ASTNode n-or-nlist)
     (.getParent ^ASTNode n-or-nlist)
     ;outer instance of nodelist is owner
-    (get-invisible-field (class ^ASTNode$NodeList n-or-nlist) (symbol "this$0") n-or-nlist)))
+    (interop/get-invisible-field (class ^ASTNode$NodeList n-or-nlist) (symbol "this$0") n-or-nlist)))
 
 (defn owner-property [n-or-nlist]
    (if 
      (instance? ASTNode n-or-nlist)
      (.getLocationInParent ^ASTNode n-or-nlist)
-     (get-invisible-field (class ^ASTNode$NodeList n-or-nlist) 'propertyDescriptor n-or-nlist)))
+     (interop/get-invisible-field (class ^ASTNode$NodeList n-or-nlist) 'propertyDescriptor n-or-nlist)))
 
 (defprotocol IAST
   (reifiers [this] 

@@ -1,6 +1,5 @@
-package damp.ekeko;
+package damp.ekeko.soot;
 
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -8,8 +7,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
@@ -24,13 +23,23 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 
-public class WholeProgramAnalysisJavaProjectModel extends JavaProjectModel {
+import damp.ekeko.EkekoProjectPropertyPage;
+import damp.ekeko.ProjectModel;
+
+public class SootProjectModel extends ProjectModel {
 	
 	private boolean stale = false;
 	private Scene scene;
+	private IJavaProject javaProject;
 
-	public WholeProgramAnalysisJavaProjectModel(IProject p) {
+	public IJavaProject getJavaProject() {
+		return javaProject;
+	}
+
+	public SootProjectModel(IProject p) {
 		super(p);
+		javaProject = JavaCore.create(p);
+		clean();
 	}
 
 	public void clean() {
@@ -40,7 +49,7 @@ public class WholeProgramAnalysisJavaProjectModel extends JavaProjectModel {
 
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
-		System.out.println("Populating WholeProgramAnalysisModel for: " + getProject().getName());
+		System.out.println("Populating SootProjectModel for: " + getProject().getName());
 		populateAnalysisInformation(monitor);
 	}
 

@@ -23,7 +23,7 @@
  * contributors.  (Soot is distributed at http://www.sable.mcgill.ca/soot)
  */
 
-package damp.ekeko;
+package damp.ekeko.soot;
 
 
 import java.io.FileOutputStream;

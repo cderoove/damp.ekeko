@@ -5,6 +5,7 @@
   (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
   (:use [damp.ekeko logic gui])
+  (:use [damp.ekeko.soot soot])
   (:use [damp.ekeko.jdt reification basic soot])
   (:use [damp.qwal])
   (:import [org.eclipse.core.runtime.jobs Job]

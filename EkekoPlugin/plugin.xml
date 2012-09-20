@@ -45,7 +45,7 @@
             commandId="damp.ekeko.commands.disableNatureOnAll">
       </handler>
       <handler
-            class="damp.ekeko.SootProjectSelectionHandler"
+            class="damp.ekeko.soot.SootProjectSelectionHandler"
             commandId="damp.ekeko.commands.showWholeProgramAnalysesSettings">
       </handler>
    </extension>
@@ -176,8 +176,12 @@
       
    </extension>
    
+   <extension
+         point="ekeko.projectModelFactory">
+      <contributedFactory factory="damp.ekeko.soot.SootProjectModelFactory">
+      </contributedFactory>
+   </extension>
 
-   
    
    <extension
          id="ekekoNature"
@@ -272,6 +276,16 @@
             </instanceof>
         </enabledWhen>
     </page>
+</extension>
+<extension
+      id="sootNature"
+      name="Ekeko Soot Project Nature"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="damp.ekeko.soot.SootNature">
+      </run>
+   </runtime>
 </extension>
 
 </plugin>

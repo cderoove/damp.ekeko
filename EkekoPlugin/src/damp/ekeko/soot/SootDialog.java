@@ -1,4 +1,4 @@
-package damp.ekeko;
+package damp.ekeko.soot;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -37,7 +37,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
-public class WholeProgramAnalysisDialog extends TitleAreaDialog {
+import damp.ekeko.EkekoModel;
+import damp.ekeko.EkekoNature;
+import damp.ekeko.EkekoProjectPropertyPage;
+
+public class SootDialog extends TitleAreaDialog {
 
 
 	private Text projectNameText;
@@ -46,7 +50,7 @@ public class WholeProgramAnalysisDialog extends TitleAreaDialog {
 	private String entryPoint;
 	
 
-	public WholeProgramAnalysisDialog(Shell parentShell) {
+	public SootDialog(Shell parentShell) {
 		super(parentShell);
 	}
 
@@ -157,7 +161,7 @@ public class WholeProgramAnalysisDialog extends TitleAreaDialog {
 
 	protected void handleEntryPointButtonSelected() {
 		IJavaProject project = getProjectCorrespondingToCurrentEntry();
-		IType type = WholeProgramAnalysisDialog.chooseMainType(getShell(), project);
+		IType type = SootDialog.chooseMainType(getShell(), project);
 		if (type != null) {
 			entryPointText.setText(type.getFullyQualifiedName());
 		}
@@ -268,16 +272,16 @@ public class WholeProgramAnalysisDialog extends TitleAreaDialog {
 		projectName = projectNameText.getText().trim();
 		entryPoint = entryPointText.getText().trim();
 		IJavaProject project = getProjectCorrespondingToCurrentEntry();
+		if(project == null)
+			return;
 		try {
-			if(project == null) {
-				EkekoModel.getInstance().setWholeProgramAnalysisProject(null);
-				return;
-			}
+			IProject p = project.getProject();
 			project.getResource().setPersistentProperty(EkekoProjectPropertyPage.ENTRYPOINT_PROPERTY, entryPoint);
-			EkekoModel.getInstance().setWholeProgramAnalysisProject(project.getProject());
+			damp.util.Natures.addNature(p, SootNature.NATURE_ID);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	@Override
@@ -360,7 +364,8 @@ public class WholeProgramAnalysisDialog extends TitleAreaDialog {
 
 	
 	private static IProject getModelProject(){
-		return EkekoModel.getInstance().getWholeProgramAnalysisProject();
+		//return EkekoModel.getInstance().getWholeProgramAnalysisProject();
+		return null;
 	}
 	
 

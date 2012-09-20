@@ -61,5 +61,9 @@ Export-Package: baristaui.util,
    damp.ekeko.util,
    damp.ekeko.workspace,
    damp.util",
+ damp.ekeko.jdt,
+ damp.ekeko.soot,
+ damp.ekeko.util,
+ damp.ekeko.workspace,
  damp.util
 Eclipse-BuddyPolicy: registered

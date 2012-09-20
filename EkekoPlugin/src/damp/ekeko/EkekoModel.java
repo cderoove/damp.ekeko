@@ -2,18 +2,12 @@ package damp.ekeko;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -22,9 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -32,10 +24,9 @@ import com.google.common.collect.Multimap;
 
 public class EkekoModel {
 	
-	private static Collection<IProjectModelFactory> factories =
-			new ArrayList<IProjectModelFactory>();
+	private static Collection<IProjectModelFactory> factories = new ArrayList<IProjectModelFactory>();
 	
-	
+
 	public static boolean registerFactory(IProjectModelFactory factory){
 		return factories.add(factory);
 	}
@@ -71,50 +62,10 @@ public class EkekoModel {
     public static EkekoModel getInstance() {
 		return LazyHolder.INSTANCE;
 	}
-		
-	//private java.util.concurrent.ConcurrentHashMap<IProject,IProjectModel> projectModels;	
-	
+			
     private Multimap<IProject, IProjectModel> projectModels = HashMultimap.create();
     
-	private IProject wholeProgramAnalysisProject;
-
 	private Set<IEkekoModelUpdateListener> listeners;
-	
-	public IProject getWholeProgramAnalysisProject() {
-		return wholeProgramAnalysisProject;
-	}
-	
-	public boolean hasWholeProgramAnalysisProject() {
-		return wholeProgramAnalysisProject != null;
-	}
-	
-	public IProjectModel getWholeProgramAnalysisProjectModel() {
-		if(!hasWholeProgramAnalysisProject())
-			return null;
-		for (IProjectModel ipm : getProjectModel(getWholeProgramAnalysisProject())) {
-			return ipm; //first one we find
-		}
-		return null;
-	}
-
-	public void setWholeProgramAnalysisProject(IProject project) throws CoreException {
-		if(project == null) {
-			if(hasWholeProgramAnalysisProject()) {
-				IProject old = getWholeProgramAnalysisProject();
-				rebuildModel(old,null); //reset
-				return;
-			} 
-		}
-		rebuildModel(project,project);
-	}
-	
-	private void rebuildModel(IProject project, IProject newWholeProgramAnalysisProject) throws CoreException {
-		if(project.hasNature(EkekoNature.NATURE_ID)) 
-			toggleNature(project); //removes the project's model
-		wholeProgramAnalysisProject = newWholeProgramAnalysisProject;
-		toggleNature(project); //(re)-builds the project's model
-	}
-
 	
 	public Collection<IProjectModel> getProjectModel(IProject ip) {
 		return projectModels.get(ip);
@@ -128,8 +79,6 @@ public class EkekoModel {
 		System.out.println("Removing an existing project from the model: " + ip.toString());
 		Collection<IProjectModel> removed = projectModels.get(ip);
 		projectModels.removeAll(ip);
-		if(hasWholeProgramAnalysisProject() && getWholeProgramAnalysisProject().equals(ip)) 
-			wholeProgramAnalysisProject = null;
 		for(IProjectModel m : removed)
 			notifyListeners(new EkekoModelRemovedEvent(m));
 	}
@@ -137,8 +86,6 @@ public class EkekoModel {
 	public void removeProjectModel(IProject ip, IProjectModel m)  {
 		Collection<IProjectModel> models = projectModels.get(ip);
 		models.remove(m);	
-		if(hasWholeProgramAnalysisProject() && getWholeProgramAnalysisProject().equals(ip)) 
-			wholeProgramAnalysisProject = null;
 		notifyListeners(new EkekoModelRemovedEvent(m));
 	}
 	
@@ -195,10 +142,7 @@ public class EkekoModel {
 		}
 	}
 	
-	private List<? extends IProjectModel> newProjectModel(IProject p) throws CoreException {
-		if(p.equals(getWholeProgramAnalysisProject()))
-			return Arrays.asList(new WholeProgramAnalysisJavaProjectModel(p));
-		
+	private List<? extends IProjectModel> newProjectModel(IProject p) throws CoreException {		
 		String[] natures = p.getDescription().getNatureIds();
 		Set<IProjectModelFactory> applicableFactories = new HashSet<IProjectModelFactory>();
 		for(int i = 0; i < natures.length; ++i){
@@ -273,6 +217,12 @@ public class EkekoModel {
 				return;
 			}					
 			switch (delta.getKind()) {
+			case IResourceDelta.DESCRIPTION:
+				//TODO: check whether this really works ...
+				//nature can have been added or removed
+				System.out.println("Re-creating project models as its natures were changed: " + ip.toString());
+				fullProjectBuild(ip,monitor);
+				return;
 			case IResourceDelta.ADDED:	
 				fullProjectBuild(ip, monitor);
 				return;
@@ -282,6 +232,7 @@ public class EkekoModel {
 			}
 		}
 		System.out.println("Updating a project in the model: " + ip.toString());
+		//TODO: take into account that project natures can have been added 
 		for (IProjectModel ipm : getProjectModel(ip)) {
 			ipm.processDelta(delta, monitor);
 			notifyListeners(new EkekoModelChangedEvent(ipm));

@@ -1,4 +1,4 @@
-package damp.ekeko;
+package damp.ekeko.soot;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -21,10 +21,11 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 
+
 public class SootProjectSelectionHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {	
-		WholeProgramAnalysisDialog dialog = new WholeProgramAnalysisDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		SootDialog dialog = new SootDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		dialog.create();
 		dialog.open();
 		return null;

@@ -32,7 +32,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.ui.dialogs.SelectionDialog;
-import damp.ekeko.WholeProgramAnalysisDialog;
+
+import damp.ekeko.soot.SootDialog;
 
 
 public class EkekoProjectPropertyPage extends PropertyPage {
@@ -74,7 +75,7 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 	
 
 	private void handleSearchButtonSelected() {
-		IType type = WholeProgramAnalysisDialog.chooseMainType(getShell(), getJavaProject());
+		IType type = SootDialog.chooseMainType(getShell(), getJavaProject());
 		if (type != null) {
 			entryPointText.setText(type.getFullyQualifiedName());
 		}

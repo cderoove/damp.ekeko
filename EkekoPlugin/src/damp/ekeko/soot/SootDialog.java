@@ -3,6 +3,7 @@ package damp.ekeko.soot;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
@@ -278,6 +279,8 @@ public class SootDialog extends TitleAreaDialog {
 			IProject p = project.getProject();
 			project.getResource().setPersistentProperty(EkekoProjectPropertyPage.ENTRYPOINT_PROPERTY, entryPoint);
 			damp.util.Natures.addNature(p, SootNature.NATURE_ID);
+			//build from scratch
+			p.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

@@ -26,7 +26,7 @@
 ;; ---------------------------
 
 
-(defn 
+(defn
   soot-model 
   "Unifies ?model with the current Soot model available to Ekeko,
    or fails when there is currently none."
@@ -265,8 +265,7 @@
              (fresh [?cfg ?defbox ?exitbox ?usebox ?defval ?usedval]
                     (soot-method-cfg-entry ?m ?cfg ?entry)
                     (soot-method-cfg-exit ?m ?cfg ?exit)
-                    (project [?cfg]
-                             (qwal ?cfg ?entry ?exit 
+                    (qwal ?cfg ?entry ?exit 
                                    []
                                    (q=>*)
                                    (qcurrent [curr] 
@@ -544,6 +543,47 @@
          ))
 
 
+(defn-
+  qwal-interprocedural-graph-from-intraprocedural-graph
+  [cfg]
+  (letfn [(make-qwal-interprocedural-node
+            [callstack node]
+            [callstack node])
+          (qwal-interprocedural-soot-cfg-successors 
+            [node tos]
+            (fresh [callstack unit key]
+                   (== node [callstack unit])
+                   (v+ unit)
+                   (soot-unit key unit)
+                   (project [unit] 
+                            (== tos 
+                                (map (partial make-qwal-interprocedural-node callstack)   
+                                     (seq (.getSuccsOf ^ExceptionalUnitGraph (:soot-cfg cfg) node)))))))]
+ 
+   (assoc cfg :interprocedural-successors qwal-interprocedural-soot-cfg-successors)
+  ))
+
+  
+
+(defn
+  soot-method-icfg
+  "Relation between a SootMethod and the program's interprocedural
+   control flow graph starting in that method,  in a format that is suitable for being
+   queried using regular path expressions provided by the damp.qwal library."
+  [?method ?icfg]
+  (fresh [?body ?cfg]
+         (soot-method-cfg ?method ?cfg)
+         (equals ?icfg (qwal-interprocedural-graph-from-intraprocedural-graph ?cfg))))
+  
+
+(def
+  soot-method-icfg-entry
+  soot-method-cfg-entry)
+
+(def
+  soot-method-icfg-exit
+  soot-method-cfg-exit)
+  
   
 ;; ALIASING
 ;; --------
@@ -578,4 +618,25 @@
          (equals ?unitgraph (:soot-cfg ?cfg))
          (equals ?a (StrongLocalMustAliasAnalysis. ?unitgraph))))
 
+
+
+(comment
+  
+  ;;test of interprocedural control flow graph traversal using damp.qwal
+  (damp.ekeko/ekeko*
+    [?m ?icfg ?entry ?unit ?exit]
+    (soot-entry-method ?m)
+    (soot-method-cfg ?m ?icfg)
+    (soot-method-cfg-entry ?m ?icfg ?entry)
+    (soot-method-cfg-exit ?m ?icfg ?exit)
+    (project [?icfg]
+             (damp.qwal/qwal ?icfg ?entry ?exit 
+                   []
+                   (damp.qwal/q=>+)
+                   (damp.qwal/qcurrent [?unit] succeed)
+                   (damp.qwal/q=>+)
+                   (damp.qwal/qcurrent [?exit] succeed))))
+    
+    ) 
+      
               

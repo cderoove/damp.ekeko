@@ -11,11 +11,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import damp.ekeko.soot.SootNature;
+
 
 public class DisableNatureOnAllHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {	
 		try {
+			//remove Soot nature first because it requires the Ekeko nature
+			damp.util.Natures.removeNatureFromAllProjects(SootNature.NATURE_ID);
 			damp.util.Natures.removeNatureFromAllProjects(EkekoNature.NATURE_ID);
 		} catch (CoreException e) {
 			e.printStackTrace();

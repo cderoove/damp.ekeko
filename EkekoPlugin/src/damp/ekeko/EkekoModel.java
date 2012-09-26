@@ -72,7 +72,7 @@ public class EkekoModel {
 	}
 	
 	public boolean hasProjectModel(IProject ip) {
-		return getProjectModel(ip) != null;
+		return !getProjectModel(ip).isEmpty();
 	}
 	
 	public void removeProjectModels(IProject ip)  {

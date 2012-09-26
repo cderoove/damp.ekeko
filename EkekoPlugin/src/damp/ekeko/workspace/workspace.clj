@@ -82,6 +82,16 @@
     (.getRoot)
     (.getProjects)))
 
+(defn
+  workspace-project-named
+  "Returns the IProject with the given name in the Eclipse workspace.
+   Project does not need to be managed by the EkekoModel."
+  [name]
+  ;next line creates projects for non-existing resources
+  ;(-> (eclipse-workspace) (.getRoot) (.getProject name)))
+  (some (fn [p] (when (= name (.getName p)) p))
+        (workspace-projects)))
+
 
 (defn 
   workspace-project-open? 
@@ -111,6 +121,7 @@
    (i.e., has the Ekeko nature enabled)."
   [p]
   (.hasProjectModel (ekekomodel/ekeko-model) p))
+  ;(damp.util.Natures/hasNature p damp.ekeko.EkekoNature/NATURE_ID))
 
 (defn 
   workspace-project-toggle-ekeko!
@@ -199,6 +210,7 @@
     projects
    ))
 
+
 (defn 
   workspace-enable-ekeko-sequentially-and-do!
   "Sequentially:
@@ -221,5 +233,11 @@
         (workspace-project-close! p)
         result))))
 
+
+(defn
+  workspace-disable-ekeko!
+  []
+  (damp.util.Natures/removeNatureFromAllProjects
+    (damp.ekeko.EkekoNature/NATURE_ID)))
 
 

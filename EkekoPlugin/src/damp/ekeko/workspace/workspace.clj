@@ -236,8 +236,34 @@
 
 (defn
   workspace-disable-ekeko!
+  "Excludes all workspace projects from Ekeko queries."
   []
   (damp.util.Natures/removeNatureFromAllProjects
     (damp.ekeko.EkekoNature/NATURE_ID)))
+
+
+(defn 
+  enable-project-nature!
+  "Adds nature to the project's nature."
+  [project nature]
+  (damp.util.Natures/addNature project nature))
+
+(defn
+  disable-project-nature!
+  "Removes nature from the project's nature."
+  [project nature]
+  (damp.util.Natures/removeNature project nature))
+
+(defn
+  workspace-disable-nature!
+  "Removes nature from all workspace projects."
+  [nature]
+  (damp.util.Natures/removeNatureFromAllProjects nature))
+
+(defn
+  build-project
+  "Performs a clean build on the project (from scratch)."
+  [project]
+  (.build project (org.eclipse.core.resources.IncrementalProjectBuilder/FULL_BUILD) nil))
 
 

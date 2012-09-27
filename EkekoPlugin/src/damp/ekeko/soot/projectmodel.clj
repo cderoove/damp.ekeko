@@ -2,7 +2,9 @@
   (:import 
     [damp.ekeko.soot SootProjectModel])
   (:require
-    [damp.ekeko [ekekomodel :as ekekomodel]]))
+    [damp.ekeko [ekekomodel :as ekekomodel]]
+    [damp.ekeko.workspace [workspace :as workspace]]
+    ))
 
 
 
@@ -25,3 +27,27 @@
   []
   (first (soot-project-models)))
 
+
+(def sootnature (damp.ekeko.soot.SootNature/NATURE_ID))
+
+(defn
+  enable-soot-nature!
+  "Enables Ekeko's Soot nature on the given project. 
+   Side effects: will start the whole-program analysis, 
+   nature will be disabled for all other projects."
+  [project]
+  (workspace/enable-project-nature! project sootnature)
+  (workspace/build-project project))
+
+(defn
+  disable-soot-nature!
+  "Disables Ekeko's Soot nature for the given project."
+  [project]
+  (workspace/disable-project-nature! project sootnature))
+
+(defn
+  workspace-disable-soot!
+  "Disables Ekeko'Soot nature on all workspace projects."
+  []
+  (damp.util.Natures/removeNatureFromAllProjects sootnature))
+  

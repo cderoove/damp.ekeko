@@ -10,7 +10,7 @@
   [s]
   (= (first (str s)) \?))
 
-(defn-
+(defn
   ekeko-extract-vars
   [p]
   (set (cond

@@ -30,8 +30,8 @@ Bundle-ClassPath: .,
  libs/java_cup.jar,
  libs/polyglot.jar,
  libs/sootclasses.jar,
- libs/core.logic-0.7.5.jar,
- libs/qwal-1.0.1-SNAPSHOT.jar
+ libs/qwal-1.0.2-SNAPSHOT.jar,
+ libs/core.logic-0.8.0-beta1.jar
 Export-Package: baristaui.util,
  baristaui.views.queryResult,
  clojure.core,

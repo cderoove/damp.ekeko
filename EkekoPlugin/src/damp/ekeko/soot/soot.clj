@@ -235,17 +235,16 @@
   qwal-graph-from-soot-cfg 
   [soot-cfg]
   {:soot-cfg soot-cfg
-   :nodes (seq (.getUnits ^Body (.getBody ^ExceptionalUnitGraph soot-cfg)))
    :predecessors (fn 
-                [node to]
-                (all
-                  (project [node]
-                           (== to (seq (.getPredsOf ^ExceptionalUnitGraph soot-cfg node))))))
+                   [node to]
+                   (all
+                     (project [node]
+                              (== to (seq (.getPredsOf ^ExceptionalUnitGraph soot-cfg node))))))
    :successors (fn 
-                [node to]
-                (all
-                  (project [node]
-                          (== to (seq (.getSuccsOf ^ExceptionalUnitGraph soot-cfg node))))))})
+                 [node to]
+                 (all
+                   (project [node]
+                            (== to (seq (.getSuccsOf ^ExceptionalUnitGraph soot-cfg node))))))})
 
 
 (defn
@@ -472,6 +471,9 @@
          (soot :method ?callee) ;application methods only
          ))
 
+
+          
+          
 ;declaratively, same as above
 (defn 
   soot-method-called-by-method

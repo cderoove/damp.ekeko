@@ -14,6 +14,15 @@
 ;TODO: (core.logic 0.8 enables multiple variables in run)
 ;(def #^{:macro true} ekeko #'run)
 
+
+;;temporarily, to enable the patch for large tabled relations:
+;;https://groups.google.com/forum/?fromgroups=#!topic/clojure/F17B05mknIg
+
+;(extend-type nil
+;  clojure.core.logic/IRefinable
+;  (refinable? [_] false)) 
+
+
 (defmacro 
   ekeko
   "Equivalent to core.logic's run* with disabled occurs check,

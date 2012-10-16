@@ -24,11 +24,6 @@
             id="damp.ekeko.commands.disableNatureOnAll"
             name="Exclude all Projects from Queries">
       </command>
-      <command
-            categoryId="damp.ekeko.commands.category"
-            id="damp.ekeko.commands.showWholeProgramAnalysesSettings"
-            name="Configure whole-program analyses...">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -43,10 +38,6 @@
       <handler
             class="damp.ekeko.DisableNatureOnAllHandler"
             commandId="damp.ekeko.commands.disableNatureOnAll">
-      </handler>
-      <handler
-            class="damp.ekeko.soot.SootProjectSelectionHandler"
-            commandId="damp.ekeko.commands.showWholeProgramAnalysesSettings">
       </handler>
    </extension>
    <extension
@@ -71,11 +62,6 @@
                   commandId="damp.ekeko.commands.disableNatureOnAll"
                   label="Exclude all Projects from Queries"
                   tooltip="Excludes all Open Projects from Ekeko Queries">
-            </command>
-            <command
-                  commandId="damp.ekeko.commands.showWholeProgramAnalysesSettings"
-                  label="Configure whole-program analyses..."
-                  tooltip="Opens Ekeko configuration for whole-program analyses.">
             </command>
          </menu>
       </menuContribution>
@@ -118,12 +104,9 @@
                label="Include in Ekeko Queries"
                menubarPath="org.eclipse.ui.projectConfigure/additions">
           </action>
-
-
        <visibility>
           <not><objectState name="nature" value="damp.ekeko.plugin.ekekoNature" /></not>
        </visibility>
-
       </objectContribution>
       
        <objectContribution
@@ -138,15 +121,51 @@
                label="Exclude from Ekeko Queries"
                menubarPath="org.eclipse.ui.projectConfigure/additions">
          </action>
-
        <visibility>
           <objectState name="nature" value="damp.ekeko.plugin.ekekoNature" />
        </visibility>
-
-
-
-
       </objectContribution>
+      
+      <!--
+            Note: if these object contributions are ever changed, don't forget
+            to start Eclipse with a -clean on the test workspace. Otherwise,
+            lots of headbanging will ensue.
+      -->
+      
+      <objectContribution
+            adaptable="true"
+            id="EkekoPlugin.removeSootNatureIProjectContribution"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="damp.ekeko.soot.ToggleSootNatureAction"
+               id="EkekoPlugin.RemoveSootNatureAction"
+               label="Disable Ekeko Soot Analyses"
+               menubarPath="org.eclipse.ui.projectConfigure/additions">
+         </action>
+       <visibility>
+          	<objectState name="nature" value="damp.ekeko.plugin.sootNature" />
+	   </visibility>
+      </objectContribution>
+
+
+      <objectContribution
+            adaptable="true"
+            id="EkekoPlugin.addSootNatureIProjectContribution"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="damp.ekeko.soot.ToggleSootNatureAction"
+               id="EkekoPlugin.AddSootNatureAction"
+               label="Enable Ekeko Soot Analyses"
+               menubarPath="org.eclipse.ui.projectConfigure/additions">
+          </action>
+       <visibility>
+          	<not><objectState name="nature" value="damp.ekeko.plugin.sootNature" /></not>
+       </visibility>
+      </objectContribution>
+      
+      
        <objectContribution
              adaptable="false"
              id="BaristaUI.popUp"
@@ -181,10 +200,27 @@
       <contributedFactory factory="damp.ekeko.soot.SootProjectModelFactory">
       </contributedFactory>
    </extension>
+   
+<extension
+      id="damp.ekeko.plugin.sootNature"
+      name="Ekeko Soot Project Nature"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="damp.ekeko.soot.SootNature">
+      </run>
+   </runtime>
+   <requires-nature
+         id="damp.ekeko.plugin.ekekoNature">
+   </requires-nature>
+   <requires-nature
+         id="org.eclipse.jdt.core.javanature">
+   </requires-nature>
+</extension>
 
    
    <extension
-         id="ekekoNature"
+         id="damp.ekeko.plugin.ekekoNature"
          name="Ekeko Project Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
@@ -276,22 +312,6 @@
             </instanceof>
         </enabledWhen>
     </page>
-</extension>
-<extension
-      id="sootNature"
-      name="Ekeko Soot Project Nature"
-      point="org.eclipse.core.resources.natures">
-   <runtime>
-      <run
-            class="damp.ekeko.soot.SootNature">
-      </run>
-   </runtime>
-   <requires-nature
-         id="damp.ekeko.plugin.ekekoNature">
-   </requires-nature>
-   <requires-nature
-         id="org.eclipse.jdt.core.javanature">
-   </requires-nature>
 </extension>
 
 </plugin>

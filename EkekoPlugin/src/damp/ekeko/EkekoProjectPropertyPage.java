@@ -1,39 +1,28 @@
 package damp.ekeko;
 
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IProject;
-
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.ui.IJavaElementSearchConstants;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.eclipse.ui.dialogs.SelectionDialog;
 
-import damp.ekeko.soot.SootDialog;
+import damp.ekeko.soot.ToggleSootNatureAction;
 
 
 public class EkekoProjectPropertyPage extends PropertyPage {
@@ -75,7 +64,7 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 	
 
 	private void handleSearchButtonSelected() {
-		IType type = SootDialog.chooseMainType(getShell(), getJavaProject());
+		IType type = ToggleSootNatureAction.chooseEntryPoint(getShell(), getJavaProject());
 		if (type != null) {
 			entryPointText.setText(type.getFullyQualifiedName());
 		}

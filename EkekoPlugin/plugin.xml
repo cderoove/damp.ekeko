@@ -161,7 +161,10 @@
                menubarPath="org.eclipse.ui.projectConfigure/additions">
           </action>
        <visibility>
-          	<not><objectState name="nature" value="damp.ekeko.plugin.sootNature" /></not>
+			<and>
+				<objectState name="nature" value="damp.ekeko.plugin.ekekoNature" />
+          		<not><objectState name="nature" value="damp.ekeko.plugin.sootNature" /></not>
+			</and>
        </visibility>
       </objectContribution>
       

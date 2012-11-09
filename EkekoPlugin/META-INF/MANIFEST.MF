@@ -31,7 +31,7 @@ Bundle-ClassPath: .,
  libs/polyglot.jar,
  libs/sootclasses.jar,
  libs/qwal-1.0.2-SNAPSHOT.jar,
- libs/core.logic-0.8.0-beta1.jar
+ libs/core.logic-0.8.0-beta3-20121108.000151-13.jar
 Export-Package: baristaui.util,
  baristaui.views.queryResult,
  clojure.core,
@@ -65,5 +65,7 @@ Export-Package: baristaui.util,
  damp.ekeko.soot,
  damp.ekeko.util,
  damp.ekeko.workspace,
- damp.util
+ damp.util,
+ test.damp,
+ test.damp.ekeko
 Eclipse-BuddyPolicy: registered

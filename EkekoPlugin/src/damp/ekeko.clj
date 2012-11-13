@@ -8,46 +8,37 @@
   (:use [damp.ekeko.soot soot])
   (:use [damp.ekeko.jdt reification basic soot])
   (:use [damp.qwal])
+  (:require [clojure.pprint])
   (:import [org.eclipse.core.runtime.jobs Job]
            [org.eclipse.core.resources ResourcesPlugin]))
 
-;TODO: (core.logic 0.8 enables multiple variables in run)
-;(def #^{:macro true} ekeko #'run)
-
-
-;;temporarily, to enable the patch for large tabled relations:
-;;https://groups.google.com/forum/?fromgroups=#!topic/clojure/F17B05mknIg
-
-;(extend-type nil
-;  clojure.core.logic/IRefinable
-;  (refinable? [_] false)) 
-
-
-(defmacro 
-  ekeko
-  "Equivalent to core.logic's run* with disabled occurs check,
-   but takes multiple logic variables as its first argument.
+(def 
+  #^{:macro true
+     :doc   
+     "Launches a query. A mere alias for core.logic's run-nc*
+      (all solutions, multiple arguments, disabled occurs check).
    
-   Example usage:
-   (ekeko [?inv ?child]
-     (ast :MethodInvocation ?inv) 
-     (child :arguments ?inv ?child))
+      Example usage:
+      (ekeko [?inv ?child]
+        (ast :MethodInvocation ?inv) 
+        (child :arguments ?inv ?child))
 
-   Will become a mere alias for run* in core.logic > 0.8
+      See also:
+      ekeko* which opens a graphical view on the solutions."}
+    ekeko
+  #'clojure.core.logic/run-nc*)
 
-   See also:
-   ekeko* which opens a graphical view on the solutions."
-  [logicvars & goals]
-  `(run-nc* [resultvar#] 
-         (fresh [~@logicvars]
-                (equals resultvar# [~@logicvars])
-                ~@goals)))
+
+(defn-
+  pprint-query-str
+  [query]
+  (binding [clojure.pprint/*print-right-margin* 200]
+    (with-out-str (clojure.pprint/pprint query))))
+  
 
 (defmacro 
   ekeko*
-  "Equivalent to core.logic's run* with disabled occurs check,
-   but takes multiple logic variables as its first argument
-   and opens an Eclipse view on the solutions.
+  "Launches a query like ekeko, but opens an Eclipse view on the solutions. 
  
    Example usage:
    (ekeko* [?inv ?child]
@@ -57,7 +48,7 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [vars & goals]
-  `(let [querystr# (str '(ekeko* [~@vars] ~@goals))
+  `(let [querystr# (pprint-query-str '(ekeko* [~@vars] ~@goals))
          start# (System/nanoTime)
          resultsqc# (run-nc* [resultvar#] 
                           (fresh [~@vars]
@@ -84,7 +75,7 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [n vars & goals]
-  `(let [querystr# (str '( ekeko-n* [~@vars] ~@goals))
+  `(let [querystr# (pprint-query-str '(ekeko-n* [~@vars] ~@goals))
          start# (System/nanoTime)
          resultsqc# (run-nc ~n [resultvar#] 
                           (fresh [~@vars]

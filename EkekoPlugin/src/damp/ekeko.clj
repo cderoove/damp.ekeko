@@ -12,21 +12,26 @@
   (:import [org.eclipse.core.runtime.jobs Job]
            [org.eclipse.core.resources ResourcesPlugin]))
 
-(def 
-  #^{:macro true
-     :doc   
-     "Launches a query. A mere alias for core.logic's run-nc*
-      (all solutions, multiple arguments, disabled occurs check).
+(defmacro 
+  ekeko
+  "Equivalent to core.logic's run-nc*  (all solutions, disabled occurs check),
+   but each solution consists of a vector of bindings for the variables
+   given as its first argument (even if only a single variable is given).
    
-      Example usage:
-      (ekeko [?inv ?child]
-        (ast :MethodInvocation ?inv) 
-        (child :arguments ?inv ?child))
+   Example usage:
+   (ekeko [?inv ?child]
+     (ast :MethodInvocation ?inv) 
+     (child :arguments ?inv ?child))
 
-      See also:
-      ekeko* which opens a graphical view on the solutions."}
-    ekeko
-  #'clojure.core.logic/run-nc*)
+  
+
+   See also:
+   ekeko* which opens a graphical view on the solutions."
+  [logicvars & goals]
+  `(run-nc* [resultvar#] 
+         (fresh [~@logicvars]
+                (equals resultvar# [~@logicvars])
+                ~@goals)))
 
 
 (defn-

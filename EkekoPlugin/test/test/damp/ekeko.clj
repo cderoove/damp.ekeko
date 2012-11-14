@@ -78,25 +78,55 @@
   [seqofseqs]
   (str (tuples-to-stringset seqofseqs)))
 
+
 (defn
-  tuples-are
-  "Verifies whether the stringset representation of the tuples corresponds to the given string
-   (obtained through tuples-to-stringsetstring)."
+  tuples-correspond
+  "Verifies whether the stringset representation of its
+   first argument (tuples obtained as solutions to an Ekeko query)
+   correspond to the string given as its second argument.
+   Such a string can be obtained from tuples through tuples-to-stringsetstring."
   [tuples stringsetstring]
   (is 
     (empty?
       (clojure.set/difference
         (tuples-to-stringset tuples)
         (read-string stringsetstring)))))
+  
+(defn
+  tuples-are
+  "Verifies whether its argument sequences contain the
+   same tuples (obtained as solutions to an Ekeko query)."
+  [tuples1 tuples2]
+  (is 
+    (empty?
+      (clojure.set/difference (into #{} tuples1)
+                              (into #{} tuples2)))))
 
+(defn
+  nonemptytuples-are
+  "Verifies whether its argument sequences are not empty,
+   and contain the same tuples (obtained as solutions to an Ekeko query)."
+  [tuples1 tuples2]
+  (is (seq tuples1))
+  (is (seq tuples2))
+  (is (count tuples1) (count tuples2))
+  (tuples-are tuples1 tuples2))
+  
+
+  
+       
 ;; Actual Tests
 ;; ------------
 
+
 (deftest
   test-ekeko
-  (tuples-are
+  (tuples-correspond
     (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))
-    "#{(\"1\" \"2\")}")) ;string obtained through (tuples-to-stringsetstring  (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))) 
+    "#{(\"1\" \"2\")}") ;string obtained through (tuples-to-stringsetstring  (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))) 
+  (tuples-are 
+    (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))
+    (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2)))) 
 
 
 ;; Test Suite

@@ -4,13 +4,12 @@
   damp.ekeko
   (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
-  (:use [damp.ekeko logic gui])
+  (:use [damp.ekeko logic])
   (:use [damp.ekeko.soot soot])
   (:use [damp.ekeko.jdt reification basic soot])
   (:use [damp.qwal])
-  (:require [clojure.pprint])
-  (:import [org.eclipse.core.runtime.jobs Job]
-           [org.eclipse.core.resources ResourcesPlugin]))
+  (:require [damp.ekeko.util [text :as text]])
+  (:require [damp.ekeko [gui :as gui]]))
 
 (defmacro 
   ekeko
@@ -23,23 +22,13 @@
      (ast :MethodInvocation ?inv) 
      (child :arguments ?inv ?child))
 
-  
-
-   See also:
+     See also:
    ekeko* which opens a graphical view on the solutions."
   [logicvars & goals]
   `(run-nc* [resultvar#] 
          (fresh [~@logicvars]
                 (equals resultvar# [~@logicvars])
                 ~@goals)))
-
-
-(defn-
-  pprint-query-str
-  [query]
-  (binding [clojure.pprint/*print-right-margin* 200]
-    (with-out-str (clojure.pprint/pprint query))))
-  
 
 (defmacro 
   ekeko*
@@ -53,7 +42,7 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [vars & goals]
-  `(let [querystr# (pprint-query-str '(ekeko* [~@vars] ~@goals))
+  `(let [querystr# (text/pprint-query-str '(ekeko* [~@vars] ~@goals))
          start# (System/nanoTime)
          resultsqc# (run-nc* [resultvar#] 
                           (fresh [~@vars]
@@ -61,7 +50,7 @@
                                  ~@goals))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
-     (eclipse-uithread-return (fn [] (open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+     (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
       
 ;TODO: eliminate code duplication
 (defmacro 
@@ -80,7 +69,7 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [n vars & goals]
-  `(let [querystr# (pprint-query-str '(ekeko-n* [~@vars] ~@goals))
+  `(let [querystr# (text/pprint-query-str '(ekeko-n* [~@vars] ~@goals))
          start# (System/nanoTime)
          resultsqc# (run-nc ~n [resultvar#] 
                           (fresh [~@vars]
@@ -88,11 +77,8 @@
                                  ~@goals))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
-     (eclipse-uithread-return (fn [] (open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+     (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
 
-
-
-     
 
 ;Example repl session
 (comment

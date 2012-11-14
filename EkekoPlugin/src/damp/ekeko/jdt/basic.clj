@@ -189,7 +189,61 @@
     (contains [:AnnotationTypeMemberDeclaration :FieldDeclaration :MethodDeclaration :SingleVariableDeclaration :TypeDeclaration :EnumDeclaration :EnumConstantDeclaration :AnnotationTypeDeclaration] ?key)
     (ast-declaration ?key ?ast)
     (child :modifiers ?ast ?mod)))
-          
+
+
+;; Type declarations and their member declarations
+;; -----------------------------------------------
+     
+(defn
+  typedeclaration-identifier-bodydeclaration-identifier
+  "Relation between a type declaration and one of its member declarations,
+   and the identifier strings of their respective simple names. Note that 
+   a single field declaration can introduce multiple identifiers." 
+  [?typedec ?typeid ?memberdec ?memberid]
+  (fresh [?tname ?mname]
+         (ast :TypeDeclaration ?typedec)
+         (has :name ?typedec ?tname)
+         (has :identifier ?tname ?typeid)
+         (child :bodyDeclarations ?typedec ?memberdec)
+         (fresh [?named]
+                (conda [(ast :FieldDeclaration ?memberdec)
+                        (child :fragments ?memberdec ?named)]
+                       [s# 
+                        (== ?named ?memberdec)])
+                (has :name ?named ?mname)
+                (has :identifier ?mname ?memberid))))
+
+
+(defn
+  typedeclaration-identifier-typedeclaration-identifier
+  "Relation between a type declaration and one of its member 
+   type declarations, and the identifier strings 
+   of their respective simple names." 
+  [?typedec ?typeid ?memberdec ?memberid]
+  (all
+    (typedeclaration-identifier-bodydeclaration-identifier ?typedec ?typeid ?memberdec ?memberid)
+    (ast :TypeDeclaration ?memberdec)))
+
+(defn
+  typedeclaration-identifier-methoddeclaration-identifier
+  "Relation between a type declaration and one of its member 
+   method declarations, and the identifier strings 
+   of their respective simple names." 
+  [?typedec ?typeid ?memberdec ?memberid]
+  (all
+    (typedeclaration-identifier-bodydeclaration-identifier ?typedec ?typeid ?memberdec ?memberid)
+    (ast :MethodDeclaration ?memberdec)))
+
+(defn
+  typedeclaration-identifier-fielddeclaration-identifier
+  "Relation between a type declaration and one of its member 
+   field declarations, and the identifier strings 
+   of the type and one of the variable declaration fragments of the field."
+  [?typedec ?typeid ?memberdec ?memberid]
+  (all
+    (typedeclaration-identifier-bodydeclaration-identifier ?typedec ?typeid ?memberdec ?memberid)
+    (ast :FieldDeclaration ?memberdec)))
+  
 
 
 ;; Relation between ASTNodes and IJavaElements from the Eclipse Java Model

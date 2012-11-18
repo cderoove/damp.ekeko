@@ -18,56 +18,62 @@
                               MethodDeclaration]
                               ))
 
-
 (set! *warn-on-reflection* true)
+
 
 ;; JDT DOM classes
 ;; ---------------
 
-(defn 
+(def 
   node-classes
-  "Returns a Seq of all known ASTNode subclasses."
-  []
   (let [lasttypeint 84]
     (for [i (range 1 (inc lasttypeint))]
       (ASTNode/nodeClassForType i))))
 
 (def 
   node-classes-as-symbols 
-  (memoize (fn []
-             (map (fn [^Class c] (symbol (.getSimpleName c))) (node-classes)))))
+  (map (fn [^Class c] (symbol (.getSimpleName c))) node-classes))
 
-(def class-for-ekeko-keyword 
+(def 
+  class-for-ekeko-keyword 
   (memoize (fn 
              [classkeyword]
              (Class/forName (str "org.eclipse.jdt.core.dom." (name classkeyword))))))
 
-(def ekeko-keyword-for-class 
+(def 
+  ekeko-keyword-for-class 
   (memoize (fn
              [astclass]
              (keyword (.getSimpleName ^Class astclass)))))
 
-(defn ekeko-keyword-for-class-of [astnode]
- (ekeko-keyword-for-class (class astnode)))
+(defn 
+  ekeko-keyword-for-class-of 
+  [astnode]
+  (ekeko-keyword-for-class (class astnode)))
 
-(def resolveable-node-classes
-  (memoize (fn 
-             []
-             (filter (fn [^Class c] 
-                       (try 
-                         (let [m (.getMethod c "resolveBinding" (make-array java.lang.Class 0))]
-                           true)
-                         (catch NoSuchMethodException e false))) 
-                     (node-classes)))))
+(def
+  ekeko-keywords-for-ast-classes
+  (map ekeko-keyword-for-class node-classes))
 
-(defn ekeko-keywords-for-resolveable-ast-classes []
-  (map ekeko-keyword-for-class (resolveable-node-classes)))
+(def 
+  resolveable-node-classes
+  (filter (fn [^Class c] 
+            (try 
+              (let [m (.getMethod c "resolveBinding" (make-array java.lang.Class 0))]
+                true)
+              (catch NoSuchMethodException e false))) 
+          node-classes))
 
-(defn ekeko-keywords-for-declaration-ast-classes []
+(def
+  ekeko-keywords-for-resolveable-ast-classes
+  (map ekeko-keyword-for-class resolveable-node-classes))
+
+(def
+  ekeko-keywords-for-declaration-ast-classes
   (filter (fn [keyw] 
             (re-matches #".*Declaration" (str keyw)))
-          (map ekeko-keyword-for-class (node-classes))))
-    
+          ekeko-keywords-for-ast-classes))
+  
 
 ;; Property descriptors
 ;; --------------------
@@ -114,7 +120,8 @@
 (defn nodeclass-property-descriptors [^Class cls]
   (clojure.lang.Reflector/invokeStaticMethod cls "propertyDescriptors" (to-array [org.eclipse.jdt.core.dom.AST/JLS3])))
 
-(def property-descriptors-per-node-class
+(def 
+  property-descriptors-per-node-class
   (memoize 
     (fn []
       (let [classes (node-classes)]
@@ -122,7 +129,8 @@
                 (map (fn [c] (nodeclass-property-descriptors c))
                      classes))))))
 
-(def owner-properties-per-node-class
+(def 
+  owner-properties-per-node-class
   (memoize 
     (fn 
       []
@@ -147,52 +155,73 @@
                                               }))))
         @ownerperclass))))
   
-  ;(def owner-keywords-per-node-keyword 
-;  (into {} (for [[^Class k v] (owners-per-node-class)]
-;             [(ast-keyword-for-class k)
-;              (map (fn [^Class c] (ast-keyword-for-class c)) v)])))
-
-
 
 ;; Ekeko-specific properties
 ;; -------------------------
 
-;it is supposedly faster to use protocols as this is simply single dispatch
-;(defmulti ekeko-properties class)
-;(defmethod ekeko-properties ASTNode [n] 
-;  (.structuralPropertiesForType n))
-;(defmethod ekeko-properties MethodDeclaration)
+;TODO: switch to record as soon as core.logic no longer reifies records as maps
+;(defrecord PropertyValueWrapper [owner property value])
+(defn
+  make-value
+  [owner property value]
+  {:type :Value
+   :owner owner :property property :value value})
 
-(defn node-ekeko-properties [n]
+(defn 
+  node-ekeko-properties
+  [n]
   (let [descriptors (node-property-descriptors n)]
-    (zipmap (map (fn [^StructuralPropertyDescriptor p] (keyword (property-descriptor-id p))) descriptors)
-            (map (fn [^StructuralPropertyDescriptor p] (fn [] (node-property-value n p))) descriptors))))
+    (zipmap (map (fn [^StructuralPropertyDescriptor p] 
+                   (keyword (property-descriptor-id p)))
+                 descriptors)
+            (map (fn [^StructuralPropertyDescriptor p]
+                   (fn [] 
+                     (let [value (node-property-value n p)]
+                       (if 
+                         (ast? value)
+                         value
+                         (make-value n p value)))))
+                 descriptors))))
+(defprotocol 
+  IHasOwner
+  (owner [n-or-wrapper]))
+          
+(extend-protocol
+  IHasOwner
+  ASTNode 
+  (owner [this] (.getParent ^ASTNode this))
+  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
+  clojure.lang.IPersistentMap
+  (owner [this] (:owner this)))
 
+(defprotocol 
+  IValueOfProperty
+  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps  
+  (owner-property [n-or-wrapper]))
 
-(defn owner [n-or-nlist]
-  (if 
-    (instance? ASTNode n-or-nlist)
-    (.getParent ^ASTNode n-or-nlist)
-    ;outer instance of nodelist is owner
-    (interop/get-invisible-field (class ^ASTNode$NodeList n-or-nlist) (symbol "this$0") n-or-nlist)))
+(extend-protocol
+  IValueOfProperty
+  ASTNode 
+  (owner-property [this] (.getLocationInParent ^ASTNode this))
+  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
+  clojure.lang.IPersistentMap
+  (owner-property [this] (:property this)))
 
-(defn owner-property [n-or-nlist]
-   (if 
-     (instance? ASTNode n-or-nlist)
-     (.getLocationInParent ^ASTNode n-or-nlist)
-     (interop/get-invisible-field (class ^ASTNode$NodeList n-or-nlist) 'propertyDescriptor n-or-nlist)))
-
-(defprotocol IAST
+(defprotocol 
+  IAST
   (reifiers [this] 
     "Returns a map of keywords to reifier functions. The latter will return an Ekeko-specific child of the AST node."))
 
-(extend org.eclipse.jdt.core.dom.ASTNode
+(extend 
+  ASTNode
   IAST
   {:reifiers (fn [this] (node-ekeko-properties this))})
                           
-(defn node-children [n]
-  (map (fn [p] (node-property-value n p))
-       (node-property-descriptors n)))
+(defn 
+  node-children
+  [n]
+  (map (fn [retrievalf] (retrievalf n))
+       (vals (node-ekeko-properties n))))
 
 ; Bindings
 ; --------
@@ -233,6 +262,43 @@
 
 ; Helper Predicates
 ; -----------------
+
+
+(defmacro 
+  ast?
+  [x]
+  `(instance? ASTNode ~x))
+
+(defmacro
+  value?
+  [x]
+  `(and 
+     (map? ~x)
+     (= :Value (:type ~x))))
+
+(defmacro
+  lstvalue?
+  [x]
+  `(and
+     (value? ~x)
+     (instance? java.util.List (:value ~x))))
+  
+
+(defmacro
+  nilvalue?
+  [x]
+  `(and
+     (value? ~x)
+     (nil? (:value ~x))))
+
+(defmacro
+  primitivevalue?
+  [x]
+  `(and
+     (value? ~x)
+     (not (instance? java.util.List (:value ~x)))
+     (not (nil? (:value ~x)))))
+  
 
 (defmacro expression? [node]
   `(instance? Expression ~node))

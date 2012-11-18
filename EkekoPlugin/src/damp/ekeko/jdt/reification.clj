@@ -49,16 +49,13 @@
    API documentation of org.eclipse.jdt.core.dom.ASTNode"
   [?keyword ?node]
   (conda [(v+ ?node) (conda [(v+ ?keyword) (all (succeeds-without-exception (instance? (astnode/class-for-ekeko-keyword ?keyword) ?node)))]
-                            [(v- ?keyword) (all (succeeds (instance? ASTNode ?node))
+                            [(v- ?keyword) (all (succeeds (astnode/ast? ?node))
                                                 (equals ?keyword (astnode/ekeko-keyword-for-class-of ?node)))])]
          [(v- ?node) (conda [(v+ ?keyword) (fresh [?nodes]
                                                   (equals ?nodes (nodes-of-type ?keyword))
                                                   (contains ?nodes ?node))]
                             [(v- ?keyword) (fresh [?keywords]
-                                                  (equals ?keywords (map (fn [^Class c]
-                                                                       (astnode/ekeko-keyword-for-class c))
-                                                                     (astnode/node-classes)))
-                                                  (contains ?keywords ?keyword)
+                                                  (contains astnode/ekeko-keywords-for-ast-classes ?keyword)
                                                   (ast ?keyword ?node))])]))
 
 ;TODO: reify actual property descriptors 
@@ -73,12 +70,14 @@
    a primitive value or an instance of ASTNode$NodeList. 
 
    Examples:
-   ;; method invocations with an implicit receiver
-   (ekeko* [?inv] (ast :MethodInvocation ?inv) 
-                  (has :expression ?inv nil)) 
+   ;; method invocations and their receiver
+   (ekeko* [?inv ?exp]
+     (ast :MethodInvocation ?inv) 
+     (has :expression ?inv exp)) 
    ;; all properties of all compilation units 
-   (ekeko* [?cu ?key ?child] (ast :CompilationUnit ?cu) 
-                             (has ?key ?cu ?child))
+   (ekeko* [?cu ?key ?child] 
+     (ast :CompilationUnit ?cu) 
+     (has ?key ?cu ?child))
    
    See also: 
    Ternary predicate child/3 
@@ -126,9 +125,11 @@
   (fresh [?ch] 
     (has ?keyword ?node ?ch)
     (conda
-           [(succeeds (instance? ASTNode ?ch)) (== ?child ?ch)] 
-           [(succeeds (instance? java.util.AbstractList ?ch)) (contains ?ch ?child)])))
-
+           [(succeeds (astnode/ast? ?ch))
+            (== ?child ?ch)] 
+           [(succeeds (astnode/lstvalue? ?ch))
+            (contains (:value ?ch) ?child)])))
+            
 (defn 
   child+
   "Transitive closure of the child relation.
@@ -162,6 +163,16 @@
 ;                [(tabled-child+ ?ch ?child)]))))    
   
 
+;(defn
+;  value
+;  "Relation of ASTNode property values that aren't ASTNode themselves:
+;   nil, primitive values and lists."
+;  [?val]
+;  (conda [(v+ ?val)
+;          (
+;          (succeeds (or (instance? PropertyValueWrapper ?val)
+;                        (instance? clojure.lang.PersistentArrayMap ?val))  ;workaround for core.logic's reifying records as maps
+                    
 
 (defn
   ast-parent

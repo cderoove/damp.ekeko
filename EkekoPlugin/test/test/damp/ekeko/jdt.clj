@@ -7,22 +7,32 @@
   (:use [damp.ekeko logic])
   (:use clojure.test)
   (:require [test.damp [ekeko :as test]]
-            [damp.ekeko.jdt [reification :as reification]]))
+            [damp.ekeko.jdt 
+             [astnode :as astnode]
+             [reification :as reification]]))
 
 ;; Tests
 
 (deftest
-  ;TODO: might be nice to have it work for other values (and nil) as well,
-  ;possible if reification of primitive values (and nil) is changed ... but comes at a high performance cost
-  ;(especially when nil has to be wrapped)
+  reification-ast
+  ^{:doc "Tests relational nature of the second argument of ast/2."}
+  (doseq [kind astnode/ekeko-keywords-for-ast-classes]
+    (test/tuples-are
+      (damp.ekeko/ekeko [?ast]
+             (reification/ast kind ?ast))
+      (damp.ekeko/ekeko [?ast]
+             (reification/ast kind ?ast) 
+             (reification/ast kind ?ast)))))
+  
+
+(deftest
+  ^{:doc "Tests whether has/3 is relational."}
   reification-has-relational
   (doseq [[node property child shouldbenode shouldbeproperty]  
           (damp.ekeko/ekeko [?node ?property ?child ?shouldbenode ?shouldbeproperty] 
                   (fresh [?kind]
                          (reification/ast ?kind ?node) 
                          (reification/has ?property ?node ?child) 
-                         (conde [(succeeds (instance? org.eclipse.jdt.core.dom.ASTNode ?child))]
-                                [(succeeds (instance? java.util.List ?child))]) 
                          (reification/has ?shouldbeproperty ?shouldbenode ?child)))]
     (is (identical? node shouldbenode)
     (is (identical? property shouldbeproperty)))))
@@ -31,7 +41,7 @@
 (deftest
   ^{:doc "Tests whether ast/2 quantifies over each node encountered during 
           a recursive descent of all compilation units."}
-   reification-ast-traversal
+   reification-ast-child+
   (test/tuples-are 
     (damp.ekeko/ekeko [?ast]
                       (fresh [?kind]
@@ -48,8 +58,11 @@
 (deftest
   test-suite
   (let [visitorproject "TestCase-JDT-CompositeVisitor"]
-    (test/against-project-named visitorproject false reification-has-relational)
-    (test/against-project-named visitorproject false reification-ast-traversal)))
+      (test/against-project-named visitorproject false reification-ast)
+      (test/against-project-named visitorproject false reification-has-relational)
+      (test/against-project-named visitorproject false reification-ast-child+)
+      
+      ))
   
 (defn 
   test-ns-hook 

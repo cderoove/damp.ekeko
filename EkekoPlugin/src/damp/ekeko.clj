@@ -99,7 +99,11 @@
   
   (ekeko* [?cu ?exp] (ast :MethodDeclaration ?cu) (child+ ?cu ?exp) (succeeds (damp.ekeko.jdt.astnode/actual-expression? ?exp)))   
   
-  (ekeko* [?inv] (ast :MethodInvocation ?inv) (has :expression ?inv nil))
+  (ekeko* [?inv]
+          (ast :MethodInvocation ?inv) 
+          (fresh [?exp]
+                 (has :expression ?inv ?exp)
+                 (nullvalue ?exp)))
   
   (ekeko* [?inv ?child] (ast :MethodInvocation ?inv) (child :arguments ?inv ?child))
 

@@ -163,17 +163,43 @@
 ;                [(tabled-child+ ?ch ?child)]))))    
   
 
-;(defn
-;  value
-;  "Relation of ASTNode property values that aren't ASTNode themselves:
-;   nil, primitive values and lists."
-;  [?val]
-;  (conda [(v+ ?val)
-;          (
-;          (succeeds (or (instance? PropertyValueWrapper ?val)
-;                        (instance? clojure.lang.PersistentArrayMap ?val))  ;workaround for core.logic's reifying records as maps
-                    
+(defn
+  value
+  "Relation of ASTNode property values that aren't ASTNode themselves:
+   nil, primitive values and lists."
+  [?val]
+  (conda [(v+ ?val)
+          (succeeds (astnode/value? ?val))]
+         [(v- ?val)
+          (fresh [?kind ?ast ?property]
+                 (ast ?kind ?ast)
+                 (has ?property ?ast ?val)
+                 (value ?val))]))
 
+(defn
+  nullvalue
+  "Relation of all null-valued ASTNode property values."
+  [?val]
+  (all
+    (value ?val)
+    (succeeds (astnode/nilvalue? ?val))))
+
+(defn
+  listvalue
+  "Relation of all list-valued ASTNode property values."
+  [?val]
+  (all
+    (value ?val)
+    (succeeds (astnode/lstvalue? ?val))))
+
+(defn
+  primitivevalue
+  "Relation of all primitive-valued ASTNode property values."
+  [?val]
+  (all
+    (value ?val)
+    (succeeds (astnode/primitivevalue? ?val))))
+          
 (defn
   ast-parent
   "Relation between an ASTNode instance ?ast and its parent node 

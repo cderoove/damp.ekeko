@@ -52,6 +52,21 @@
                              (conde [(== ?cu ?ast)]
                                     [(reification/child+ ?cu ?ast)])))))
 
+(deftest
+  reification-value
+  ^{:doc "Tests relational nature of value/1, 
+          listvalue/1, nullvalue/1, primitivevalue/1."}
+  (doseq [valpred [reification/value reification/listvalue
+                   reification/nullvalue reification/primitivevalue]]
+    (test/tuples-are
+      (damp.ekeko/ekeko [?val]
+                        (valpred ?val))
+      (damp.ekeko/ekeko [?val]
+                        (valpred ?val) 
+                        (valpred ?val)))))
+  
+  
+
 ;; Test suite
 
 
@@ -61,6 +76,7 @@
       (test/against-project-named visitorproject false reification-ast)
       (test/against-project-named visitorproject false reification-has-relational)
       (test/against-project-named visitorproject false reification-ast-child+)
+      (test/against-project-named visitorproject false reification-value)
       
       ))
   

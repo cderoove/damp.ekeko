@@ -16,11 +16,12 @@ Require-Bundle: clojure.osgi,
  org.eclipse.ui.ide,
  org.eclipse.jface.text,
  org.eclipse.jdt.ui,
- ccw.core,
+ ccw.core;bundle-version="0.10.2",
  org.eclipse.jdt.astview,
  org.eclipse.jdt.launching,
  org.clojure.tools.nrepl,
- ccw.util
+ ccw.util,
+ org.eclipse.debug.core;bundle-version="3.7.100"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

@@ -87,7 +87,7 @@ public class Activator extends AbstractUIPlugin {
 		        	Object handler = BundleUtils.requireAndGetVar(
 		        	        getBundle().getSymbolicName(),
 		        	        "clojure.tools.nrepl.ack/handle-ack").invoke(defaultHandler);
-		            ackREPLServer = (ServerSocket)((Map)((Agent)startServer.invoke(Keyword.intern("handler"), handler)).deref()).get(Keyword.intern("ss"));
+		            ackREPLServer = (ServerSocket)((Map)startServer.invoke(Keyword.intern("handler"), handler)).get(Keyword.intern("server-socket"));
 		            Activator.log("Started Ekeko-hosted nREPL server: nrepl://localhost:" + ackREPLServer.getLocalPort());
 		        } catch (Exception e) {
 		            Activator.logError("Could not start Ekeko-hosted nREPL server", e);
@@ -106,26 +106,10 @@ public class Activator extends AbstractUIPlugin {
 		//starts repl in environment with correct class loader 
 		ClojureOSGi.withBundle(getDefault().getBundle(), new RunnableWithException() {
 			public Object run() throws Exception {
-				startREPLServer();
-				
-				/*
-				 * 
-				 * java.lang.IllegalStateException: Can't change/establish root binding of: *ns* with set
-	at clojure.lang.Var.set(Var.java:219)
-	at clojure.lang.RT$1.invoke(RT.java:226)
-
-				 * 
-				 * 
-				Object use = RT.readString("(use 'damp.ekeko)");
-				clojure.lang.Compiler.eval(use);
-				Object inns = RT.readString("(in-ns 'damp.ekeko)");
-				clojure.lang.Compiler.eval(inns);
-				
-				*/
-				
+				startREPLServer();				
 				return null;
 			}});
-		REPLView.connect(String.format("nrepl://%s:%s", "localhost", ackREPLServer.getLocalPort()));//CCWPlugin.getDefault().getREPLServerPort());
+		REPLView.connect(String.format("nrepl://%s:%s", "localhost", ackREPLServer.getLocalPort()),true);
 	}
 	
 	private void stopREPLServer() {

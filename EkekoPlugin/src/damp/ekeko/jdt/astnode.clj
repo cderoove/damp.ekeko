@@ -167,6 +167,8 @@
   {:type :Value
    :owner owner :property property :value value})
 
+(declare ast?)
+
 (defn 
   node-ekeko-properties
   [n]

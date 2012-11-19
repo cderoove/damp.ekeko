@@ -220,7 +220,7 @@
   {:reifiers (fn [this] (node-ekeko-properties this))})
                           
 (defn 
-  node-children
+  node-propertyvalues
   [n]
   (map (fn [retrievalf] (retrievalf n))
        (vals (node-ekeko-properties n))))

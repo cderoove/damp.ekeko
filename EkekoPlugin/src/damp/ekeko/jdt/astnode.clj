@@ -21,6 +21,54 @@
 (set! *warn-on-reflection* true)
 
 
+
+; Helper Predicates
+; -----------------
+
+(defmacro 
+  ast?
+  [x]
+  `(instance? ASTNode ~x))
+
+(defmacro
+  value?
+  [x]
+  `(and 
+     (map? ~x)
+     (= :Value (:type ~x))))
+
+(defmacro
+  lstvalue?
+  [x]
+  `(and
+     (value? ~x)
+     (instance? java.util.List (:value ~x))))
+  
+
+(defmacro
+  nilvalue?
+  [x]
+  `(and
+     (value? ~x)
+     (nil? (:value ~x))))
+
+(defmacro
+  primitivevalue?
+  [x]
+  `(and
+     (value? ~x)
+     (not (instance? java.util.List (:value ~x)))
+     (not (nil? (:value ~x)))))
+  
+
+(defmacro expression? [node]
+  `(instance? Expression ~node))
+
+(defmacro statement? [node]
+  `(instance? Statement ~node))
+
+
+
 ;; JDT DOM classes
 ;; ---------------
 
@@ -167,8 +215,6 @@
   {:type :Value
    :owner owner :property property :value value})
 
-(declare ast?)
-
 (defn 
   node-ekeko-properties
   [n]
@@ -222,7 +268,7 @@
 (defn 
   node-propertyvalues
   [n]
-  (map (fn [retrievalf] (retrievalf n))
+  (map (fn [retrievalf] (retrievalf))
        (vals (node-ekeko-properties n))))
 
 ; Bindings
@@ -252,91 +298,5 @@
 
 (defn binding-member-value-pair? [^IBinding b]
   (= IBinding/MEMBER_VALUE_PAIR (binding-kind b)))
-
-;;Very expensive; should not be used
-;(defn ast-bindings [] 
-;  (let [resolveable-asts
-;       (reduce (fn [nodes keyword] (clojure.set/union nodes (set (nodes-of-type keyword))))
-;               #{}
-;               (ekeko-keywords-for-resolveable-ast-classes))]
-;    (map (fn [ast] (.resolveBinding ast)) resolveable-asts)))
-
-
-; Helper Predicates
-; -----------------
-
-
-(defmacro 
-  ast?
-  [x]
-  `(instance? ASTNode ~x))
-
-(defmacro
-  value?
-  [x]
-  `(and 
-     (map? ~x)
-     (= :Value (:type ~x))))
-
-(defmacro
-  lstvalue?
-  [x]
-  `(and
-     (value? ~x)
-     (instance? java.util.List (:value ~x))))
-  
-
-(defmacro
-  nilvalue?
-  [x]
-  `(and
-     (value? ~x)
-     (nil? (:value ~x))))
-
-(defmacro
-  primitivevalue?
-  [x]
-  `(and
-     (value? ~x)
-     (not (instance? java.util.List (:value ~x)))
-     (not (nil? (:value ~x)))))
-  
-
-(defmacro expression? [node]
-  `(instance? Expression ~node))
-
-;redundant: the ones in the expression table of the model ought to be the same
-(defn actual-expression? [^ASTNode node]
-  (and (expression? node)
-       ;(not (instance? Annotation node)) ;TODO: I excluded Annotations from Cava's expressions
-       (not (and (instance? Name node)
-                 (or (= QualifiedName/QUALIFIER_PROPERTY (.getLocationInParent node)) ;no qualifiers of qualified names
-                     (if-let [b (resolved-binding ^Name node)]
-                       (not (binding-variable? b)) ;no names of methods etc..
-                       false)))))) 
-
-(defmacro statement? [node]
-  `(instance? Statement ~node))
-
-;TODO: ugly
-(defn statement-with-scope? [node]
-  (or (instance? Block node)
-      (instance? IfStatement node)
-      (instance? WhileStatement node)
-      (instance? ForStatement node)
-      (instance? EnhancedForStatement node)
-      (instance? SynchronizedStatement node)
-      (instance? TryStatement node)
-      (instance? DoStatement node)
-      (instance? LabeledStatement node)
-      (instance? SwitchStatement node)))
-
-
-;;Methods
-(defn has-same-body? [^MethodDeclaration method1 ^MethodDeclaration method2]
-  (.subtreeMatch
-    method1
-    (new org.eclipse.jdt.core.dom.ASTMatcher)
-    method2))
 
 

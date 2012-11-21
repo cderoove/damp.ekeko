@@ -23,7 +23,6 @@
      
 (set! *warn-on-reflection* true)
 
-
 (declare nodes-of-type)
 
 ;TODO: implement variant of defne that takes modes for variables 
@@ -140,9 +139,8 @@
 
   Examples:
   ;;?exp is an expression within method declaration ?m
-  (ekeko* [?m ?exp] (ast :MethodDeclaration ?m)
-                    (child+ ?m ?exp)
-                    (succeeds (actual-expression? ?exp)))   
+  (ekeko* [?m ?ch] (ast :MethodDeclaration ?m)
+                   (child+ ?m ?ch))   
 
   See also:
   Ternary predicate child/3"
@@ -199,6 +197,15 @@
   (all
     (value ?val)
     (succeeds (astnode/primitivevalue? ?val))))
+
+(defn
+  value-raw
+  "Relation of an ASTNode property value that isn't an ASTNode itself
+   and its raw value (either a primitive, nil, or a list)."
+  [?val ?raw]
+  (all
+    (value ?val)
+    (equals ?raw (:value ?val))))
           
 (defn
   ast-parent

@@ -97,7 +97,7 @@
   
   (ekeko* [?node ?child ?keyword] (child ?keyword ?node ?child)) 
   
-  (ekeko* [?cu ?exp] (ast :MethodDeclaration ?cu) (child+ ?cu ?exp) (succeeds (damp.ekeko.jdt.astnode/actual-expression? ?exp)))   
+  (ekeko* [?cu ?exp] (ast :MethodDeclaration ?cu) (child+ ?cu ?exp))
   
   (ekeko* [?inv]
           (ast :MethodInvocation ?inv) 

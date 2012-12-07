@@ -21,7 +21,7 @@ Require-Bundle: clojure.osgi,
  org.eclipse.jdt.launching,
  org.clojure.tools.nrepl,
  ccw.util,
- org.eclipse.debug.core;bundle-version="3.7.100"
+ org.eclipse.debug.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

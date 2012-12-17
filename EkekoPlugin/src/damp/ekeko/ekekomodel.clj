@@ -21,9 +21,11 @@
          Example usage:
          ;;temporarily query JHotDraw51 only:
             (binding [*queried-project-models* 
-                       (filter (fn [project-model] 
-                          (= \"JHotDraw51\" (.getName (.getProject project-model))))
-                        (all-project-models))]
+                       (atom
+                         (filter 
+                           (fn [project-model] 
+                             (= \"JHotDraw51\" (.getName (.getProject project-model))))
+                        (all-project-models)))]
               (ekeko* [?cu] (ast :CompilationUnit ?cu)))"
           }
        *queried-project-models*
@@ -51,7 +53,7 @@
   []
   (if 
     *queried-project-models*
-    *queried-project-models*
+    @*queried-project-models*
     (all-project-models)))
 
 

@@ -243,9 +243,10 @@
   ;manually determine ProjectModel instances to be queried 
   ;(will be filtered to JavaProjectModel instances by ast reification predicates)
   (binding [damp.ekeko.ekekomodel/*queried-project-models* 
-            (filter (fn [project-model] 
+            (atom 
+              (filter (fn [project-model] 
                       (= "JHotDraw51" (.getName (.getProject project-model))))
-                    (all-project-models))]
+                    (all-project-models)))]
     (ekeko* [?cu] (ast :CompilationUnit ?cu)))
   
   

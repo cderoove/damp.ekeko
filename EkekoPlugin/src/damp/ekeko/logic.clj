@@ -19,7 +19,7 @@
          :else nil)))
 
 ;;TODO: move to a project with multiple, regular core.logic logic variables
-;;TODO: move to constraints such that the evaluating of the expression can be delayed until all variables are bound
+;;TODO: move to constraints such that the evaluation of the expression can be delayed until all variables are bound
 (defmacro
   equals
   "Non-relational. Projects all logic variables on the right-hand side

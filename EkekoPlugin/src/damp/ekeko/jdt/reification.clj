@@ -242,7 +242,7 @@
    Binary predicate ast/2
    API documentation of org.eclipse.jdt.core.dom.IBinding"
   [?key ?ast]
-  (let  [keys (astnode/ekeko-keywords-for-resolveable-ast-classes)]
+  (let  [keys astnode/ekeko-keywords-for-resolveable-ast-classes]
     (all
          (contains keys ?key)
          (ast ?key ?ast))))
@@ -255,7 +255,7 @@
    See also:
    Binary predicate ast/2"
   [?key ?ast]
-  (let [declaration-keywords (astnode/ekeko-keywords-for-declaration-ast-classes)]
+  (let [declaration-keywords astnode/ekeko-keywords-for-declaration-ast-classes]
     (all 
       (contains declaration-keywords ?key)
       (ast ?key ?ast))))
@@ -269,14 +269,14 @@
     Note that ?ast can be an instance of FieldAccess, 
     SuperFieldAccess, SimpleName or QualifiedName."
   [?key ?node] 
-  (conda [(v- ?node)
+  (conde [(v- ?node)
           (ast :FieldAccessLike ?node) 
           (ast ?key ?node)]
          [(v+ ?node) 
           (fresh [?n] 
-            (ast :FieldAccessLike ?n)
-            (== ?n ?node))]))
-
+                 (ast :FieldAccessLike ?n)
+                 (== ?n ?node))]))
+    
 (defn 
   ast-type
   "Like ast/2, but ensures ?type is an 
@@ -323,7 +323,7 @@
    SuperMethodInvocation, ClassInstanceCreation,
    ConstructorInvocation or SuperConstructorInvocation"
   [?key ?node] 
-  (conda [(v- ?node)
+  (conde [(v- ?node)
           (ast :MethodInvocationLike ?node)
           (ast ?key ?node)]
          [(v+ ?node)
@@ -334,7 +334,7 @@
                      :ConstructorInvocation 
                      :SuperConstructorInvocation] ?key) ;TODO: define a constant for this
           ]))
-
+  
 
 (defn
   ast-expression-typebinding

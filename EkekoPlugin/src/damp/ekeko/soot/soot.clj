@@ -1045,6 +1045,46 @@ current version of the current goal."}
                    (damp.qwal/qcurrent [current] (== ?unit (frame-unit current))) 
                    (damp.qwal/q=>+)
                    )))
+  
+  
+  ;;FOLLOWING REVEALS NON-DETERMINISTIC BUG ... could be in core.logic's tabling 
+  ;;works OK without tabling in damp.qwal's q* goal
+  ;;solution count differs per invocation
+   (defn query []
+    (map 
+      (fn [tuple]
+        (nth tuple 2))
+      (damp.ekeko/ekeko
+        [?m ?entry ?unit ?exit]
+        (fresh [?cfg]
+               (soot-entry-method ?m)
+               (soot-method-cfg ?m ?cfg)
+               (soot-method-cfg-entry ?m ?cfg ?entry)
+               (soot-method-cfg-exit ?m ?cfg ?exit)
+               (project [?cfg]
+                        (damp.qwal/qwal ?cfg ?entry ?exit 
+                                        []
+                                        (damp.qwal/q=>*)
+                                        (damp.qwal/qcurrent [current] (== current ?unit))
+                                        (damp.qwal/q=>*)
+                                        ))))))
+  
+  
+  
+  (defn q []
+     (count(into #{} (query))))
+  
+  (for [n (range 100)] (q)) 
+  
+  
+  (defn diffs []
+         (clojure.set/difference
+           (into #{} (query))
+           (into #{} (query))))   
+  
+
+  
+  
     
     ) 
       

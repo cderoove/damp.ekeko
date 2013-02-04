@@ -3,7 +3,7 @@
     :author "Coen De Roover"}
    damp.ekeko.logic 
   (:refer-clojure :exclude [==])
-   (:use [clojure.core.logic]))
+  (:use [clojure.core.logic]))
 
 (defn- 
   ekeko-lvar-sym?
@@ -89,13 +89,13 @@
   v+ 
   "Non-relational. Verifies that logic variable v is ground."
   [v]
-  `(project [~v] (succeeds (not (lvar? ~v)))))
+  `(nonlvaro ~v))
 
 (defmacro
   v-
   "Non-relational. Verifies that logic variable v is not ground."
   [v]
-  `(project [~v] (succeeds (lvar? ~v))))
+  `(lvaro ~v))
 
 
 (defmacro

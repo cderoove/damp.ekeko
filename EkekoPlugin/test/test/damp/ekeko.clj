@@ -1,8 +1,8 @@
 (ns test.damp.ekeko
   (:refer-clojure :exclude [== type declare])
-  (:use [clojure.core.logic :exclude [is]] :reload)
-  (:require [damp.ekeko])
   (:require
+    [clojure.core.logic :exclude [is] :as l]
+    [damp.ekeko]
     [damp.ekeko.workspace
      [workspace :as ws]]
     [damp.ekeko.soot
@@ -111,6 +111,17 @@
   (is (seq tuples2))
   (is (count tuples1) (count tuples2))
   (tuples-are tuples1 tuples2))
+
+(defn
+  tuples-aresubset
+  "Verifies whether all elements from its first argument sequence are
+   included in its second argument sequence (both obtained as solutions to an Ekeko query)."
+  [tuples1 tuples2]
+  (is 
+    (clojure.set/subset? (into #{} tuples1)
+                         (into #{} tuples2))))
+
+  
   
 
   
@@ -122,11 +133,11 @@
 (deftest
   test-ekeko
   (tuples-correspond
-    (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))
+    (damp.ekeko/ekeko [?x ?y] (l/== ?x 1) (l/== ?y 2))
     "#{(\"1\" \"2\")}") ;string obtained through (tuples-to-stringsetstring  (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))) 
   (tuples-are 
-    (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2))
-    (damp.ekeko/ekeko [?x ?y] (== ?x 1) (== ?y 2)))) 
+    (damp.ekeko/ekeko [?x ?y] (l/== ?x 1) (l/== ?y 2))
+    (damp.ekeko/ekeko [?x ?y] (l/== ?x 1) (l/== ?y 2)))) 
 
 
 ;; Test Suite

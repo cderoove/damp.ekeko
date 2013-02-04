@@ -288,19 +288,6 @@
     (ast :Type ?type) ;above trick is not necessary as Type is an actual super class 
     (ast ?key ?type)))
 
-(defn 
-  ast-name-of-parameter
-  "Like ast/2, but ensures ?name is the SimpleName 
-   of a formal parameter declaration."
-  [?keyw ?name]
-  (fresh [?nameBinding ?parent]
-         (== ?keyw :SimpleName)
-         (ast ?keyw ?name) 
-         (equals ?nameBinding (.resolveBinding ^SimpleName ?name))
-         (succeeds (.isParameter ^IVariableBinding ?nameBinding))
-         (ast-parent ?name ?parent)
-         (ast :SingleVariableDeclaration ?parent)))
-
 
 (defn 
   ast-resolveable-declaration
@@ -336,6 +323,35 @@
           ]))
   
 
+(declare ast-expression-typebinding)
+
+(defn 
+  ast-expression-reference
+  "Relation between a reference-valued Expression instance ?ast and 
+   the keyword ?keyw representing its kind."
+  [?keyw ?ast]
+  (fresh [?binding]
+         (ast-expression-typebinding ?keyw ?ast ?binding)
+         (succeeds (not (.isPrimitive ^ITypeBinding ?binding))))) 
+
+
+(defn 
+  ast-name-of-parameter
+  "Like ast/2, but ensures ?name is the SimpleName 
+   of a formal parameter declaration."
+  [?keyw ?name]
+  (fresh [?nameBinding ?parent]
+         (== ?keyw :SimpleName)
+         (ast ?keyw ?name) 
+         (equals ?nameBinding (.resolveBinding ^SimpleName ?name))
+         (succeeds (.isParameter ^IVariableBinding ?nameBinding))
+         (ast-parent ?name ?parent)
+         (ast :SingleVariableDeclaration ?parent)))
+
+
+;; Bindings
+;; --------
+
 (defn
   ast-expression-typebinding
   "Relation between an Expression instance ?ast,
@@ -348,18 +364,6 @@
     (!= nil ?binding)
     (ast ?key ?ast)))
 
-(defn 
-  ast-expression-reference
-  "Relation between a reference-valued Expression instance ?ast and 
-   the keyword ?keyw representing its kind."
-  [?keyw ?ast]
-  (fresh [?binding]
-         (ast-expression-typebinding ?keyw ?ast ?binding)
-         (succeeds (not (.isPrimitive ^ITypeBinding ?binding))))) 
-
-
-;; Bindings
-;; --------
 
 (defn 
   ast-type-binding
@@ -385,9 +389,10 @@
    See also:
    API documentation of org.eclipse.jdt.core.dom.TypeDeclaration
    and org.eclipse.jdt.core.dom.ITypeBinding"
-  [?typeDeclaration ?binding]
+  [?key ?typeDeclaration ?binding]
   (all 
-    (ast :TypeDeclaration ?typeDeclaration)
+    (== ?key :TypeDeclaration)
+    (ast ?key ?typeDeclaration)
     (!= nil ?binding)
     (equals ?binding (.resolveBinding ^TypeDeclaration ?typeDeclaration))))
 
@@ -427,9 +432,9 @@
    Note that this relation is quite slow to compute.
 
    See also:
-   binary predicate ast-typedeclaration-binding/2 
+   ternary predicate ast-typedeclaration-binding/3 
    which restricts ?n to TypeDeclaration instances"
-  [?n ?key ?binding]
+  [?key ?n ?binding]
   (all 
     (!= ?binding nil)
     (!= ?n nil)

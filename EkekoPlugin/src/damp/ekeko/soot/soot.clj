@@ -241,9 +241,9 @@
                      (project [node]
                               (== to (seq (.getPredsOf ^ExceptionalUnitGraph soot-cfg node))))))
    :successors (fn 
-                 [node to]
-                 (all
-                   (project [node]
+                 [node to ]
+                 (all 
+                   (project [node] 
                             (== to (seq (.getSuccsOf ^ExceptionalUnitGraph soot-cfg node))))))})
 
 
@@ -285,7 +285,7 @@
   Soot heads and tails of the control flow graph.
   API reference of soot.toolkits.graph.ExceptionalUnitGraph"
    [?method ?cfg]
-   (conda [(v+ ?cfg)
+   (conde [(v+ ?cfg)
             (fresh [?body]
                    (equals ?body (.getBody ^ExceptionalUnitGraph (:soot-cfg ?cfg)))
                    (soot-method-body ?method ?body))]
@@ -559,42 +559,6 @@
     (.getLast ^PatchingChain (.getUnits ^Body sootbody)))
 
 
-
-
-(comment
-  
-;correctness depends on the depth at which icfg-contextualnode-node cuts of the call list
-;no good either
-
-;linked callframes
-(defn
-  make-icfg-context
-  [caller invocation previous]
-  {:caller caller
-   :invocation invocation
-   :previous previous })
-
-(defn
-  make-icfg-contextualnode
-  [unit method context]
-  {:unit unit
-   :method method
-   :context context})
-
-;removes link to previous callframe
-(defn
-  icfg-contextualnode-node
-  [contextualnode]
-  (assoc contextualnode 
-         :context
-         (dissoc (:context contextualnode) :previous)))
-
-;(defn
-;  icfg-contextualnode-node
-;  [contextualnode]
-;  (dissoc contextualnode :context))
-
-
 (defn
   jdk-node?
   [node]
@@ -606,162 +570,6 @@
 ; -only store call/return nodes, retrieve others on the fly
 ; -comptue call/return nodes from edges 
 
-
-
-  
-(defn
-  make-icfg
-  [entrym]
-  (let [;cache avoids multiple cfg instances per method
-        method2graph
-        (atom {})
-        method-cfg 
-        (fn [method] 
-          (or
-            (get @method2graph method)
-            (let [graph (ExceptionalUnitGraph. (.getActiveBody ^SootMethod method))]
-              (swap! method2graph assoc method graph)
-              graph)))
-        model
-        (projectmodel/current-soot-model)
-        startnode
-        (make-icfg-contextualnode
-          (sootbody-firstunit (.getActiveBody entrym)) 
-          entrym
-          (make-icfg-context nil nil nil))
-        successors-noninvoking
-        (fn [node]
-          (let [unit (:unit node)
-                method (:method node)
-                context (:context node)
-                immediate-successors 
-                (.getSuccsOf ^ExceptionalUnitGraph (method-cfg method) unit)]
-            (if
-              (seq immediate-successors)
-              (map (fn [successor] (make-icfg-contextualnode successor method context)) immediate-successors)
-              ;return to caller
-              (let [caller (:caller context)
-                    invocation (:invocation context)
-                    previous (:previous context)]
-                (if-not
-                  caller 
-                  ;entry method
-                  []
-                  ;regular method
-                  (map (fn [successor] (make-icfg-contextualnode successor caller previous))
-                       (.getSuccsOf ^ExceptionalUnitGraph (method-cfg caller) invocation)))))))] 
-  (loop 
-    [;visited #{}
-     node2successors {}
-     worklist (list startnode)]
-    (if 
-      (seq worklist)
-      (let [node 
-            (first worklist)
-            non-contextual-node
-            (icfg-contextualnode-node node)]
-        (if 
-          ;already handled the non-contextual node?
-          (node2successors non-contextual-node)        
-          (recur node2successors (rest worklist)) 
-          (let [unit (:unit node)
-                method (:method node)
-                context (:context node)
-                contextual-successors
-                (if 
-                  ;unit containing a method invocation
-                  (.containsInvokeExpr ^Stmt unit)
-                  (let [methods 
-                        (iterator-seq (.dynamicUnitCallees ^SootProjectModel model unit))
-                        active-methods 
-                        (filter (fn [method] (.hasActiveBody ^SootMethod method)) methods)
-                        application-methods 
-                        (filter (fn [method] (.isApplicationClass (.getDeclaringClass method))) active-methods)]
-                    (if 
-                      (seq application-methods)
-                      (map (fn [new-callee]
-                             (make-icfg-contextualnode
-                               (sootbody-firstunit (.getActiveBody new-callee))
-                               new-callee
-                               (make-icfg-context method unit context)))
-                           application-methods)
-                      (successors-noninvoking node)))
-                  ;regular unit     
-                  (successors-noninvoking node))]
-            (recur 
-              (assoc node2successors non-contextual-node (map icfg-contextualnode-node contextual-successors))
-              (concat (rest worklist) contextual-successors)))))
-      node2successors))))
-                          
-      
- ;     (fn [icfgnode] (if-let
- ;                      [successors (node2successors icfgnode)] 
- ;                      successors
- ;                      (map (fn [successor] (make-icfg-node successor ))
- ;                                    (.getSuccsOf ^ExceptionalUnitGraph (method-cfg calling-method) calling-unit))))
-  
-
- 
- 
-
-
- 
- 
- 
- (defn-
-   qwal-interprocedural-graph-from-soot-method
-   [starting-method]
-   (let [icfg (make-icfg starting-method)]
-     {:soot-method starting-method
-      :icfg icfg
-      :successors (fn [node tos]
-                    (all
-                      (project [node]
-                               (== nil (println (node-str node) " =>"))
-                               (== tos (icfg node))
-                               (project [tos]
-                                        (== nil (println (map node-str tos)))))))}))
-  
-  (defn
-    soot-method-icfg
-    "Relation between a SootMethod and the program's interprocedural
-   control flow graph starting in that method, in a format that is suitable for being
-   queried using regular path expressions provided by the damp.qwal library."
-    [?method ?icfg]
-    (conde [(v+ ?icfg)
-            (equals ?method (:soot-method ?icfg))]
-           [(v- ?icfg)
-            (soot :method ?method)
-            (equals ?icfg (qwal-interprocedural-graph-from-soot-method ?method))]))
-  
-  (defn
-    soot-method-icfg-entry
-    [?method ?icfg ?entry]
-    (fresh [?body]
-           (soot-method-icfg ?method ?icfg)
-           (soot-method-body ?method ?body)
-           ;analogous to skipping of multiple heads in successor function
-           (equals ?entry
-                   (icfg-contextualnode-node
-                     (make-icfg-contextualnode
-                       (sootbody-firstunit ?body)
-                       ?method
-                       (make-icfg-context nil nil nil))))))
-  (defn
-    soot-method-icfg-exit
-    [?method ?icfg ?exit]
-    (fresh [?cfg ?cfgexit]
-           (soot-method-icfg ?method ?icfg)
-           (soot-method-cfg ?method ?cfg)
-           (soot-method-cfg-exit ?method ?cfg ?cfgexit)
-           (equals ?exit 
-                   (icfg-contextualnode-node
-                     (make-icfg-contextualnode
-                       ?cfgexit
-                       ?method
-                       (make-icfg-context nil nil nil))))))
-                   
-)
 
 
 (defn
@@ -890,11 +698,8 @@
     {:soot-method starting-method
      :successors (fn [node tos]
                    (all
-                     
                      (project [node]
-                              (== tos (tracesuccessorf node))
-                              
-                     
+                              (== tos (successorf node))
                      )))}))
 
 (defn
@@ -915,7 +720,6 @@
   (fresh [?body]
          (soot-method-icfg ?method ?icfg)
          (soot-method-body ?method ?body)
-         ;analogous to skipping of multiple heads in successor function
          (equals ?entry (make-icfgnode (sootbody-firstunit ?body) ?method [])))) 
 
 (defn
@@ -924,75 +728,7 @@
   (fresh [?cfg  ?body]
          (soot-method-icfg ?method ?icfg)        
          (soot-method-body ?method ?body)
-         (trace-lvars "Exit:" ?exit)
-         (equals ?exit (make-icfgnode (sootbody-lastunit ?body) ?method []))
-         (trace-lvars "Succeeded exit:" ?exit)
-         
-         )) 
-
-  
-;(soot-method-cfg ?method ?cfg)
-;(soot-method-cfg-exit ?method ?cfg ?cfgexit)
-;(equals ?exit (make-icfgnode ?cfgexit ?method []))))
-
-(def
-  successoro
-  (make-soot-icfg-successors))
-
-
-(comment
-(defn
-  ^{:doc "goals is a list of goals.
-Each goal is called, passing the next version of the previous goal as the
-current version of the current goal."}
-  ekeko-solve-goals [graph curr end goals]
-  (all
-  (project [goals]
-           (conde [(== true
-                       (empty? goals))
-                   (== curr end)
-                  ]
-                  [(== false (empty? goals))
-                   (fresh [h t foo]
-                          (== h (first goals))
-                          (== t (rest goals))
-                          (project [h t curr]
-                            (h graph curr foo)
-                            (ekeko-solve-goals graph foo end t)))]))))
-(def
-  paddo
-  (tabled
-    [graph start end]
-    (conde
-      [(== start end)]
-      [(fresh [?via ?vias]
-              (project [start graph]
-                       ((:successors graph)  start ?vias))
-              (membero ?via ?vias)
-              (paddo graph ?via end))])))
-
-
-
-             
-           
-;ca marche:
-;          
-;(damp.ekeko/ekeko* [?begin ?end ?unit] (fresh [?m ?icfg ?via]
-;                             (soot-entry-method ?m)
-;                             (soot-method-icfg ?m ?icfg)
-;                             (soot-method-icfg-entry ?m ?icfg ?begin)
-;                             (soot-method-icfg-exit ?m ?icfg ?end)
-;                             (paddo ?icfg ?begin ?via)
-;                             (== ?via ?unit)
-;                             (paddo ?icfg ?via ?end)
-;                             ))
-
-
-
-)
-           
-           
-
+         (equals ?exit (make-icfgnode (sootbody-lastunit ?body) ?method [])))) 
 
 ;; ALIASING
 ;; --------
@@ -1026,66 +762,5 @@ current version of the current goal."}
          (soot-method-cfg ?m ?cfg)
          (equals ?unitgraph (:soot-cfg ?cfg))
          (equals ?a (StrongLocalMustAliasAnalysis. ?unitgraph))))
-
-
-
-(comment
-  
-  ;;test of interprocedural control flow graph traversal using damp.qwal
-  (damp.ekeko/ekeko*
-    [?m ?icfg ?entry ?unit ?exit]
-    (soot-entry-method ?m)
-    (soot-method-icfg ?m ?icfg)
-    (soot-method-icfg-entry ?m ?icfg ?entry)
-    (soot-method-icfg-exit ?m ?icfg ?exit)
-    (project [?icfg]
-             (damp.qwal/qwal ?icfg ?entry ?exit 
-                   []
-                   (damp.qwal/q=>+)
-                   (damp.qwal/qcurrent [current] (== ?unit (frame-unit current))) 
-                   (damp.qwal/q=>+)
-                   )))
-  
-  
-  ;;FOLLOWING REVEALS NON-DETERMINISTIC BUG ... could be in core.logic's tabling 
-  ;;works OK without tabling in damp.qwal's q* goal
-  ;;solution count differs per invocation
-   (defn query []
-    (map 
-      (fn [tuple]
-        (nth tuple 2))
-      (damp.ekeko/ekeko
-        [?m ?entry ?unit ?exit]
-        (fresh [?cfg]
-               (soot-entry-method ?m)
-               (soot-method-cfg ?m ?cfg)
-               (soot-method-cfg-entry ?m ?cfg ?entry)
-               (soot-method-cfg-exit ?m ?cfg ?exit)
-               (project [?cfg]
-                        (damp.qwal/qwal ?cfg ?entry ?exit 
-                                        []
-                                        (damp.qwal/q=>*)
-                                        (damp.qwal/qcurrent [current] (== current ?unit))
-                                        (damp.qwal/q=>*)
-                                        ))))))
-  
-  
-  
-  (defn q []
-     (count(into #{} (query))))
-  
-  (for [n (range 100)] (q)) 
-  
-  
-  (defn diffs []
-         (clojure.set/difference
-           (into #{} (query))
-           (into #{} (query))))   
-  
-
-  
-  
-    
-    ) 
       
               

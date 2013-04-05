@@ -2,6 +2,7 @@ package damp.ekeko;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,18 +16,21 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import ccw.repl.REPLView;
 import ccw.util.BundleUtils;
-import clojure.lang.Agent;
 import clojure.lang.Keyword;
 import clojure.lang.Var;
 import clojure.osgi.ClojureOSGi;
 import clojure.osgi.RunnableWithException;
+//import ccw.repl.REPLView;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -109,7 +113,18 @@ public class Activator extends AbstractUIPlugin {
 				startREPLServer();				
 				return null;
 			}});
-		REPLView.connect(String.format("nrepl://%s:%s", "localhost", ackREPLServer.getLocalPort()),true);
+		
+		int port = ackREPLServer.getLocalPort();
+		String url = String.format("nrepl://%s:%s", "localhost", port);
+		//disabled because we cannot depend on ccw.core
+		//REPLView.connect(url,port,true);
+			
+		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+		MessageDialog.openInformation(shell, 
+				"Ekeko-hosted nREPL server started", 
+				"Successfully started an Ekeko-hosted nREPL server on port " + port  + ".\n" +
+				"Connect to this repl using the 'Connect to REPL' dialog in the Window menu.");		
 	}
 	
 	private void stopREPLServer() {

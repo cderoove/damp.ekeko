@@ -25,11 +25,44 @@
   "Non-relational. Projects all logic variables on the right-hand side
    that start with a question mark (e.g., ?x), evaluates the resulting
    Clojure expression and unifies the result with the left hand-side. "
-  [lvar exp & rest]
+  [lvar exp]
   (let [expvars#  (ekeko-extract-vars exp)] 
     `(project [~@expvars#]
-      (== ~lvar ~exp)
-      ~@rest)))
+      (== ~lvar ~exp))))
+
+(defmacro
+  findall
+  "Crude approximation of Prolog's findall.
+   To be improved.
+
+   Introduces the first argument as a fresh var
+   into the lexical scope of the second one. 
+
+   Unifies third argment with a clojure vector 
+   of bindings for the first argument (expected to be a var) 
+   found in all solutions to the second argument (expected to be a goal).
+
+   Examples:
+   - vector of members within each type declaration:
+   (ekeko*
+     [?t ?members] 
+     (ast :TypeDeclaration ?t)
+     (findall ?name
+              (child :bodyDeclarations ?t ?name)
+              ?members))
+
+    - empty vector for each type declaration:
+    (ekeko*
+      [?t ?nosolutions] 
+      (ast :TypeDeclaration ?t)
+      (findall ?x
+               (all (== 1 2) (== 2 3))
+               ?nosolutions))"
+  [var goal solutionseq]
+  (let [expvars# (ekeko-extract-vars goal)
+        expvarstobeprojected# (disj (set expvars#) var)] 
+    `(project [~@expvarstobeprojected#]
+              (== ~solutionseq  (into [] (run* [~var] ~goal))))))
 
 (defmacro 
   perform 
@@ -112,4 +145,8 @@
   [g]
   (condu
     [g succeed]))
+
+  
+  
+
 

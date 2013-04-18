@@ -146,6 +146,18 @@
   (condu
     [g succeed]))
 
+(defn-
+  samesets
+  [col1 col2] 
+  (= (set col1) (set col2)))
+
+(defn
+  same-elements
+  "Non-relational. Checks whether the two _fully ground_ collections contain the same elements (set equality)."
+  [?col1 ?col2]
+  (all
+    (succeeds (samesets ?col1 ?col2))))
+    
   
   
 

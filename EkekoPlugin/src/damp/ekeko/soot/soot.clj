@@ -337,6 +337,18 @@
     (soot-method-body ?m ?body)
     (equals ?units (.getUnits ^Body ?body))))
 
+
+(defn
+  soot|method-soot|unit
+  "Relation between a SootMethod ?m and one of the units ?unit
+   in its active JimpleBody."
+  [?m ?unit]
+  (fresh [?units]
+         (soot-method-units ?m ?units)
+         (contains ?units ?unit)))
+                
+
+
 (defn 
   soot-method-unit-trailing-unit
   "Relation between a SootMethod ?m and two of its units 
@@ -371,7 +383,7 @@
   "Relation between a soot Unit ?u and one of the ValueBox instances it defines.
 
   See also:
-  predicate soot-unit-userbox/2"
+  predicate soot-unit-usebox/2"
   [?u ?b]
   (fresh [?boxes ?keyw]
          (soot-unit ?keyw ?u)
@@ -383,7 +395,7 @@
   "Relation between a soot Unit ?u and one of the ValueBox instances it uses.
 
   See also:
-  predicate soot-unit-userbox/2"
+  predicate soot-unit-defbox/2"
   [?u ?b]
   (fresh [?boxes ?keyw]
          (soot-unit ?keyw ?u)
@@ -497,6 +509,10 @@
          (soot :method ?caller) ;application methods only
          ))
 
+(def
+  soot|method-soot|method|caller
+  soot-method-called-by-method)
+
 (defn 
   soot-method-called-by-unit 
   "Relation between SootMethod ?m and one of the Unit instances ?unit 
@@ -519,6 +535,10 @@
          (contains ?units ?unit)
          (soot-unit ?keyw  ?unit) 
          ))
+
+(def
+  soot|method-soot|unit|caller
+  soot-method-called-by-unit)
 
 ;declaratively, same as above
 (defn 
@@ -660,20 +680,27 @@
       (let [method (icfgnode-method icfgnode)
             unit (icfgnode-unit icfgnode)
             stack (icfgnode-stack icfgnode)]
-        ;(println icfg-node)
+        ;(println stack)
         (if 
           ;unit containing a method invocation
           (and 
             (.containsInvokeExpr ^Stmt unit)
-            (not (some (fn [frame] (= unit (frame-unit frame))) stack)))        
+            (not-any? (fn [frame] (= unit (frame-unit frame))) stack))
+          
           (let [model (projectmodel/current-soot-model)
                 methods (iterator-seq (.dynamicUnitCallees ^SootProjectModel model unit))
                 active-methods (filter (fn [method] (.hasActiveBody ^SootMethod method)) methods)
+                nonjdk-activemethods (remove (fn [method] (.isJavaLibraryMethod method)) active-methods)
                 expanded-callstack  (conj stack (make-frame unit method))]
-            (map
-              (fn [callee]
-                (make-icfgnode (sootbody-firstunit (.getActiveBody callee)) callee expanded-callstack))
-              active-methods))
+            (if
+              ;(seq nonjdk-activemethods)
+              (seq nonjdk-activemethods)
+              (map
+                (fn [callee]
+                  (make-icfgnode (sootbody-firstunit (.getActiveBody callee)) callee expanded-callstack))
+                nonjdk-activemethods)
+              (successors-noninvoking method unit stack)))
+          
           (successors-noninvoking method unit stack))))))
 
 
@@ -681,7 +708,8 @@
 (defn
   node-str
   [node]
-  (str (icfgnode-unit node) "|" (.getName (icfgnode-method node))))
+ ; (str (icfgnode-unit node) "|" (.getName (icfgnode-method node))))
+  (.getName (icfgnode-method node)))
 
 ;todo: predecessors
 (defn-
@@ -693,14 +721,13 @@
         (fn [node]
           (let [tos (successorf node)]
             (println (node-str node) "=>" (map node-str tos))
-            tos))
-        ]
+            tos))]
     {:soot-method starting-method
      :successors (fn [node tos]
                    (all
                      (project [node]
-                              (== tos (successorf node))
-                     )))}))
+                              (== tos (tracesuccessorf node))
+                              )))}))
 
 (defn
   soot-method-icfg
@@ -762,5 +789,32 @@
          (soot-method-cfg ?m ?cfg)
          (equals ?unitgraph (:soot-cfg ?cfg))
          (equals ?a (StrongLocalMustAliasAnalysis. ?unitgraph))))
+
+
+
+;; Basic relations
+;; ---------------
+
+(defn
+  soot|unit|reads-soot|field
+  "Relation between a Soot unit and the Soot field it reads from."
+  [?unit ?field]
+  (fresh [?usebox ?value]
+         (soot-unit-usebox ?unit ?usebox)
+         (soot-valuebox-value ?usebox ?value)
+         (succeeds (instance? soot.jimple.FieldRef ?value))
+         (equals ?field (.getField ?value))))
+
+(defn
+  soot|unit|writes-soot|field
+  "Relation between a Soot unit and the Soot field it writes to."
+  [?unit ?field]
+  (fresh [?usebox ?value]
+         (soot-unit-defbox ?unit ?usebox)
+         (soot-valuebox-value ?usebox ?value)
+         (succeeds (instance? soot.jimple.FieldRef ?value))
+         (equals ?field (.getField ?value))))
+
+
       
               

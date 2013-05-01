@@ -488,12 +488,13 @@
    ASTNode$NodeList list of statements ?slist in its body. 
    Note that abstract methods are not included in this relation, 
    but methods with en empty body are."
-  [?m ?slist]
-  (fresh [?body]
+  [?m ?statements]
+  (fresh [?body ?slist]
          (ast :MethodDeclaration ?m)
          (has :body ?m ?body)
          (!= nil ?body)
-         (has :statements ?body ?slist)))
+         (has :statements ?body ?slist)
+         (value-raw ?slist ?statements)))
 
 (defn- 
   jdt-method-cfg [m]

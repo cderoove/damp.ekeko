@@ -390,6 +390,8 @@
          (equals ?boxes (.getDefBoxes ^Unit ?u))
          (contains ?boxes ?b)))
 
+(def soot|unit|writes-soot|valuebox soot-unit-defbox)
+
 (defn 
   soot-unit-usebox
   "Relation between a soot Unit ?u and one of the ValueBox instances it uses.
@@ -401,6 +403,9 @@
          (soot-unit ?keyw ?u)
          (equals ?boxes (.getUseBoxes ^Unit ?u))
          (contains ?boxes ?b)))
+
+(def soot|unit|reads-soot|valuebox soot-unit-usebox)
+
 
 (defn 
   soot-valuebox 
@@ -726,7 +731,7 @@
      :successors (fn [node tos]
                    (all
                      (project [node]
-                              (== tos (tracesuccessorf node))
+                              (== tos (successorf node))
                               )))}))
 
 (defn

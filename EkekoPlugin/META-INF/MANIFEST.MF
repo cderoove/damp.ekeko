@@ -4,8 +4,7 @@ Bundle-Name: Ekeko Eclipse Plugin
 Bundle-SymbolicName: damp.ekeko.plugin;singleton:=true
 Bundle-Version: 1.0.3
 Bundle-Activator: damp.ekeko.Activator
-Require-Bundle: clojure.osgi,
- org.eclipse.ui,
+Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  org.eclipse.core.resources,
@@ -18,8 +17,7 @@ Require-Bundle: clojure.osgi,
  org.eclipse.jdt.ui,
  org.eclipse.jdt.astview,
  org.eclipse.jdt.launching,
- org.eclipse.debug.core,
- ccw.util;bundle-version="0.11.1"
+ org.eclipse.debug.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

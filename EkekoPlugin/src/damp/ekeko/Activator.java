@@ -23,14 +23,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import ccw.util.BundleUtils;
 import clojure.lang.Keyword;
 import clojure.lang.Var;
-import clojure.osgi.ClojureOSGi;
-import clojure.osgi.RunnableWithException;
+import ccw.util.BundleUtils;
+import ccw.util.osgi.ClojureOSGi;
 //import ccw.repl.REPLView;
+import ccw.util.osgi.RunnableWithException;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -64,9 +65,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	private void startClojureCode(BundleContext bundleContext) throws Exception {
-		ClojureOSGi.require(bundleContext, "clojure.stacktrace"); 
-		ClojureOSGi.require(bundleContext, "clojure.test");  
-		ClojureOSGi.require(bundleContext, "clojure.tools.nrepl.server"); 
+		Bundle b = bundleContext.getBundle();
+		ClojureOSGi.require(b, "clojure.stacktrace"); 
+		ClojureOSGi.require(b, "clojure.test");  
+		ClojureOSGi.require(b, "clojure.tools.nrepl.server"); 
 		//ClojureOSGi.require(bundleContext, "damp.ekeko"); 
 		
 	}

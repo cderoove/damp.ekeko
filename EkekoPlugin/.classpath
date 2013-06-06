@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="libs/soot.jar"/>
 	<classpathentry kind="lib" path="libs/tools.nrepl-0.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.3.jar"/>
+	<classpathentry kind="lib" path="libs/clojure-1.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

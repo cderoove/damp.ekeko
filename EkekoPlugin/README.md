@@ -10,17 +10,17 @@ Ekeko is meant as the successor to the [SOUL logic program query language](http:
 
 
 ## Installation
-
 Install the prebuilt Ekeko plugin from the Eclipse update site: 
-[http://soft.vub.ac.be/eclipse/update-3.7/](http://soft.vub.ac.be/eclipse/update-3.7/) 
+[http://soft.vub.ac.be/~cderoove/eclipse/](http://soft.vub.ac.be/~cderoove/eclipse/) 
+
+Ensure plugin dependencies [org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php) and [Counterclockwise](http://code.google.com/p/counterclockwise/) are installed.
 
 See [Installing New Software](http://help.eclipse.org/juno/topic/org.eclipse.platform.doc.user/tasks/tasks-124.htm) for help on installing Eclipse plugins from an update site. 
 
 Ekeko has been tested against [Eclipse Juno (4.2)](http://www.eclipse.org)
 
-Plugin dependencies [org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php) and [Counterclockwise](http://code.google.com/p/counterclockwise/) should be installed automatically.
+Alternatively, the plugin can also be built from the [EclipsePlugin](https://github.com/cderoove/damp.ekeko/tree/master/EkekoPlugin) project in this repository.
 
-Alternatively, the plugin can also be built from [EclipsePlugin](https://github.com/cderoove/damp.ekeko/tree/master/EkekoPlugin) and its feature from [EclipseFeature](https://github.com/cderoove/damp.ekeko/tree/master/EkekoFeature) using the Eclipse export wizards on the [plugin.xml](https://github.com/cderoove/damp.ekeko/blob/master/EkekoPlugin/plugin.xml) and [feature.xml](https://github.com/cderoove/damp.ekeko/blob/master/EkekoFeature/feature.xml) files from the respective Eclipse projects. 
 
 ## Documentation
 
@@ -33,7 +33,7 @@ See the [damp.ekeko API documentation](http://cderoove.github.com/damp.ekeko/) f
 
 ## License  
 
-Copyright © 2012 Ekeko contributors: 
+Copyright © 2012-2013 Ekeko contributors: 
 
 * [Coen De Roover](http://soft.vub.ac.be/~cderoove/): initial design, implementation and documentation
  

@@ -34,7 +34,7 @@ External dependencies:
    </license>
 
    <url>
-      <update label="Ekeko Update Site" url="http://soft.vub.ac.be/eclipse/update-3.7/"/>
+      <update label="Ekeko Update Site" url="http://soft.vub.ac.be/~cderoove/eclipse/"/>
       <discovery label="Counterclockwise Update Site" url="http://ccw.cgrand.net/updatesite/"/>
       <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site/"/>
    </url>

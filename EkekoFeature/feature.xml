@@ -10,7 +10,7 @@ to academic papers about logic program querying.
    </description>
 
    <copyright>
-      (c) 2012 Ekeko contributors
+      (c) 2012-2013 Ekeko contributors
 Coen De Roover:
 - initial design, implementation and documentation
 Carlos Noguera 
@@ -40,24 +40,20 @@ External dependencies:
    </url>
 
    <requires>
-      <import plugin="org.eclipse.jdt.astview" version="1.1.8" match="greaterOrEqual"/>
-      <import feature="ccw.feature"/>
-      <import plugin="clojure.osgi"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.jdt.core"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="ccw.clojure"/>
       <import plugin="org.eclipse.ui.console"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.jdt.ui"/>
-      <import plugin="ccw.core"/>
+      <import plugin="org.eclipse.jdt.astview" version="1.1.8" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.clojure.tools.nrepl"/>
-      <import plugin="ccw.util"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import feature="ccw.feature"/>
    </requires>
 
    <plugin

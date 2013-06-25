@@ -2,7 +2,7 @@
 <feature
       id="damp.ekeko.feature"
       label="Ekeko"
-      version="1.0.3">
+      version="2.0.0">
 
    <description>
       Ekeko is an environment for querying and transforming Eclipse workspaces using causally-connected applicative logic meta-programs. Ekeko is based on the core.logic (https://github.com/clojure/core.logic) port to Clojure (http://clojure.org/) of the applicative logic programming language Kanren (http://kanren.sourceforge.net/). Ekeko is meant as the successor to the SOUL logic program query language (http://soft.vub.ac.be/SOUL/), which still hosts links
@@ -64,7 +64,7 @@ External dependencies:
          id="damp.ekeko.plugin"
          download-size="0"
          install-size="0"
-         version="1.0.3"
+         version="2.0.0"
          unpack="false"/>
 
 </feature>

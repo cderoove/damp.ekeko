@@ -22,27 +22,25 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import damp.ekeko.soot.SootProjectModel;
 import damp.ekeko.soot.ToggleSootNatureAction;
 
 
 public class EkekoProjectPropertyPage extends PropertyPage {
 
-	private static final String ENTRYPOINT_TITLE = "&Entry Point for Static Analyses:";
+	private static final String ENTRYPOINT_TITLE = "&Entry point for static analyses:";
 	public static final QualifiedName ENTRYPOINT_PROPERTY = new QualifiedName(Activator.PLUGIN_ID, "ENTRYPOINT");
 	private static final String DEFAULT_ENTRYPOINT = "";
+	
+	private static final String SOOTARGS_TITLE = "&Soot arguments:";
+	private static final String SOOTARGS_TOOLTIP = "&If Ekeko Soot analyses are enabled, Soot is executed with these arguments whenever the project is built.";
+	public static final QualifiedName SOOTARGS_PROPERTY = new QualifiedName(Activator.PLUGIN_ID, "SOOTARGS");
+	private static final String DEFAULT_SOOTARGS = SootProjectModel.DEFAULT_SOOTARGS;
 
 	private static final int TEXT_FIELD_WIDTH = 50;
 
 	private Text entryPointText;
-	private IJavaProject javaProject;
-
-	/**
-	 * Constructor for SamplePropertyPage.
-	 */
-	public EkekoProjectPropertyPage() {
-		super();
-		javaProject = getJavaProject();
-	}
+	private Text sootArgsText;
 
 	private IResource getResource() {
 		IAdaptable e = getElement();
@@ -61,8 +59,6 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 			return JavaCore.create((IProject) e); 
 	}
 	
-	
-
 	private void handleSearchButtonSelected() {
 		IType type = ToggleSootNatureAction.chooseEntryPoint(getShell(), getJavaProject());
 		if (type != null) {
@@ -70,10 +66,7 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		}
 	}
 
-
-
-
-	private void addSecondSection(Composite parent) {
+	private void addEntryPointTextBox(Composite parent) {
 		Composite composite = createDefaultComposite(parent);
 
 		// Label for owner field
@@ -97,14 +90,33 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		GridData buttonGD = new GridData();
 		selectButton.setLayoutData(buttonGD);
 		
-	
-		
 		// Populate owner text field
 		try {
 			String owner = getResource().getPersistentProperty(ENTRYPOINT_PROPERTY);
 			entryPointText.setText((owner != null) ? owner : DEFAULT_ENTRYPOINT);
 		} catch (CoreException e) {
 			entryPointText.setText(DEFAULT_ENTRYPOINT);
+		}
+	}
+	
+	private void addSootArgsTextBox(Composite parent) {
+		Composite composite = createDefaultComposite(parent);
+
+		Label ownerLabel = new Label(composite, SWT.NONE);
+		ownerLabel.setText(SOOTARGS_TITLE);
+
+		sootArgsText = new Text(composite, SWT.MULTI | SWT.BORDER);
+		GridData gd = new GridData();
+		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+		gd.heightHint = sootArgsText.getLineHeight()*2;
+		sootArgsText.setLayoutData(gd);
+		
+		try {
+			String owner = getResource().getPersistentProperty(SOOTARGS_PROPERTY);
+			sootArgsText.setText((owner != null) ? owner : DEFAULT_SOOTARGS);
+			sootArgsText.setToolTipText(SOOTARGS_TOOLTIP);
+		} catch (CoreException e) {
+			sootArgsText.setText(DEFAULT_SOOTARGS);
 		}
 	}
 
@@ -119,9 +131,10 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		data.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(data);
 
-		// addFirstSection(composite);
-		// addSeparator(composite);
-		addSecondSection(composite);
+		addEntryPointTextBox(composite);
+		addSeparator(composite, 20);
+		addSootArgsTextBox(composite);
+		
 		return composite;
 	}
 
@@ -143,16 +156,33 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		super.performDefaults();
 		// Populate the owner text field with the default value
 		entryPointText.setText(DEFAULT_ENTRYPOINT);
+		sootArgsText.setText(DEFAULT_SOOTARGS);
 	}
 
 	public boolean performOk() {
 		// store the value in the owner text field
 		try {
 			getResource().setPersistentProperty(ENTRYPOINT_PROPERTY, entryPointText.getText());
+			getResource().setPersistentProperty(SOOTARGS_PROPERTY, sootArgsText.getText());
 		} catch (CoreException e) {
 			return false;
 		}
 		return true;
+	}
+	
+	public void addSeparator(Composite parent, int horizontalSpan) {
+		addLabel(parent, horizontalSpan, SWT.SEPARATOR | SWT.HORIZONTAL);
+	}
+	
+	public Label addLabel(Composite parent, int horizontalSpan, int style) {
+		Label label = new Label(parent, style);
+		GridData gd = new GridData();
+		gd.horizontalSpan = horizontalSpan;
+		gd.horizontalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		label.setLayoutData(gd);
+
+		return label;
 	}
 
 }

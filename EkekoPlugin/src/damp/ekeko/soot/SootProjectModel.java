@@ -1,7 +1,9 @@
 package damp.ekeko.soot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
@@ -31,6 +33,13 @@ public class SootProjectModel extends ProjectModel {
 	private boolean stale = false;
 	private Scene scene;
 	private IJavaProject javaProject;
+	
+	public static final String DEFAULT_SOOTARGS = "-src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
+			"-p cg.spark cs-demand:true -p jap.npc";
+
+/*  Use these arguments to greatly speed up the Soot analysis. (The sacrifice is that the simple "class hierarchy analysis" is used, 
+ * and *only* the application classes will be analysed (i.e. the standard Java libraries are excluded). */
+//	public static final String DEFAULT_SOOTARGS = "-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha";
 
 	public IJavaProject getJavaProject() {
 		return javaProject;
@@ -82,21 +91,30 @@ public class SootProjectModel extends ProjectModel {
 	private String[] sootMainArguments() {
 		//mind the separators (i.e., a single space), see split statement
 
-		String geometricString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
-				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
-				"-p cg.spark geom-pta:true,geom-trans:false -p jap.npc on -main-class "//,geom-eval:2 for some stats
-				+ entryPoint()
-				+ " " 
-				+ entryPoint();
+//		String geometricString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
+//				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
+//				"-p cg.spark geom-pta:true,geom-trans:false -p jap.npc on -main-class "//,geom-eval:2 for some stats
+//				+ entryPoint()
+//				+ " " 
+//				+ entryPoint();
 		
-		String refinementString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
-				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
-				"-p cg.spark cs-demand:true -p jap.npc on -main-class "// lazy-pts:true
-				+ entryPoint()
-				+ " " 
-				+ entryPoint();
+//		String refinementString = "-soot-classpath " + classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE() +
+//				" -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
+//				"-p cg.spark cs-demand:true -p jap.npc on -main-class "// lazy-pts:true
+//				+ entryPoint()
+//				+ " " 
+//				+ entryPoint();
 		
-		return refinementString.split(" ");
+		ArrayList<String> result = new ArrayList<String>();
+		result.add("-soot-classpath");
+		result.add(classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE());
+		result.addAll(sootArgs());
+		result.add("on");
+		result.add("-main-class");
+		result.add(entryPoint());
+		result.add(entryPoint());
+		
+		return result.toArray(new String[result.size()]);
 	}
 
 	private String entryPoint() {
@@ -105,6 +123,16 @@ public class SootProjectModel extends ProjectModel {
 		} catch (CoreException e) {
 			e.printStackTrace();
 			return "";
+		}
+	}
+	
+	private List<String> sootArgs() {
+		try {	
+			String args = getProject().getPersistentProperty(EkekoProjectPropertyPage.SOOTARGS_PROPERTY);
+			return Arrays.asList(args.split(" ")); 
+		} catch (CoreException e) {
+			e.printStackTrace();
+			return Arrays.asList(DEFAULT_SOOTARGS.split(" "));
 		}
 	}
 	

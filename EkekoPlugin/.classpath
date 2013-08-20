@@ -8,11 +8,7 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
+	<classpathentry exported="true" kind="lib" path="classes" sourcepath="classes"/>
 	<classpathentry exported="true" kind="lib" path="libs/tools.nrepl-0.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.2-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/clojure-1.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

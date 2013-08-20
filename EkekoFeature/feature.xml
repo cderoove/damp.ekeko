@@ -63,4 +63,11 @@ External dependencies:
          version="2.0.0"
          unpack="false"/>
 
+   <plugin
+         id="damp.libs"
+         download-size="0"
+         install-size="0"
+         version="1.0.0"
+         unpack="false"/>
+
 </feature>

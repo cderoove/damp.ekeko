@@ -120,7 +120,7 @@ public class SootProjectModel extends ProjectModel {
 	private String entryPoint() {
 		try {
 			return getProject().getPersistentProperty(EkekoProjectPropertyPage.ENTRYPOINT_PROPERTY);
-		} catch (CoreException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return "";
 		}
@@ -130,7 +130,7 @@ public class SootProjectModel extends ProjectModel {
 		try {	
 			String args = getProject().getPersistentProperty(EkekoProjectPropertyPage.SOOTARGS_PROPERTY);
 			return Arrays.asList(args.split(" ")); 
-		} catch (CoreException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Arrays.asList(DEFAULT_SOOTARGS.split(" "));
 		}

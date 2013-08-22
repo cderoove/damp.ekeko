@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Ekeko"
+            id="EkekoVisualization">
+      </category>
+      <view
+            allowMultiple="true"
+            category="EkekoVisualization"
+            class="damp.ekeko.visualization.EkekoVisualizationView"
+            id="damp.ekeko.visualization.EkekoVisualizationView"
+            name="Ekeko Visualization">
+      </view>
+   </extension>
+
+</plugin>

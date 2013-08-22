@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Libraries Shared by Damp Projects
 Bundle-SymbolicName: damp.libs
-Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Version: 2.0.2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: libs/clojure-1.5.1.jar,
  libs/core.logic-0.8.3.jar,
  libs/guava-11.0.2.jar,

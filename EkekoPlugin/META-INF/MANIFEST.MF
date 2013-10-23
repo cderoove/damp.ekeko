@@ -21,7 +21,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- classes/,
  libs/tools.nrepl-0.2.1.jar
 Export-Package: baristaui.util;
   uses:="org.eclipse.jface.action,

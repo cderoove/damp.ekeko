@@ -173,7 +173,7 @@
                  (ast ?kind ?ast)
                  (has ?property ?ast ?val)
                  (value ?val))]))
-
+  
 (defn
   nullvalue
   "Relation of all null-valued ASTNode property values."
@@ -210,15 +210,16 @@
 (defn
   ast-parent
   "Relation between an ASTNode instance ?ast and its parent node 
-   ?parent. Note that ?parent is nil when ?ast is the root AST node 
-   (i.e., a CompilationUnit instance).
+   ?parent. Note that this predicate fails for CompilationUnit instances, 
+   which function as the root of the AST.
    
    See also:
    API documentation of org.eclipse.jdt.core.dom.ASTNode" 
   [?ast ?parent]
   (fresh [?key]
     (ast ?key ?ast)
-    (equals ?parent (.getParent ^ASTNode ?ast))))
+    (equals ?parent (.getParent ^ASTNode ?ast))
+    (!= nil ?parent)))
 
 (defn 
   ast-root
@@ -492,7 +493,7 @@
   (fresh [?body ?slist]
          (ast :MethodDeclaration ?m)
          (has :body ?m ?body)
-         (!= nil ?body)
+         (ast :Block ?body)
          (has :statements ?body ?slist)
          (value-raw ?slist ?statements)))
 
@@ -544,10 +545,11 @@
   Predicates method-cfg-entry and method-cfg-exit which quantify 
   over the symbolic entry and exit point of a method's control flow graph."
   [?m ?cfg]
-  (fresh [?slist]
-        (method-statements ?m ?slist)
-        (succeeds (> (.size ^ASTNode$NodeList ?slist) 0)) 
-        (equals ?cfg (qwal-graph-from-jdt-cfg (jdt-method-cfg ?m)))))
+  (fresh [?g] 
+    (ast :MethodDeclaration ?m)
+    (equals ?g (jdt-method-cfg ?m))
+    (!= ?g nil)
+    (equals ?cfg (qwal-graph-from-jdt-cfg ?g))))
 
 (defn-
   method-first-statement
@@ -576,9 +578,7 @@
   (all 
    (ast :MethodDeclaration ?m)
    (has :body ?m ?exit)
-   (!= nil ?exit)))
-
-
+   (ast :Block ?exit)))
 
 
 ; Node generators called by reification goals
@@ -735,6 +735,7 @@
   [?itype ?super-itype]
   (fresh [?supers]
      (type ?itype)
+     (!= nil ?super-itype)
      (itype-super-itypes ?itype ?supers)
      (contains ?supers ?super-itype)))
 
@@ -929,6 +930,19 @@
 
 
 (defn
+  aux 
+  [n]
+  (into []
+        (into #{}
+              (map 
+                (fn [p]
+                  (let [^WorkingCopyOwner wco nil
+                        ^IProgressMonitor pm nil]
+                    (.findType ^IJavaProject p ^String n wco pm)))
+                (javaprojectmodel/ekeko-javaprojects)))))
+  
+
+(defn
   type-qualifiedname
   "Relation of IType ?t and its fully qualified name String ?n."
   [?t ?n]
@@ -941,16 +955,8 @@
              (type ?t)
              (type-qualifiedname ?t ?n)]
              [(v+ ?n)
-              (fresh [?types]
-                     (equals ?types (into #{}
-                                          (map 
-                                            (fn [p]
-                                              (let [^WorkingCopyOwner wco nil
-                                                    ^IProgressMonitor pm nil]
-                                                (.findType ^IJavaProject p ^String ?n wco pm)))
-                                            (javaprojectmodel/ekeko-javaprojects))))
-                     (contains ?types ?t)
-                     (!= nil ?t))])]))
+              (contains (aux ?n) ?t)
+              (!= nil ?t)])]))
 
 (defn 
   ast-type-type

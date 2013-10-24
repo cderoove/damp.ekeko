@@ -1119,3 +1119,25 @@
 
     
 
+;;sort me please
+(defn 
+  name-fully-qualified-name
+  "Relation between name ast and its fully qualified name string"
+  [?simple-name ?string-name]
+  (all
+    (ast :Name ?simple-name)
+    (equals ?string-name (.getFullyQualifiedName ?simple-name))))
+
+
+(defn type-declaration-string-name [?type-decl ?name]
+  (fresh [?ast-name]
+         (ast :TypeDeclaration ?type-decl)
+         (has :name ?type-decl ?ast-name)
+         (name-fully-qualified-name ?ast-name ?name)))
+
+
+(defn annotation-is-named [?annotation ?name]
+  (all
+    (ast :Annotation ?annotation)
+    (has :typeName ?annotation ?name)))
+

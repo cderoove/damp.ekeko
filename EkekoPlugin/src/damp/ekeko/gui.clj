@@ -46,6 +46,14 @@
   [^Window window]
   (.getShell window))
 
+(defn
+  workbench-activepage 
+  "Returns the active workbench page. Must be called from UI thread."
+  []
+  (-> (PlatformUI/getWorkbench)
+    .getActiveWorkbenchWindow ;nil if called from non-ui thread 
+    .getActivePage))
+
 
 ;; Selecting an IWorkingSet
 ;; ------------------------

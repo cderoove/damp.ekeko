@@ -37,13 +37,17 @@ public class EkekoVisualizationView extends ViewPart implements IZoomableWorkben
 		return graph;
 	}
 	
+	public GraphViewer getViewer() {
+		return viewer;
+	}
+
 	
 	public void createPartControl(Composite parent) {
 		//using a dummy viewer on top of the graph for the zoom contribution
-	    //viewer = new GraphViewer(parent, SWT.BORDER); 
-	    //graph = viewer.getGraphControl();
+	    viewer = new GraphViewer(parent, SWT.BORDER); 
+	    graph = viewer.getGraphControl();
 	    
-		graph = new Graph(parent, SWT.BORDER);
+		//graph = new Graph(parent, SWT.BORDER);
 		
 	    /*
 	    GraphNode node1 = new GraphNode(graph, SWT.NONE, "Jim");

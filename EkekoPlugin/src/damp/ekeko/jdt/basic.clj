@@ -611,4 +611,9 @@
     (type ?t)
     (succeeds (.isResolved ^IType ?t))))
 
-
+(defn
+  invocation-calls
+  [?inv ?method]  
+  (fresh [?binding]
+            (ast-invocation-binding :MethodInvocation ?inv ?binding)
+            (ast-declares-binding :MethodDeclaration ?method ?binding)))

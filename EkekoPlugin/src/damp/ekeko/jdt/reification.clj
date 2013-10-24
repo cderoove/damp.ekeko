@@ -949,7 +949,7 @@
   (conda 
     [(v+ ?t)
      (succeeds (instance? IType ?t))
-     (equals ?n (.getElementName ^IType ?t))]
+     (equals ?n (.getFullyQualifiedName ^IType ?t))]
     [(v- ?t)
      (conda [(v- ?n) 
              (type ?t)
@@ -1127,23 +1127,33 @@
 
 ;;sort me please
 (defn 
-  name-fully-qualified-name
+  simplename-stringname
   "Relation between name ast and its fully qualified name string"
   [?simple-name ?string-name]
   (all
     (ast :Name ?simple-name)
-    (equals ?string-name (.getFullyQualifiedName ?simple-name))))
+    (equals ?string-name (.getIdentifier ?simple-name))))
 
 
-(defn type-declaration-string-name [?type-decl ?name]
-  (fresh [?ast-name]
+(defn typedeclaration-qualifiedname [?type-decl ?name]
+  (fresh [?itype]
          (ast :TypeDeclaration ?type-decl)
-         (has :name ?type-decl ?ast-name)
-         (name-fully-qualified-name ?ast-name ?name)))
+         (equals ?itype (javaprojectmodel/declaration-to-ielement ?type-decl))
+         (type-qualifiedname ?itype ?name)))
+
+(defn typedeclaration-typedeclaration|super 
+  [?type-declaration ?superclass]
+  (fresh [?type-itype ?super-itype ?super-types]
+    (ast :TypeDeclaration ?type-declaration)
+    (equals ?type-itype (javaprojectmodel/declaration-to-ielement ?type-declaration))
+    (type-super-type ?type-itype ?super-itype)
+    (equals ?superclass  (javaprojectmodel/ielement-to-declaration ?super-itype))))
 
 
-(defn annotation-is-named [?annotation ?name]
-  (all
+
+(defn annotation-qualifiedname [?annotation ?name]
+  (fresh [?annotation-binding ?type-binding]
     (ast :Annotation ?annotation)
-    (has :typeName ?annotation ?name)))
-
+    (equals ?annotation-binding (.resolveAnnotationBinding ?annotation))
+    (equals ?type-binding (.getAnnotationType ?annotation-binding))
+    (equals ?name (.getQualifiedName ?type-binding))))

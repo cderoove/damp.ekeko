@@ -19,7 +19,8 @@
     [org.eclipse.jdt.core.dom Expression IVariableBinding ASTParser AST IBinding Type TypeDeclaration 
      QualifiedName SimpleName ITypeBinding MethodDeclaration
      MethodInvocation ClassInstanceCreation SuperConstructorInvocation SuperMethodInvocation
-     SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit]))
+     SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit
+     Annotation IAnnotationBinding]))
      
 (set! *warn-on-reflection* true)
 
@@ -1132,8 +1133,12 @@
   [?simple-name ?string-name]
   (all
     (ast :Name ?simple-name)
-    (equals ?string-name (.getIdentifier ?simple-name))))
+    (equals ?string-name (.getIdentifier ^SimpleName ?simple-name))))
 
+(defn simplename-simplename|same [?name-a ?name-b]
+  (fresh [?string]
+    (simplename-stringname ?name-a ?string)
+    (simplename-stringname ?name-b ?string)))
 
 (defn typedeclaration-qualifiedname [?type-decl ?name]
   (fresh [?itype]
@@ -1154,6 +1159,13 @@
 (defn annotation-qualifiedname [?annotation ?name]
   (fresh [?annotation-binding ?type-binding]
     (ast :Annotation ?annotation)
-    (equals ?annotation-binding (.resolveAnnotationBinding ?annotation))
-    (equals ?type-binding (.getAnnotationType ?annotation-binding))
-    (equals ?name (.getQualifiedName ?type-binding))))
+    (equals ?annotation-binding (.resolveAnnotationBinding ^Annotation ?annotation))
+    (equals ?type-binding (.getAnnotationType ^IAnnotationBinding ?annotation-binding))
+    (equals ?name (.getQualifiedName ^ITypeBinding ?type-binding))))
+
+
+(defn annotation-fielddeclaration [?annotation ?field-decl]
+  (all
+    (ast :Annotation ?annotation)
+    (ast-parent ?annotation ?field-decl)
+    (ast :FieldDeclaration ?field-decl)))

@@ -36,6 +36,8 @@ import ccw.util.osgi.RunnableWithException;
 public class Activator extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "damp.ekeko.plugin"; //$NON-NLS-1$
+	public static final String EKEKO_PROBLEM_MARKER = "damp.ekeko.plugin.ekekoproblemmarker";
+
 	private static Activator plugin;
 
 	private static Map<String, Image> pluginImages = new HashMap<String, Image>();

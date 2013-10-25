@@ -101,22 +101,6 @@
 (defn ekekomarker-astnode [marker]
   (.getAttribute marker "astnode"))
 
-(defn annotation-fixer []
-  (reify
-    org.eclipse.ui.IMarkerResolution
-    (getLabel [this] "Add Generic from Annotation")
-    (run [this marker] (println "Fixing"))))
-
-(defn install-fixer []
-  (damp.ekeko.EkekoProblemFixer/installNewResolution "annotation" (annotation-fixer)))
-
-
-
-
-(defn demo-shizzle []
-  (let [wrong-nodes (logic/run* [?ast]
-                                (field-declaration|incorrect ?ast))]
-    (map add-annotation-problem-marker wrong-nodes)))
     
 
 ;;Rewrites
@@ -167,7 +151,17 @@
         index (if (instance? java.lang.String idx)
                (Integer/parseInt idx)
                idx)] 
-    (println "add node" newnode)
+    (.insertAt list-rewrite newnode index nil)))
+
+(defn add-node-cu
+  "Add newnode to propertyList of the given parent at idx position."
+  [cu parent propertykey newnode idx]
+  (let [rewrite (current-rewrite-for-cu cu)
+        property (astnode/node-property-descriptor-for-ekeko-keyword parent propertykey) 
+        list-rewrite (.getListRewrite rewrite parent property)
+        index (if (instance? java.lang.String idx)
+               (Integer/parseInt idx)
+               idx)] 
     (.insertAt list-rewrite newnode index nil)))
 
 
@@ -204,7 +198,9 @@
     node
     (astnode/node-property-descriptor-for-ekeko-keyword node keyword)))
 
-(defn fix-marker [marker]
+
+;;Marker Fixing
+(defn marker-quick-fix [marker]
   (let [fielddecl (ekekomarker-astnode marker)
         type (node-property fielddecl :type)
         [anno anno-type] (fielddeclaration-getinfo fielddecl)
@@ -212,7 +208,27 @@
         type-copy (ASTNode/copySubtree ast type)
         anno-type-copy (ASTNode/copySubtree ast anno-type)
         new-node (.newParameterizedType ast type-copy)]
-        
     (do
       (change-property-node fielddecl :type new-node)
-      (add-node new-node :typeArguments anno-type-copy 0))))
+      (add-node-cu (.getRoot fielddecl) new-node :typeArguments anno-type-copy 0)
+      (apply-and-reset-rewrites)
+      (reset-and-delete-markers)))
+
+
+(defn annotation-fixer []
+  (reify
+    org.eclipse.ui.IMarkerResolution
+    (getLabel [this] "Add Generic from Annotation")
+    (run [this marker] 
+      (marker-quick-fix marker))))
+
+(defn install-fixer []
+  (damp.ekeko.EkekoProblemFixer/installNewResolution "annotation" (annotation-fixer)))
+
+(defn demo []
+  (let [wrong-nodes (logic/run* [?ast]
+                                (field-declaration|incorrect ?ast))]
+    (map add-annotation-problem-marker wrong-nodes)))
+
+
+(install-fixer)

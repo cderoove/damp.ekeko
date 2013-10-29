@@ -20,7 +20,7 @@
      QualifiedName SimpleName ITypeBinding MethodDeclaration
      MethodInvocation ClassInstanceCreation SuperConstructorInvocation SuperMethodInvocation
      SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit
-     Annotation IAnnotationBinding]))
+     Annotation IAnnotationBinding TypeLiteral]))
      
 (set! *warn-on-reflection* true)
 
@@ -1169,3 +1169,22 @@
     (ast :Annotation ?annotation)
     (ast-parent ?annotation ?field-decl)
     (ast :FieldDeclaration ?field-decl)))
+
+(defn typeliteral-name [?type-literal ?name]
+  (fresh [?type]
+    (has :type ?type-literal ?type)
+    (has :name ?type ?name)))
+
+
+(defn type-type|same [?type-literalA ?type-literalB]
+  (fresh [?keyA ?keyB ?bindingA ?bindingB ?element]
+    (ast-type-binding ?keyA ?type-literalA ?bindingA)
+    (ast-type-binding ?keyB ?type-literalB ?bindingB)
+    (binding-element ?bindingA ?element)
+    (binding-element ?bindingB ?element)))
+
+(defn typeliteral-type [?typeliteral ?type]
+  (all
+    (ast :TypeLiteral ?typeliteral)
+    (ast :Type ?type)
+    (equals ?type (.getType ^TypeLiteral ?typeliteral))))

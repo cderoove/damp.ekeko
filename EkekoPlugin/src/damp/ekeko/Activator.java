@@ -2,7 +2,6 @@ package damp.ekeko;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,17 +20,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import clojure.lang.Keyword;
-import clojure.lang.Var;
 import ccw.util.BundleUtils;
 import ccw.util.osgi.ClojureOSGi;
 //import ccw.repl.REPLView;
 import ccw.util.osgi.RunnableWithException;
+import clojure.lang.Keyword;
+import clojure.lang.Var;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -47,9 +45,9 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		EkekoModel.registerDefaultFactories();
 		this.registerContributedFactories();
-		
+		startClojureCode(context);		
 		EkekoModel.getInstance().populate();
-		startClojureCode(context);
+	
 	}
 
 	public void stop(BundleContext context) throws Exception {

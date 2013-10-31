@@ -13,6 +13,9 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -130,16 +133,27 @@ public class EkekoModel {
 	}
 	
 	public void populate() {
-		System.out.println("Populating model from enabled natures.");
-		IProject[] iprojects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		for(IProject p : iprojects) {
-			try {
-				if(p.isOpen() && p.hasNature(EkekoNature.NATURE_ID)) 
-					fullProjectBuild(p,null);
-			} catch (CoreException e) {
-				e.printStackTrace();
+		final String msg = "Populating Ekeko project models for queried projects.";
+		System.out.println(msg);
+		Job job = new Job(msg) {
+			protected IStatus run(final IProgressMonitor m) {
+				IProject[] iprojects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+				m.beginTask(msg, iprojects.length);
+				for(IProject p : iprojects) {
+					try {
+						if(p.isOpen() && p.hasNature(EkekoNature.NATURE_ID)) 
+							fullProjectBuild(p,null);
+						m.worked(1);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
+				}
+				m.done();
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		job.setUser(false);
+		job.schedule();
 	}
 	
 	private List<? extends IProjectModel> newProjectModel(IProject p) throws CoreException {		

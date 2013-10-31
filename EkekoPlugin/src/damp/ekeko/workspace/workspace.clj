@@ -178,7 +178,7 @@
 
 (defn 
   reduce-projects!
-  "Clojure reduce over all projects in the workspace.
+  "Clojure reduce over the given workspace projects.
    Destructive as it opens and closes each project sequentially."
   [f initval projects]
   (reduce 

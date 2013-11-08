@@ -16,7 +16,8 @@
 ;;Start a REPL by selecting Ekeko->start nREPL from the menu
 ;;Connect to that REPL by selecting Window->Connect to REPL from the menu
 
-;;Rightclick on this file and select: Clojure->Load File in REPL
+;;Open this file in the  Clojure editor (by double clicking the file in the Eclipse package explorer)
+;;Rightclick within the editor and select: Clojure->Load File in REPL
 ;;In the same menu select Switch REPL to File's namespace
 
 ;;You can run the code by just writing (demo)

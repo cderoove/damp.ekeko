@@ -1,3 +1,9 @@
+# CSMR WCRE Demo 
+
+Please see the documentation at the top of the [csmrwcre2014.clj](https://github.com/cderoove/damp.ekeko/blob/master/EkekoDemo/src/damp/ekeko/demo/csmrwcre2014.clj
+) file. 
+
+
 # damp.ekeko.EkekoDemo
 
 Demonstrator of using the [damp.ekeko.EkekoPlugin](https://github.com/cderoove/damp.ekeko/tree/master/EkekoPlugin) from within other Clojure or Java code (e.g., within an Eclipse plugin). 

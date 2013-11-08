@@ -31,7 +31,7 @@
 (defn reset-and-delete-marker [a-marker]
   (do
     (.delete a-marker)
-    (swap! markers #(filter (.exists %2) %1))))
+    (swap! markers (fn [markers] (filter #(.exists %1) markers)))))
 
 (defn ekekomarker-astnode [marker]
   (.getAttribute marker "astnode"))

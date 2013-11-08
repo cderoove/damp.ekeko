@@ -7,14 +7,22 @@
              [markers :as markers]
              [rewrites :as rewrites]])
   (:import [org.eclipse.ui.IMarkerResolution])
-  (:import [damp.ekeko.EkekoProblemFixer])
-  (:import 
-    [damp.ekeko JavaProjectModel]
-    [org.eclipse.jface.text Document]
-    [org.eclipse.text.edits TextEdit]
-    [org.eclipse.jdt.core ICompilationUnit IJavaProject]
-    [org.eclipse.jdt.core.dom BodyDeclaration Expression Statement ASTNode ASTParser AST CompilationUnit]
-    [org.eclipse.jdt.core.dom.rewrite ASTRewrite] ))
+  (:import [damp.ekeko.EkekoProblemFixer]))
+
+
+;;The archive containing the source code can be found here: http://soft.vub.ac.be/~resteven/csmrwcrecase.zip
+;;Ensure it has the Ekeko Nature by rightclicking on the project, configure, include in Ekeko Queries
+
+;;Start a REPL by selecting Ekeko->start nREPL from the menu
+;;Connect to that REPL by selecting Window->Connect to REPL from the menu
+
+;;Rightclick on this file and select: Clojure->Load File in REPL
+;;In the same menu select Switch REPL to File's namespace
+
+;;You can run the code by just writing (demo)
+;;This will mark all the incorrect nodes with an annotation marker
+;;You can solve a marker by calling (marker-quick-fix (first @markers/markers))
+;;Or by clicking on the warning popup and use the quick fix
 
 
 (defn typedeclaration|inhierarchy [?type-decl]

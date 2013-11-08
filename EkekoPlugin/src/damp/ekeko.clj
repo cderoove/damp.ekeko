@@ -251,6 +251,24 @@
   
   
   
+  ;;To re-generate documentation
+  ;;- ensure Eclipse is started using the plugin project as the working directory (e.g., /Users/cderoove/git/damp.ekeko/EkekoPlugin)
+  ;;- evaluate:
+  (use 'codox.main)
+  (codox.main/generate-docs {
+             :name "Ekeko"
+             :version "2.0.4"
+             :description "Applicative logic meta-programming using core.logic against an Eclipse workspace."
+             :output-dir "/Users/cderoove/Desktop/docekeko"
+             :sources ["src"]
+             :src-dir-uri "https://github.com/cderoove/damp.ekeko/blob/master/EkekoPlugin"
+             :src-linenum-anchor-prefix "L"}
+   )
+  
+
+
+  
+  
   )    
 
 

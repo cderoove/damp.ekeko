@@ -1,11 +1,6 @@
 package damp.ekeko;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,7 +14,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.ITypeHierarchyChangedListener;
@@ -28,7 +22,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTRequestor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -47,11 +40,9 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.internal.compiler.ast.AnnotationMethodDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
-
 
 import com.google.common.collect.Iterables;
 
@@ -95,9 +86,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	private Set<ASTNode> invocationLikeNodes;
 	
 	private ConcurrentHashMap<MethodDeclaration,ControlFlowGraph> controlFlowGraphs;
-
-
-	
 	
 	private Set<Statement> statements;	
 	private Set<Expression> expressions;
@@ -273,10 +261,15 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	}
 	
+	
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
 		System.out.println("Populating JavaProjectModel for: " + javaProject.getElementName());
 		for(IPackageFragment frag : javaProject.getPackageFragments()) {
+			if(monitor.isCanceled()) {
+				buildCanceled();
+				return;
+			}
 			ICompilationUnit[] icus = frag.getCompilationUnits();
 			CompilationUnit[] cus = parse(icus,monitor);
 			for(int i=0;i<icus.length;i++) 

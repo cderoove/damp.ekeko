@@ -24,6 +24,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import damp.util.Natures;
+
 
 public class EkekoModel {
 	
@@ -132,6 +134,16 @@ public class EkekoModel {
 		projectModels.clear();
 	}
 	
+	
+	void buildCanceled() {
+		clean();
+		try {
+			Natures.removeNatureFromAllProjects(EkekoNature.NATURE_ID);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void populate() {
 		final String msg = "Populating Ekeko project models for queried projects.";
 		System.out.println(msg);
@@ -140,11 +152,16 @@ public class EkekoModel {
 				IProject[] iprojects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 				m.beginTask(msg, iprojects.length);
 				for(IProject p : iprojects) {
+					if(m.isCanceled()) {
+						buildCanceled();
+						return Status.CANCEL_STATUS;
+					}
 					try {
 						if(p.isOpen() && p.hasNature(EkekoNature.NATURE_ID)) 
 							fullProjectBuild(p,null);
 						m.worked(1);
-					} catch (CoreException e) {
+					} 
+					catch (CoreException e) {
 						e.printStackTrace();
 					}
 				}
@@ -187,10 +204,7 @@ public class EkekoModel {
 			return applicableProjectModels;
 		}
 	}
-	
-	
-	
-	
+		
 	
 	public void fullProjectBuild(IProject project, IProgressMonitor monitor) throws CoreException {
 		if(project.isOpen()) {

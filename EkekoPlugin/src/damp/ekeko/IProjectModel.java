@@ -47,4 +47,5 @@ public interface IProjectModel {
 	 */
 	abstract public void addedToEkekoModel(EkekoModel m, Collection<IProjectModel> otherModelsForProject);
 
+	
 }

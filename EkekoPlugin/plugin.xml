@@ -10,10 +10,16 @@
             id="damp.ekeko.commands.category">
       </category>
       <command
-            name="Start ekeko-hosted nREPL"
+            name="Start Ekeko-hosted nREPL"
             categoryId="damp.ekeko.commands.category"
-            id="damp.ekeko.commands.nreplCommand">
+            id="damp.ekeko.commands.startREPL">
       </command>
+      <command
+            name="Stop Ekeko-hosted nREPL"
+            categoryId="damp.ekeko.commands.category"
+            id="damp.ekeko.commands.stopREPL">
+      </command>
+      
       <command
             categoryId="damp.ekeko.commands.category"
             id="damp.ekeko.commands.enableNatureOnAll"
@@ -28,8 +34,15 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            commandId="damp.ekeko.commands.nreplCommand"
-            class="damp.ekeko.NReplCommandHandler">
+            commandId="damp.ekeko.commands.startREPL"
+            class="damp.ekeko.REPLStartHandler">
+         <enabledWhen>
+            <with
+                  variable="damp.ekeko.services.REPLRunning">
+               <equals
+                     value="false">
+               </equals>
+            </with></enabledWhen>
       </handler>
       <handler
             class="damp.ekeko.EnableNatureOnAllHandler"
@@ -39,6 +52,18 @@
             class="damp.ekeko.DisableNatureOnAllHandler"
             commandId="damp.ekeko.commands.disableNatureOnAll">
       </handler>
+      <handler
+            class="damp.ekeko.REPLStopHandler"
+            commandId="damp.ekeko.commands.stopREPL">
+         <enabledWhen>
+            <with
+                  variable="damp.ekeko.services.REPLRunning">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -47,11 +72,16 @@
          <menu
                label="Ekeko"
                mnemonic="EK"
-               id="damp.ekeko.menus.sampleMenu">
+               id="damp.ekeko.menus.ekekoMenu">
             <command
-                  commandId="damp.ekeko.commands.nreplCommand"
+                  commandId="damp.ekeko.commands.startREPL"
                   label="Start nREPL"
                   tooltip="Start Ekeko-hosted nREPL server">
+            </command>
+            <command
+                  commandId="damp.ekeko.commands.stopREPL"
+                  label="Stop nREPL"
+                  tooltip="Stop Ekeko-hosted nREPL server">
             </command>
             <command
                   commandId="damp.ekeko.commands.enableNatureOnAll"
@@ -331,5 +361,15 @@
          markerType="damp.ekeko.plugin.ekekoproblemmarker"
          class="damp.ekeko.EkekoProblemFixer"/>
    </extension>
+
+<extension point="org.eclipse.ui.services">
+   <sourceProvider
+         provider="damp.ekeko.gui.EkekoSourceProvider">
+      <variable
+            name="damp.ekeko.services.REPLRunning"
+            priorityLevel="workbench">
+      </variable>
+   </sourceProvider>
+</extension>
 
 </plugin>

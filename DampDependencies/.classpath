@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="codoxlibs/codox.core-0.6.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="codoxlibs/hiccup-1.0.2.jar"/>
@@ -8,7 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="libs/clojure-1.5.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
 	<classpathentry kind="output" path="bin"/>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="EkekoVisualizationFeature"
+      label="EkekoVisualizationFeature"
+      version="1.0.0.qualifier">
+
+   <description url="http://www.example.com/description">
+      Extension for the Ekeko plugin that enables visualizing query results as graphs drawn by  
+Eclipse Zest (The Eclipse Visualization Toolkit).
+   </description>
+
+   <copyright>
+      Copyright © 2013-2014 EkekoVisualizer contributors: Coen De Roover, Johan Fabry.
+   </copyright>
+
+   <license url="">
+      Distributed under the Eclipse Public License.
+   </license>
+
+   <url>
+      <discovery label="ZEST update-site" url="http://download.eclipse.org/tools/gef/updates/releases/"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="damp.libs" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="damp.ekeko.plugin" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.zest.core" version="1.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.zest.layouts" version="1.1.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="EkekoVisualization"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

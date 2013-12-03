@@ -36,7 +36,7 @@ External dependencies:
    <url>
       <update label="Ekeko Update Site" url="http://soft.vub.ac.be/~cderoove/eclipse/"/>
       <discovery label="Counterclockwise Update Site" url="http://updatesite.ccw-ide.org/stable/"/>
-      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site/"/>
+      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site"/>
    </url>
 
    <requires>

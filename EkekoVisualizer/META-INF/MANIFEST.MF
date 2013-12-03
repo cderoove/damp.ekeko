@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ekeko-driven Visualizations
-Bundle-SymbolicName: EkekoVisualization;singleton:=true
+Bundle-SymbolicName: EkekoVisualizer;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: damp.ekeko.visualization.Activator
 Require-Bundle: org.eclipse.ui,

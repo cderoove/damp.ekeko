@@ -20,7 +20,6 @@ public class EkekoSourceProvider extends AbstractSourceProvider {
 	public Map<String, Object> getCurrentState() {
 		Map<String, Object> stateMap = new HashMap<String, Object>(1);	
 		stateMap.put(REPL_RUNNING, new Boolean(REPLController.getCurrent().isRunning()));
-		System.out.println(stateMap.toString());
 		return stateMap;
 	}
 

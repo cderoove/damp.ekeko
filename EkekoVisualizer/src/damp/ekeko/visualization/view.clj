@@ -4,8 +4,14 @@
            [org.eclipse.zest.layouts.algorithms  CompositeLayoutAlgorithm TreeLayoutAlgorithm HorizontalTreeLayoutAlgorithm RadialLayoutAlgorithm GridLayoutAlgorithm SpringLayoutAlgorithm HorizontalShift]  
            [org.eclipse.swt SWT]
            [org.eclipse.zest.layouts LayoutStyles LayoutAlgorithm]
-           [org.eclipse.zest.core.viewers  IGraphEntityContentProvider EntityConnectionData]
+           [org.eclipse.zest.core.viewers  IGraphEntityContentProvider EntityConnectionData IEntityStyleProvider]
            [org.eclipse.jface.viewers ArrayContentProvider LabelProvider]
+           [org.eclipse.ui.plugin AbstractUIPlugin]
+           [org.eclipse.swt.widgets Display]
+           [org.eclipse.swt SWT]
+           [org.eclipse.jface.resource JFaceResources LocalResourceManager]
+           [org.eclipse.swt.graphics RGB]
+
            ))
 
 ;; Opening a view
@@ -17,7 +23,7 @@
   show-graph-view
   []
   (let [page (gui/workbench-activepage)
-        viewid (damp.ekeko.visualization.EkekoVisualizationView/ID)
+        viewid (damp.ekeko.gui.views.EkekoVisualizationView/ID)
         uniqueid (str @graph-view-cnt)
         viewpart (.showView page viewid uniqueid (org.eclipse.ui.IWorkbenchPage/VIEW_ACTIVATE))]
     (swap! graph-view-cnt inc)
@@ -142,7 +148,7 @@
   show-mgraph-view
   []
   (let [page (gui/workbench-activepage)
-        viewid (damp.ekeko.visualization.EkekoVisualizationView/ID)
+        viewid (damp.ekeko.gui.views.EkekoVisualizationView/ID)
         uniqueid (str @mgraph-view-cnt)
         viewpart (.showView page viewid uniqueid (org.eclipse.ui.IWorkbenchPage/VIEW_ACTIVATE))]
     (swap! mgraph-view-cnt inc)
@@ -157,16 +163,48 @@
 
 (defrecord ModelBasedView [content label layout])
 
-
 (defn
   make-graphicalcontext
-  [& { :keys [connections nodelabel edgelabel layout] 
-       :or {connections (fn [element] [])
-         nodelabel (fn [node] "")         
-         edgelabel (fn [edge] "")
-         layout tree-layout
-         }
-    }]
+  [& {
+      :keys
+      [layout
+       connections 
+       node|label 
+       edge|label
+       node|image
+       edge|image
+       node|zoomed
+       node|border|color
+       edge|border|color
+       node|border|color|highlight 
+       edge|border|color|highlight 
+       node|border|width
+       edge|border|width
+       node|color|foreground
+       edge|color|foreground
+       node|color|background
+       node|color|highlight
+       node|tooltip
+       ] 
+      :or 
+      {connections (fn [element] [])
+       node|label (fn [node] "")        
+       edge|label (fn [edge] "")
+       node|image (fn [node] nil)
+       edge|image (fn [edge] nil)
+       node|zoomed (fn [node] false)
+       node|border|color (fn [node] nil)
+       edge|border|color (fn [edge] nil)
+       node|border|width (fn [node] 1)
+       node|border|color|highlight (fn [node] nil)
+       edge|border|color|highlight (fn [edge] nil)
+       node|color|foreground (fn [node] nil)
+       edge|color|foreground (fn [edge] nil)
+       node|color|background (fn [node] nil)
+       node|color|highlight (fn [node] nil)
+       node|tooltip (fn [node] nil)
+       layout tree-layout }
+      }]
   (ModelBasedView.
     (proxy 
       [ArrayContentProvider IGraphEntityContentProvider]
@@ -174,16 +212,45 @@
       (getConnectedTo [element]   
         (connections element))) 
     (proxy 
-        [LabelProvider]
+        [LabelProvider IEntityStyleProvider]
         []
         (getText [object]
           (if
             (instance? EntityConnectionData object)
-            (edgelabel object)
-            (nodelabel object))))
+            (edge|label object)
+            (node|label object)))
+        (getImage [object]
+          (if
+            (instance? EntityConnectionData object)
+            (edge|image object)
+            (node|image object)))
+        (fisheyeNode [object]
+          (node|zoomed object))
+        (getBorderWidth [object]
+          (node|border|width object))
+        (getBorderColor [object]
+          (if
+            (instance? EntityConnectionData object)
+            (edge|border|color object)
+            (node|border|color object)))
+        (getBorderHighlightColor [object]
+          (if
+            (instance? EntityConnectionData object)
+            (edge|border|color|highlight object)
+            (node|border|color|highlight object)))
+        (getNodeHighlightColor [node]
+          (node|color|highlight node))
+        (getBackgroundColour [node]
+          (node|color|background node))
+        (getForegroundColour [object]
+          (if
+            (instance? EntityConnectionData object)
+            (edge|color|foreground object)
+            (node|color|foreground object)))
+        (getTooltip [node]
+          (node|tooltip node)))
+    
     (horizontal-shift layout)))
-
-
 
 
 
@@ -247,33 +314,81 @@
     ))
           
 
+
 (defn
-  open-view-with-context
+  set-view-elements!
+  [view elements]    
+  (ui 
+    (.setInput view elements)
+    (graph-layout! (.getControl view))))
+
+(defn
+  set-view-context!
+  [view context]
+  (ui
+    (.setContentProvider view (:content context))
+    (.setLabelProvider view (:label context))
+    (.setLayoutAlgorithm view (:layout context) true)
+   ))
+  
+(defn
+  open-view-on-elements-with-context
   [elements context]
   (let [v (open-mgraph-view)]
-    (ui
-      (.setContentProvider v (:content context))
-      (.setLabelProvider v (:label context))
-      (.setInput v elements)
-      (.setLayoutAlgorithm v (:layout context) true)
-     ; (graph-layout! (.getControl v))
-      )))
-  
+    (ui 
+      (set-view-context! v context)
+      (set-view-elements! v elements))))
+
+(defn
+  system-color
+  [swt-color-constant]
+  (.getSystemColor (Display/getCurrent) swt-color-constant))
+
+(defn 
+  color
+  [view red green blue]
+  (let [mngr 
+        (LocalResourceManager. (JFaceResources/getResources) (.getControl view))]
+    ;to be reused, map on clojure side ... or using binding http://clojuredocs.org/clojure_core/clojure.core/binding
+    (.createColor mngr (RGB. red green blue))
+  ))
+
+
   
 (comment
   
-  (def x (range 10))
-  (def context (make-graphicalcontext 
-                 :connections
-                 (fn [element] (into-array [(first x)]))
-                 :nodelabel
-                 (fn [node]  (str node))
-                 :edgelabel
-                 (fn [edge] (str (.source edge) "->" (.dest edge)))
-                 
-                 ))
-  (open-view-with-context x context)
+  (let 
+    [img 
+     (.createImage (AbstractUIPlugin/imageDescriptorFromPlugin  damp.ekeko.Activator/PLUGIN_ID "/icons/ekeko46.png"))
+     elements
+     (range 10)
+     view
+     (open-mgraph-view)
+     context 
+     (make-graphicalcontext 
+       :connections
+       (fn [element] (into-array [(first x)]))
+       :node|label
+       (fn [node]  (str node))
+       :edge|label
+       (fn [edge] (str (.source edge) "->" (.dest edge)))
+       :node|image
+       (fn [node] img)
+       :node|border|width 
+       (fn [node] node)
+       :node|border|color 
+       (fn [node] (color view 100 10 14)))
+     ]
+    (set-view-context! view context)
+    (set-view-elements! view elements)
+    )
+    
+    
+    
   
   
-  )
   
+  
+  
+    )
+    

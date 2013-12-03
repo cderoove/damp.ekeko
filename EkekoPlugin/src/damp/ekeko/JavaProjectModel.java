@@ -1,17 +1,22 @@
 package damp.ekeko;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -176,7 +181,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return controlFlowGraphs.get(m);
 	}
 	
-	
 	public ITypeHierarchy getTypeHierarchy(IType type) throws JavaModelException {
 		ITypeHierarchy typeHierarchy;
 		if (!itype2typehierarchy.containsKey(type)) {
@@ -188,6 +192,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return typeHierarchy;
 	}
 
+	//no longer called, but kept for the bug information
 	public CompilationUnit[] parse(ICompilationUnit[] icus, IProgressMonitor monitor) {
 		final CompilationUnit[] compilationUnits = new CompilationUnit[icus.length];
 		
@@ -216,6 +221,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return (CompilationUnit) parser.createAST(monitor);
 	}
 	
+		
 
 	public void clean() {
 		super.clean();
@@ -264,20 +270,67 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
-		System.out.println("Populating JavaProjectModel for: " + javaProject.getElementName());
-		for(IPackageFragment frag : javaProject.getPackageFragments()) {
-			if(monitor.isCanceled()) {
+		String msg = "Populating JavaProjectModel for: " + javaProject.getElementName();
+		System.out.println(msg);
+		IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+	    SubMonitor sub = SubMonitor.convert(monitor, msg, packageFragments.length);
+		for(IPackageFragment frag : packageFragments) {
+			if(sub.isCanceled()) {
 				buildCanceled();
 				return;
 			}
-			ICompilationUnit[] icus = frag.getCompilationUnits();
-			CompilationUnit[] cus = parse(icus,monitor);
-			for(int i=0;i<icus.length;i++) 
-				icu2ast.put(icus[i], cus[i]);
-		}
-	
+			parsePackageFragment(frag, sub);
+			sub.worked(1);
+		}	
 		gatherInformationFromCompilationUnits();
 	}
+	
+	
+	public static Collection<IMarker> getCompilationErrors(ICompilationUnit icu) {
+		LinkedList<IMarker> errors = new LinkedList<IMarker>();
+		IResource resource = icu.getResource();	
+		try {
+			for (IMarker marker: resource.findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER,true,IResource.DEPTH_INFINITE)) {
+				Integer severityType = (Integer) marker.getAttribute(IMarker.SEVERITY);
+				if (severityType.intValue() == IMarker.SEVERITY_ERROR)
+					errors.add(marker);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return errors;
+	}
+
+	public static boolean compilationUnitHasCompilationErrors(ICompilationUnit icu) {
+		return !getCompilationErrors(icu).isEmpty();
+	}
+
+	private void parsePackageFragment(IPackageFragment frag, IProgressMonitor monitor) throws JavaModelException {
+		ICompilationUnit[] icus = frag.getCompilationUnits();
+		SubMonitor sub = SubMonitor.convert(monitor, icus.length);
+		for(ICompilationUnit icu : icus) {
+			CompilationUnit cu;
+			if(compilationUnitHasCompilationErrors(icu)) {
+				cu = parseCompilationUnitWithErrors(icu, sub.newChild(1));
+			} else {
+				cu = parseCompilationUnitWithoutErrors(icu, sub.newChild(1));
+			}
+			if(cu != null)
+				icu2ast.put(icu, cu);
+		}		
+	}
+	
+	//overridden in PPAJavaProjectModel
+	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
+		System.out.println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
+		monitor.worked(1);
+		return null;
+	}
+	
+	protected CompilationUnit parseCompilationUnitWithoutErrors(ICompilationUnit icu, IProgressMonitor monitor) {
+		return parse(icu, monitor);
+	}
+	
 	
 	protected void gatherInformationFromCompilationUnits() {
 		final long startTime = System.currentTimeMillis();

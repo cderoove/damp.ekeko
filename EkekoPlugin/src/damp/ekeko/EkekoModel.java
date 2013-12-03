@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -150,7 +151,7 @@ public class EkekoModel {
 		Job job = new Job(msg) {
 			protected IStatus run(final IProgressMonitor m) {
 				IProject[] iprojects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				m.beginTask(msg, iprojects.length);
+				SubMonitor sub = SubMonitor.convert(m, msg, iprojects.length);
 				for(IProject p : iprojects) {
 					if(m.isCanceled()) {
 						buildCanceled();
@@ -158,14 +159,12 @@ public class EkekoModel {
 					}
 					try {
 						if(p.isOpen() && p.hasNature(EkekoNature.NATURE_ID)) 
-							fullProjectBuild(p,null);
-						m.worked(1);
+							fullProjectBuild(p, sub.newChild(1));
 					} 
 					catch (CoreException e) {
 						e.printStackTrace();
 					}
 				}
-				m.done();
 				return Status.OK_STATUS;
 			}
 		};
@@ -207,8 +206,10 @@ public class EkekoModel {
 		
 	
 	public void fullProjectBuild(IProject project, IProgressMonitor monitor) throws CoreException {
+		String msg = "Adding a new project to the model: " + project.toString();
+	    SubMonitor sub = SubMonitor.convert(monitor, msg, 1);
 		if(project.isOpen()) {
-			System.out.println("Adding a new project to the model: " + project.toString());
+			System.out.println(msg);
 			List<? extends IProjectModel> models = newProjectModel(project);
 			for (IProjectModel model : models) {
 				model.populate(monitor);
@@ -216,6 +217,7 @@ public class EkekoModel {
 				addProjectModel(project, model);
 			}
 		}
+		sub.worked(1);
 	}
 
 	private void addProjectModel(IProject project, IProjectModel model){

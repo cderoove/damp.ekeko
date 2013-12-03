@@ -1,4 +1,4 @@
-package damp.ekeko.visualization;
+package damp.ekeko.gui.views;
 
 
 import org.eclipse.jface.action.IMenuManager;

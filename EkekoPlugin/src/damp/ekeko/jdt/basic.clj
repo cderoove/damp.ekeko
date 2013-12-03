@@ -6,7 +6,7 @@
   (:use [clojure.core.logic])
   (:use [damp.ekeko.logic])
   (:use [damp.ekeko.jdt.reification])
-  (:require [damp.ekeko.jdt [astnode :as astnode]])
+  (:require [damp.ekeko.jdt [astnode :as astnode] [javaprojectmodel :as javaprojectmodel]])
   (:require [clojure set])
   (:import 
     [org.eclipse.jdt.core  ICompilationUnit IType  IJavaElement IMember]
@@ -612,8 +612,28 @@
     (succeeds (.isResolved ^IType ?t))))
 
 (defn
-  invocation-calls
-  [?inv ?method]  
-  (fresh [?binding]
-            (ast-invocation-binding :MethodInvocation ?inv ?binding)
-            (ast-declares-binding :MethodDeclaration ?method ?binding)))
+  method-method|overrides
+  "Relation between a MethodDeclaration ?m and one of its overriding MethodDeclatations ?overrider."
+  [?m ?overrider]
+  (all
+    (ast :MethodDeclaration ?m)
+    (contains (damp.ekeko.jdt.javaprojectmodel/method-overriders ?m) ?overrider)
+    (ast :MethodDeclaration ?overrider)))
+
+(defn
+  methodinvocation-methoddeclaration
+  "Relation between a MethodInvocation ?i and one of the possible MethodDeclarations ?m it may call."
+  [?i ?m]
+  (all
+    (ast :MethodInvocation ?i)
+    (contains (javaprojectmodel/invocation-targets ?i) ?m)
+    (ast :MethodDeclaration ?m)))
+
+;commented out because  methodinvocation-methoddeclaration should be used instead
+;  (defn
+;    invocation-calls
+;    [?inv ?method]  
+;    (fresh [?binding]
+;           (ast-invocation-binding :MethodInvocation ?inv ?binding)
+;           (ast-declares-binding :MethodDeclaration ?method ?binding)))
+

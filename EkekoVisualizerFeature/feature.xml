@@ -2,7 +2,7 @@
 <feature
       id="EkekoVisualizationFeature"
       label="EkekoVisualizationFeature"
-      version="1.0.0.qualifier">
+      version="0.0.1.qualifier">
 
    <description url="http://www.example.com/description">
       Extension for the Ekeko plugin that enables visualizing query results as graphs drawn by  
@@ -31,10 +31,10 @@ Eclipse Zest (The Eclipse Visualization Toolkit).
    </requires>
 
    <plugin
-         id="EkekoVisualization"
+         id="EkekoVisualizer"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
 </feature>

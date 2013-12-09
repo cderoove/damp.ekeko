@@ -6,7 +6,7 @@
   (:use clojure.core.logic)
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.soot soot])
-  (:use [damp.ekeko.jdt reification basic soot])
+  (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
   (:use [damp.qwal])
   (:require [damp.ekeko.util [text :as text]])
   (:require [damp.ekeko [gui :as gui]]))
@@ -107,46 +107,22 @@
   
   (ekeko* [?inv ?child] (ast :MethodInvocation ?inv) (child :arguments ?inv ?child))
 
-  (ekeko* [?m ?o] (ast :MethodDeclaration ?m) (fresh [?os]
-                                                  (equals ?os (damp.ekeko.jdt.javaprojectmodel/method-overriders ?m))
-                                                  (contains ?os ?o)))
+  (ekeko* [?m ?o] (ast :MethodDeclaration ?m) (methoddeclaration-methoddeclaration|overrides ?m ?o))
   
-  (ekeko* [?i ?m] (ast :MethodInvocation ?i) (fresh [?ts]
-                                                  (equals ?ts (damp.ekeko.jdt.javaprojectmodel/invocation-targets ?i))
-                                                  (contains ?ts ?m)))
+  (ekeko* [?i ?m] (ast :MethodInvocation ?i) (methodinvocation-methoddeclaration ?i ?m))
   
   (ekeko* [?import] (ast :ImportDeclaration ?import))
+
+  (ekeko* [?import ?package] (ast|importdeclaration-package ?import ?package))
   
-  (ekeko* [?import ?binding] (import-declaration-imports-binding ?import ?binding))
-  
-  (ekeko* [?n ?key ?binding] (ast-declares-binding  ?n ?key ?binding))
-  
-  (ekeko* [?import ?package] (import-declaration-imports-package ?import ?package))
-  
-  (ekeko* [?import ?package ?name] (import-declaration-imports-package ?import ?package) (equals ?name (.getName ?package)))
-  
-  (ekeko* [?import ?package ?components] (import-declaration-imports-package ?import ?package) (equals ?components (vec (.getNameComponents ?package))))
-    
-  
-  (ekeko* [?qualifiedPackageName ?qualifiedTypeName ?typeNode] 
-          (fresh [?typeBinding ?packageBinding]
-                 (ast :Type ?typeNode) 
-                 (!= nil ?typeBinding)
-                 (equals ?typeBinding (.resolveBinding ?typeNode))
-                 (equals false (.isFromSource ?typeBinding))
-                 (equals false (.isPrimitive ?typeBinding))
-                 (equals ?qualifiedTypeName (.getQualifiedName ?typeBinding))
-                 (!= nil ?packageBinding)
-                 (equals ?packageBinding (.getPackage ?typeBinding))
-                 (equals ?qualifiedPackageName (.getName ?packageBinding)) 
-                 ))
-  
-  
+  (ekeko* [?import ?package ?name] (ast|importdeclaration-package ?import ?package) (equals ?name (.getElementName ?package)))
+      
+ 
   (ekeko* [?m ?cfg] (method-cfg ?m ?cfg))
   
   (ekeko* [?m ?cfg ?entry ?end]
           (method-cfg ?m ?cfg) 
-          (method-cfg-entry ?m ?entry)
+          (method-cfg|entry ?m ?entry)
           (fresh [?beforeReturn ?return]
                  (qwal ?cfg ?entry ?end []
                        (qcurrent [currentStatement]
@@ -159,7 +135,7 @@
   (ekeko-n* 100 [?m ?beforeReturn ?return]
             (fresh [?end ?entry ?cfg]
                    (method-cfg ?m ?cfg)
-                   (method-cfg-entry ?m ?entry)
+                   (method-cfg|entry ?m ?entry)
                    (qwal ?cfg ?entry ?end 
                          []
                          (q=>*)

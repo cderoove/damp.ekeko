@@ -3,12 +3,17 @@
     :author "Coen De Roover"}
   damp.ekeko.jdt.soot
   (:refer-clojure :exclude [== type])
-  (:use [clojure.core.logic])
-  (:use [damp.ekeko logic])
-  (:use [damp.ekeko.jdt reification basic])
-  (:require [damp.ekeko.jdt [astnode :as astnode]]
-            [damp.ekeko [ekekomodel :as ekekomodel]]
-            [damp.ekeko.soot [soot :as soot]])
+  (:require [clojure.core [logic :as l]])
+  (:require 
+    [damp.ekeko
+     [logic :as el] [ekekomodel :as ekekomodel]]
+    [damp.ekeko.jdt 
+     [javaprojectmodel :as javaprojectmodel]
+     [astnode :as astnode]
+     [ast :as ast]
+     [convenience :as convenience]
+     ]
+    [damp.ekeko.soot [soot :as soot]])
   (:import 
     [java.util Iterator]
     [damp.ekeko JavaProjectModel EkekoModel]
@@ -27,41 +32,52 @@
 ;; SOOT <-> JDT
 ;; ------------
 
+;TODO: set *queried-project-models* to speed this up
+(defn 
+  ast-model
+  [?keyword ?node ?model]
+  ;THIS IS TOO SLOW, FOR NOW ASSUMING there is only 1 ekeko model, the SOOT-enabled one
+  ;(l/fresh [?cu ?p]
+  ;    (ast-root ?node ?cu)
+  ;    (el/equals ?p (-> ?cu (.getJavaElement) (.getJavaProject)))
+  ;    (el/equals ?model (.getJavaProjectModel (ekeko-model) ?p))))
+  (ast/ast ?keyword ?node))
+
 
 (defn 
   method-declaration-signature
   "Relation between the JDT MethodDeclaration ?ast
    and its Soot signature string ?signature."
   [?ast ?signature]
-   (all
-    (ast :MethodDeclaration ?ast)
-    (equals ?signature (JavaProjectModel/keyForMethodDeclaration ?ast))))
+   (l/all
+    (ast/ast :MethodDeclaration ?ast)
+    (el/equals ?signature (JavaProjectModel/keyForMethodDeclaration ?ast))))
 
 (defn 
   type-declaration-signature 
   "Relation between the JDT TypeDeclaration ?ast
    and its Soot signature string ?signature."
   [?ast ?signature]
-  (all
-    (ast :TypeDeclaration ?ast)
-    (equals ?signature (JavaProjectModel/keyForTypeDeclaration ?ast))))
+  (l/all
+    (ast/ast :TypeDeclaration ?ast)
+    (el/equals ?signature (JavaProjectModel/keyForTypeDeclaration ?ast))))
 
 (defn 
   field-signature
   "Relation between the JDT FieldDeclaration ?ast
    and its Soot signature string ?signature."
   [?ast ?signature]
-  (fresh [?declaration]
-         (ast :FieldDeclaration ?declaration)
-         (child :fragments ?declaration ?ast)
-         (equals ?signature (JavaProjectModel/sootSignatureForFieldVariableBinding (.resolveBinding ^VariableDeclarationFragment ?ast)))))
+  (l/fresh [?declaration]
+         (ast/ast :FieldDeclaration ?declaration)
+         (ast/child   :fragments ?declaration ?ast)
+         (el/equals ?signature (JavaProjectModel/sootSignatureForFieldVariableBinding (.resolveBinding ^VariableDeclarationFragment ?ast)))))
 
 (defn 
   ast-soot-class
   "Relation between the JDT TypeDeclaration ?jdt
    and the corresponding SootClass ?soot."
   [?jdt ?soot]
-    (fresh [?model ?scene ?binaryname]
+    (l/fresh [?model ?scene ?binaryname]
            (soot/soot-model-scene ?model ?scene)
            (ast-model :TypeDeclaration ?jdt ?model) 
            (type-declaration-signature ?jdt ?binaryname)
@@ -74,9 +90,9 @@
      and the corresponding SootMethod ?soot.
      Tabled."}
   ast-soot-method 
-  (tabled
+  (l/tabled
     [?jdt ?soot]
-    (fresh [?model ?scene ?signature]
+    (l/fresh [?model ?scene ?signature]
            (soot/soot-model-scene ?model ?scene)
            (ast-model :MethodDeclaration ?jdt ?model) 
            (method-declaration-signature ?jdt ?signature)
@@ -90,10 +106,10 @@
 
   Note that a field declaration AST node can declare multiple fields."
   [?declaration ?field ?soot]
-    (fresh [?model ?scene ?signature]
+    (l/fresh [?model ?scene ?signature]
            (soot/soot-model-scene ?model ?scene)
            (ast-model :FieldDeclaration ?declaration ?model) 
-           (child :fragments ?declaration ?field)
+           (ast/child   :fragments ?declaration ?field)
            (field-signature ?field ?signature)
            (soot/soot-field-signature ?soot ?signature)))
 
@@ -127,8 +143,8 @@
   "Relation of JDT ASTNode instances ?ast and Soot Unit instances ?unit
    that are compatible based on their respective line number information. "
   [?ast ?unit] 
-  (fresh [?astkeyw ?unitkeyw]
-    (ast ?astkeyw ?ast)
+  (l/fresh [?astkeyw ?unitkeyw]
+    (ast/ast ?astkeyw ?ast)
     (soot/soot-unit ?unitkeyw ?unit)))
 
 ;todo: arrays
@@ -137,10 +153,10 @@
   "Relation between reference-valued JDT Expression instances ?ast
    and the Ekeko model ?model in which they reside."
   [?ast ?model]
-  (fresh [?scene ?keyw ?binding]
+  (l/fresh [?scene ?keyw ?binding]
          (soot/soot-model-scene ?model ?scene)
          (ast-model :Expression ?ast ?model)
-         (ast-expression-reference ?keyw ?ast)))
+         (ast/ast|expression|reference ?keyw ?ast)))
          
          
 
@@ -154,21 +170,21 @@
    Note that ?sm can be a class initializer as well as
    a constructor."
   [?ast ?model ?sm]
-    (all
+    (l/all
       (ast-reference-soot-model ?ast ?model)
-      (conde [(fresh [?m]
-                     (ast-encompassing-method ?ast ?m)
+      (l/conde [(l/fresh [?m]
+                     (ast/ast-methoddeclaration|encompassing ?ast ?m)
                      (ast-soot-method ?m ?sm))]
-             [(fresh [?p ?t ?sc]
-                     (ast-parent ?ast ?p)
-                   (ast :FieldDeclaration ?p)
-                   (ast-encompassing-typedeclaration ?ast ?t)
-                   (ast-soot-class ?t ?sc)
-                   (conde [(fresh [?mod]
-                                  (ast-declaration-modifier :FieldDeclaration ?ast ?mod) 
-                                  (modifier-static ?mod))
-                           (soot/soot-class-initializer-method ?sc ?sm)]
-                          [(soot/soot-class-constructor-method ?sc ?sm)]))])))
+             [(l/fresh [?p ?t ?sc]
+                       (ast/ast-parent ?ast ?p)
+                       (ast/ast :FieldDeclaration ?p)
+                       (ast/ast-typedeclaration|encompassing ?ast ?t)
+                       (ast-soot-class ?t ?sc)
+                       (l/conde [(l/fresh [?mod]
+                                          (ast/ast|declaration-modifier :FieldDeclaration ?ast ?mod) 
+                                          (convenience/modifier|static ?mod))
+                                 (soot/soot-class-initializer-method ?sc ?sm)]
+                                [(soot/soot-class-constructor-method ?sc ?sm)]))])))
 
 ;TODO: assumes SOOT has been run with variable name preservation option on (was not the case for SOUL's Cava)
 (defn 
@@ -176,20 +192,20 @@
   "Non-relational. Verifies that JDT SimpleName instance ?name
    has the same identifier as Soot JimpleLocal ?local."
   [?name ?local]
-  (fresh [?identifier]
-         (ast :SimpleName ?name)
+  (l/fresh [?identifier]
+         (ast/ast :SimpleName ?name)
          (soot/soot-value :JimpleLocal ?local)
-         (equals ?identifier (.getName ^JimpleLocal ?local))
-         (equals ?identifier (.getIdentifier ^SimpleName ?name))))
+         (el/equals ?identifier (.getName ^JimpleLocal ?local))
+         (el/equals ?identifier (.getIdentifier ^SimpleName ?name))))
 
 (defn 
   is-ast-soot-value-type-compatible? 
   "Non-relational. Verifies that the declared type of JDT Expression instance ?expression
    and the declared type of Soot Value ?value have the same Soot signature string."
   [?expression ?value]  
- (fresh [?signature]
-        (equals ?signature (JavaProjectModel/sootSubsignatureTypeStringForEclipseTypeBinding (.resolveTypeBinding ^Expression ?expression)))
-        (equals ?signature (.toString ^soot.Type (.getType ^Value ?value)))))
+ (l/fresh [?signature]
+        (el/equals ?signature (JavaProjectModel/sootSubsignatureTypeStringForEclipseTypeBinding (.resolveTypeBinding ^Expression ?expression)))
+        (el/equals ?signature (.toString ^soot.Type (.getType ^Value ?value)))))
 
 
 (defn 
@@ -197,9 +213,9 @@
   "Non-relational. Verifies that Soot JimpleLocal ?local
    is named 'this'."
   [?local]
-  (all 
+  (l/all 
     (soot/soot-value :JimpleLocal ?local)
-    (equals "this" (.getName ^JimpleLocal ?local))))
+    (el/equals "this" (.getName ^JimpleLocal ?local))))
 
 
 (defn 
@@ -208,12 +224,12 @@
    JDT Expression instance ?expression and SootMethodRef ?value are compatible."
   [?expression ?value]
   ;TODO: provide type hints based on it being one of the method invocations (which only have Expresison as common super type(
-  (fresh [?identifier]
-          (equals ?identifier (.getIdentifier ^SimpleName (.getName ?expression)))
-          (equals ?identifier (.name ^SootMethodRef (.getMethodRef ?value)))
-          (fresh [?argcnt]
-                 (equals ?argcnt (.size ^ASTNode$NodeList (.arguments ?expression))) 
-                 (equals ?argcnt (.getArgCount ?value)))))
+  (l/fresh [?identifier]
+          (el/equals ?identifier (.getIdentifier ^SimpleName (.getName ?expression)))
+          (el/equals ?identifier (.name ^SootMethodRef (.getMethodRef ?value)))
+          (l/fresh [?argcnt]
+                 (el/equals ?argcnt (.size ^ASTNode$NodeList (.arguments ?expression))) 
+                 (el/equals ?argcnt (.getArgCount ?value)))))
 
 (defn 
   is-ast-expression-soot-field-access-compatible-local-on-lhs?
@@ -221,19 +237,19 @@
      that accesses a field with binding ?fieldBinding, can feature on the RHS of
      a Soot Unit with SootValue ?value on its LHS of which ?valKeyw represents the kind."
   [?fieldBinding ?expressionKeyw ?expression ?valKeyw ?value]
-  (fresh [?modFlags ?sig ?sf]
-         (equals ?sig (JavaProjectModel/sootSignatureForFieldVariableBinding ^IVariableBinding ?fieldBinding))
-         (!= ?sig nil)
+  (l/fresh [?modFlags ?sig ?sf]
+         (el/equals ?sig (JavaProjectModel/sootSignatureForFieldVariableBinding ^IVariableBinding ?fieldBinding))
+         (l/!= ?sig nil)
          (soot/soot-field-signature ?sf ?sig)
-         (equals ?modFlags (.getModifiers ^VariableBinding ?fieldBinding)) ;TODO: add type hint to JDT-internal IFieldVariableBinding (or something like that)
-         (conda [(succeeds (org.eclipse.jdt.core.dom.Modifier/isStatic ?modFlags)) 
-                 (== ?valKeyw :StaticFieldRef)
-                 (equals ?sf (.getField ^StaticFieldRef ?value))]
-                [(== ?valKeyw :JInstanceFieldRef)
-                  (equals ?sf (.getField ^InstanceFieldRef ?value))
-                  (fresh [?base]
-                         (equals ?base (.getBase ^InstanceFieldRef ?value))
-                         (conda [(== ?expressionKeyw :SimpleName)
+         (el/equals ?modFlags (.getModifiers ^VariableBinding ?fieldBinding)) ;TODO: add type hint to JDT-internal IFieldVariableBinding (or something like that)
+         (l/conda [(el/succeeds (org.eclipse.jdt.core.dom.Modifier/isStatic ?modFlags)) 
+                 (l/== ?valKeyw :StaticFieldRef)
+                 (el/equals ?sf (.getField ^StaticFieldRef ?value))]
+                [(l/== ?valKeyw :JInstanceFieldRef)
+                  (el/equals ?sf (.getField ^InstanceFieldRef ?value))
+                  (l/fresh [?base]
+                         (el/equals ?base (.getBase ^InstanceFieldRef ?value))
+                         (l/conda [(l/== ?expressionKeyw :SimpleName)
                                  (is-soot-local-named-this? ?base)]
                                 [(soot/soot-value :JimpleLocal ?base)]))])))
 
@@ -246,42 +262,42 @@
    represents the kind, can feature on the RHS of a Soot Unit 
    with SootValue ?value on its LHS of which ?valKeyw represents the kind."
   [?keyw ?expression ?valkeyw ?value]
-  (conda [(== ?keyw :ClassInstanceCreation)
-          (== ?valkeyw :JNewExpr)
+  (l/conda [(l/== ?keyw :ClassInstanceCreation)
+          (l/== ?valkeyw :JNewExpr)
           ;todo: check arg count of init invocation in trailing unit
           ]       
-         [(== ?keyw :CastExpression)
-          (== ?valkeyw :JCastExpr)]
-         [(== ?keyw :MethodInvocation)
-          (all
-            (conda [(== ?valkeyw :JStaticInvokeExpr)]
-                   [(== ?valkeyw :JVirtualInvokeExpr)]
-                   [(== ?valkeyw :JInterfaceInvokeExpr)])
+         [(l/== ?keyw :CastExpression)
+          (l/== ?valkeyw :JCastExpr)]
+         [(l/== ?keyw :MethodInvocation)
+          (l/all
+            (l/conda [(l/== ?valkeyw :JStaticInvokeExpr)]
+                   [(l/== ?valkeyw :JVirtualInvokeExpr)]
+                   [(l/== ?valkeyw :JInterfaceInvokeExpr)])
             (is-ast-invocation-soot-value-compatible-name-args? ?expression ?value))]
-         [(== ?keyw :SuperMethodInvocation) 
-          (== ?valkeyw :JSpecialInvokeExpr) ;todo: qualified super invocations (cf Cava)
+         [(l/== ?keyw :SuperMethodInvocation) 
+          (l/== ?valkeyw :JSpecialInvokeExpr) ;todo: qualified super invocations (cf Cava)
           (is-ast-invocation-soot-value-compatible-name-args? ?expression ?value)]
-         [(== ?keyw :ThisExpression)
-          fail ;better to take an identitystmt unit with this local on the lhs
+         [(l/== ?keyw :ThisExpression)
+           l/fail ;better to take an identitystmt unit with this local on the lhs
           (is-soot-local-named-this? ?value)] ;todo qualified this expressions (cf Cava)
-         [(== ?keyw :FieldAccess) ;TODO: what's the Jimple equivalent of a SuperFieldAccess?
-          (fresh [?binding]
-                 (equals ?binding (.resolveFieldBinding ^FieldAccess ?expression))
+         [(l/== ?keyw :FieldAccess) ;TODO: what's the Jimple equivalent of a SuperFieldAccess?
+          (l/fresh [?binding]
+                 (el/equals ?binding (.resolveFieldBinding ^FieldAccess ?expression))
                  (is-ast-expression-soot-field-access-compatible-local-on-lhs? ?binding ?keyw ?expression ?valkeyw ?value))]
-         [(== ?keyw :QualifiedName)
-           (fresh [?binding]
-                 (equals ?binding (.resolveBinding ^QualifiedName ?expression))
+         [(l/== ?keyw :QualifiedName)
+           (l/fresh [?binding]
+                 (el/equals ?binding (.resolveBinding ^QualifiedName ?expression))
                  (is-ast-expression-soot-field-access-compatible-local-on-lhs? ?binding ?keyw ?expression ?valkeyw ?value))]
-         [(== ?keyw :SimpleName)
-          (fresh [?nameBinding]
-                 (equals ?nameBinding (.resolveBinding ^SimpleName ?expression))
-                 (conda [(all 
-                           (succeeds (instance? IVariableBinding ?nameBinding)) ; can also resolve to a type binding
-                           (succeeds (.isField ^IVariableBinding ?nameBinding))) 
+         [(l/== ?keyw :SimpleName)
+          (l/fresh [?nameBinding]
+                 (el/equals ?nameBinding (.resolveBinding ^SimpleName ?expression))
+                 (l/conda [(l/all 
+                           (el/succeeds (instance? IVariableBinding ?nameBinding)) ; can also resolve to a type binding
+                           (el/succeeds (.isField ^IVariableBinding ?nameBinding))) 
                          (is-ast-expression-soot-field-access-compatible-local-on-lhs? ?nameBinding ?keyw ?expression ?valkeyw ?value)]
                         [;local on rhs 
-                         (== ?valkeyw :JimpleLocal)
-                         fail ;better to take a unit with this local on the lhs (TODO: SURE? NOT THE CASE FOR FLOW-SENSITIVE ANALYSES)
+                         (l/== ?valkeyw :JimpleLocal)
+                         l/fail ;better to take a unit with this local on the lhs (TODO: SURE? NOT THE CASE FOR FLOW-SENSITIVE ANALYSES)
                          (is-ast-soot-name-local-compatible? ?expression ?value)]
                         ))]
          ;TODO:expand to array accesses
@@ -295,19 +311,19 @@
    that accesses a field with binding ?fieldBinding, can feature on the LHS of
    a Soot Unit with SootValue ?value on its RHS of which ?valKeyw represents the kind."
   [?fieldBinding ?expressionKeyw ?expression ?valKeyw ?value]
-  (fresh [?modFlags ?sig ?sf]
-         (equals ?sig (JavaProjectModel/sootSignatureForFieldVariableBinding ^IVariableBinding ?fieldBinding))
-         (!= ?sig nil)
+  (l/fresh [?modFlags ?sig ?sf]
+         (el/equals ?sig (JavaProjectModel/sootSignatureForFieldVariableBinding ^IVariableBinding ?fieldBinding))
+         (l/!= ?sig nil)
          (soot/soot-field-signature ?sf ?sig)
-         (equals ?modFlags (.getModifiers ^VariableBinding ?fieldBinding)) 
-         (conda [(succeeds (org.eclipse.jdt.core.dom.Modifier/isStatic ?modFlags))
-                 (== ?valKeyw :StaticFieldRef)
-                 (equals ?sf (.getField ^StaticFieldRef ?value))]
-                [(== ?valKeyw :JInstanceFieldRef)
-                  (equals ?sf (.getField ^JInstanceFieldRef ?value))
-                  (fresh [?base]
-                         (equals ?base (.getBase ^JInstanceFieldRef ?value))
-                         (conda [(== ?expressionKeyw :SimpleName)
+         (el/equals ?modFlags (.getModifiers ^VariableBinding ?fieldBinding)) 
+         (l/conda [(el/succeeds (org.eclipse.jdt.core.dom.Modifier/isStatic ?modFlags))
+                 (l/== ?valKeyw :StaticFieldRef)
+                 (el/equals ?sf (.getField ^StaticFieldRef ?value))]
+                [(l/== ?valKeyw :JInstanceFieldRef)
+                  (el/equals ?sf (.getField ^JInstanceFieldRef ?value))
+                  (l/fresh [?base]
+                         (el/equals ?base (.getBase ^JInstanceFieldRef ?value))
+                         (l/conda [(l/== ?expressionKeyw :SimpleName)
                                  (is-soot-local-named-this? ?base)]
                                 [(soot/soot-value :JimpleLocal ?base)]))])))
 
@@ -321,15 +337,15 @@
    that accesses a field with binding ?fieldBinding, can feature on the LHS of
    a Soot Unit with SootValue ?value on its RHS of which ?valKeyw represents the kind."
   [?keyw ?expression ?lvalkeyw ?lvalue]
-    (conda [(== ?keyw :SimpleName) 
+    (l/conda [(l/== ?keyw :SimpleName) 
             (is-ast-soot-name-local-compatible? ?expression ?lvalue)]
-           [(== ?keyw :FieldAccess)
-            (fresh [?binding]
-                 (equals ?binding (.resolveFieldBinding ^FieldAccess ?expression))
+           [(l/== ?keyw :FieldAccess)
+            (l/fresh [?binding]
+                 (el/equals ?binding (.resolveFieldBinding ^FieldAccess ?expression))
                  (is-ast-expression-soot-field-access-compatible-local-on-rhs? ?binding ?keyw ?expression ?lvalkeyw ?lvalue))]
-           [(== ?keyw :QualifiedName)
-             (fresh [?binding]
-                 (equals ?binding (.resolveBinding ^QualifiedName ?expression))
+           [(l/== ?keyw :QualifiedName)
+             (l/fresh [?binding]
+                 (el/equals ?binding (.resolveBinding ^QualifiedName ?expression))
                  (is-ast-expression-soot-field-access-compatible-local-on-rhs? ?binding ?keyw ?expression ?lvalkeyw ?lvalue)
                  )]      
            ;TODO:expand to array indices being assigned to
@@ -343,8 +359,8 @@
    with a JimpleLocal on the LHS and a Soot value compatible with
    JDT ASTNode ?expression on its RHS."  
   [?expression ?unit]
-  (fresh [?keyw ?valkeyw ?left ?right ?signature]
-    (ast ?keyw ?expression)
+  (l/fresh [?keyw ?valkeyw ?left ?right ?signature]
+    (ast/ast ?keyw ?expression)
     (soot/soot-unit-assign-leftop ?unit ?left)
     (soot/soot-value :JimpleLocal ?left)
     (soot/soot-unit-assign-rightop ?unit ?right)
@@ -359,8 +375,8 @@
    with a JimpleLocal on the RHS and a Soot value compatible with
    JDT ASTNode ?expression on its LHS."
   [?expression ?unit]
-  (fresh [?keyw ?lvalkeyw ?left ?right ?signature]
-    (ast ?keyw ?expression)
+  (l/fresh [?keyw ?lvalkeyw ?left ?right ?signature]
+    (ast/ast ?keyw ?expression)
     (soot/soot-unit-assign-rightop ?unit ?right)
     (soot/soot-value :JimpleLocal ?right)
     (soot/soot-unit-assign-leftop ?unit ?left)    
@@ -374,15 +390,15 @@
    with a JimpleLocal on its LHS that is compatible with the SimpleName or
    ThisExpression ?expression."
   [?expression ?unitkeyw ?unit]
-  (fresh [?keyw ?local]
-         (conda [(== ?unitkeyw :JIdentityStmt) (equals ?local (.getLeftOp ^JIdentityStmt ?unit))]
-                [(== ?unitkeyw :JAssignStmt) (equals ?local (.getLeftOp ^JAssignStmt ?unit))])
-         (ast ?keyw ?expression)
-         (conda [(== ?keyw :SimpleName)
+  (l/fresh [?keyw ?local]
+         (l/conda [(l/== ?unitkeyw :JIdentityStmt) (el/equals ?local (.getLeftOp ^JIdentityStmt ?unit))]
+                [(l/== ?unitkeyw :JAssignStmt) (el/equals ?local (.getLeftOp ^JAssignStmt ?unit))])
+         (ast/ast ?keyw ?expression)
+         (l/conda [(l/== ?keyw :SimpleName)
                  ;local varibale declaration, parameter names
                  (is-ast-soot-name-local-compatible? ?expression ?local)]
                 ;initial assignment of this
-                [(== ?keyw :ThisExpression)
+                [(l/== ?keyw :ThisExpression)
                  (is-soot-local-named-this? ?local)]
                 ))) 
          
@@ -399,28 +415,28 @@
    Using ?unit and ?local, the Soot program analyses in ?model
    can be queried about the results for ?expression."}
   ast-reference-model-soot-unit-local
-  (tabled 
+  (l/tabled   
     [?expression ?model ?unit ?local]
-    (fresh [?m ?units ?value]
+    (l/fresh [?m ?units ?value]
            (ast-reference-soot-model-method ?expression ?model ?m)
            (soot/soot-method-units ?m ?units)
-           (contains ?units ?unit)
+           (el/contains ?units ?unit)
            (is-ast-soot-unit-position-compatible? ?expression ?unit)
            ;this conde cannot be changed into a conda without getting errors (TODO: check invariants that govern use of conda)
-           (conde [;identity or assigment unit assigning to an expression that is a local name
-                   (conda [(ast :SimpleName ?expression)]
-                          [(ast :ThisExpression ?expression)])
-                   (fresh [?unitKeyw]
+           (l/conde [;identity or assigment unit assigning to an expression that is a local name
+                   (l/conda [(ast/ast :SimpleName ?expression)]
+                          [(ast/ast :ThisExpression ?expression)])
+                   (l/fresh [?unitKeyw]
                           (soot/soot-unit ?unitKeyw ?unit)
                           ;silly conda to enable type hinting
-                          (conda [(== ?unitKeyw :JIdentityStmt) (equals ?local (.getLeftOp ^JIdentityStmt ?unit))]
-                                 [(== ?unitKeyw :JAssignStmt) (equals ?local (.getLeftOp ^JAssignStmt ?unit))])
+                          (l/conda [(l/== ?unitKeyw :JIdentityStmt) (el/equals ?local (.getLeftOp ^JIdentityStmt ?unit))]
+                                 [(l/== ?unitKeyw :JAssignStmt) (el/equals ?local (.getLeftOp ^JAssignStmt ?unit))])
                           (is-ast-unit-identity-or-assignment-compatible-local-on-lhs? ?expression ?unitKeyw ?unit))]
                   [ ;assignment unit where expression is on the RHS, local on the LHS
                    (is-ast-unit-assign-compatible-local-on-lhs? ?expression ?unit)
                    (soot/soot-unit-assign-leftop ?unit ?local)
                    ;TODO: Cava used to check wjether a subsequent unit uses the local as the expression's parent
-                   ;(fresh [?trailingUnit]
+                   ;(l/fresh [?trailingUnit]
                    ;       (soot-method-unit-trailing-unit ?m ?unit ?trailingUnit))
                    ]
                   [
@@ -435,7 +451,7 @@
 
 
            
-           ;(conda [(ast :ClassInstanceCreation ?expression) 
+           ;(l/conda [(ast/ast :ClassInstanceCreation ?expression) 
            ;        (ast-soot-expression-class-instance-creation ?expression ?unit ?local)])))
 
 
@@ -444,7 +460,7 @@
 ;following qwal-query does not work
 ;
 ;(defn ast-soot-expression-class-instance-creation [?exp ?unit ?local]
-;  (fresh [?m ?cfg ?entry ?exit 
+;  (l/fresh [?m ?cfg ?entry ?exit 
 ;          ?model ?scene ?signature]
 ;         (soot-model-scene ?model ?scene)
 ;         (ast-model :ClassInstanceCreation ?exp ?model)
@@ -457,17 +473,17 @@
 ;                        []
 ;                        (q=>*)
 ;                        (with-current [u] 
-;                          (fresh [?foo ?value]
-;                                 (== ?unit u)
+;                          (l/fresh [?foo ?value]
+;                                 (l/== ?unit u)
 ;                                 (soot-unit-assign-rightop ?unit ?value)
 ;                                 (soot-value :JNewExpr ?value)
 ;                                 (soot-unit-assign-leftop ?unit ?local)))
 ;                        ;(q=>+)
                         ;(with-current [u]
-                        ;  (fresh [?vt ?t]
-                         ;        (== ?t u)
+                        ;  (l/fresh [?vt ?t]
+                         ;        (l/== ?t u)
                           ;       (soot-unit :JInvokeStmt ?t)
-                           ;      (equals ?vt (.getInvokeExpr ?t))))
+                           ;      (el/equals ?vt (.getInvokeExpr ?t))))
 ;                        (q=>+)))))
 
 
@@ -476,12 +492,12 @@
 
 ;assuming the geometric encoding pta was run
 ;(defn ast-reference-soot-model-points-to-context [?ast ?model ?set ?sm]
-;  (fresh [?scene ?unit ?local ?sm ?context]
+;  (l/fresh [?scene ?unit ?local ?sm ?context]
 ;         (soot-model-scene ?model ?scene)
 ;         (ast-reference-model-soot-unit-local ?ast ?model ?unit ?local)
 ;         (ast-reference-soot-model-method ?ast ?model ?sm)
 ;         (soot-method-called-by-unit ?sm ?context)
-;         (equals ?set (.reachingObjects 
+;         (el/equals ?set (.reachingObjects 
 ;                        ^PointsToAnalysis (.getPointsToAnalysis ^Scene ?scene) 
 ;                        ^Context ?context
 ;                        ^Local ?local))))
@@ -493,7 +509,7 @@
 ;check out why .. as all variables should already by bound before the call to condu
 ;(defn ast-references-soot-model-may-alias-nodup
 ;  [?ast1 ?ast2 ?model]
-;  (fresh [?foo]
+;  (l/fresh [?foo]
 ;    (ast-reference-soot-model ?ast1 ?model)
 ;    (ast-reference-soot-model ?ast2 ?model)
 ;    (condu 
@@ -504,10 +520,10 @@
 ;assuming the geometric encoding pta was run v (TODO: perform instance? check omn pta)
 ;(defn ast-references-soot-model-may-alias-context
 ;  [?ast1 ?ast2 ?model ?context]
-;  (fresh [?set1 ?set2]
+;  (l/fresh [?set1 ?set2]
 ;    (ast-reference-soot-model-points-to ?ast1 ?model ?set1 ?context) ;if given to one (a condu), ensure that ?model is already bound or remains unbound
 ;    (ast-reference-soot-model-points-to ?ast2 ?model ?set2 ?context)
-;    (succeeds (.hasNonEmptyIntersection ^PointsToSet ?set1 ?set2))))
+;    (el/succeeds (.hasNonEmptyIntersection ^PointsToSet ?set1 ?set2))))
 
 
 
@@ -519,12 +535,12 @@
    at run-time.
    Tabled."}
   ast-reference-soot-model-points-to
-  (tabled 
+  (l/tabled   
     [?ast ?model ?set]
-    (fresh [?scene ?unit ?local]
+    (l/fresh [?scene ?unit ?local]
            (ast-reference-model-soot-unit-local ?ast ?model ?unit ?local)
            (soot/soot-model-scene ?model ?scene)
-         (equals ?set (.reachingObjects ^PointsToAnalysis (.getPointsToAnalysis ^Scene ?scene) ^Local ?local)))))
+         (el/equals ?set (.reachingObjects ^PointsToAnalysis (.getPointsToAnalysis ^Scene ?scene) ^Local ?local)))))
 
 ;TODO: try to use one as it only only has to succeed for one non-empty intersection, but impossible to use since ?set1 and ?set2 will be bound
 (defn 
@@ -537,14 +553,14 @@
    Examples:
    (ekeko-n* 100
              [?ast1 ?ast2]
-             (fresh [?model]
+             (l/fresh [?model]
                     (ast-references-soot-model-may-alias ?ast1 ?ast2 ?model)))
    "
   [?ast1 ?ast2 ?model]
-  (fresh [?set1 ?set2]
+  (l/fresh [?set1 ?set2]
     (ast-reference-soot-model-points-to ?ast1 ?model ?set1) ;if given to one (a condu), ensure that ?model is already bound or remains unbound
     (ast-reference-soot-model-points-to ?ast2 ?model ?set2)
-    (succeeds (.hasNonEmptyIntersection ^PointsToSet ?set1 ?set2)))) ;assuming the geometric encoding pta was run
+    (el/succeeds (.hasNonEmptyIntersection ^PointsToSet ?set1 ?set2)))) ;assuming the geometric encoding pta was run
 
 (defn 
   ast-references-soot-model-local-must-alias
@@ -553,13 +569,13 @@
    that must alias according to the method's intra-procedural must alias analysis, 
    and the model ?model in which they reside."
   [?ast1 ?ast2 ?model]
-  (fresh [?m ?unit1 ?unit2 ?local1 ?local2 ?a]
+  (l/fresh [?m ?unit1 ?unit2 ?local1 ?local2 ?a]
          (ast-reference-soot-model-method ?ast1 ?model ?m)
          (ast-reference-soot-model-method ?ast2 ?model ?m) ;TODO: make called predicate mode-aware
          (soot/soot-method-local-must-alias-analysis ?m ?a)
          (ast-reference-model-soot-unit-local ?ast1 ?model ?unit1 ?local1)
          (ast-reference-model-soot-unit-local ?ast2 ?model ?unit2 ?local2) 
-         (succeeds (.mustAlias ^LocalMustAliasAnalysis ?a ?local1 ?unit1 ?local2 ?unit2))))
+         (el/succeeds (.mustAlias ^LocalMustAliasAnalysis ?a ?local1 ?unit1 ?local2 ?unit2))))
 
 (defn 
   ast-references-soot-model-local-must-alias-strong
@@ -569,13 +585,13 @@
    strong intra-procedural must alias analysis, 
    and the model ?model in which they reside."
   [?ast1 ?ast2 ?model]
-  (fresh [?m ?unit1 ?unit2 ?local1 ?local2 ?a]
+  (l/fresh [?m ?unit1 ?unit2 ?local1 ?local2 ?a]
          (ast-reference-soot-model-method ?ast1 ?model ?m)
          (ast-reference-soot-model-method ?ast2 ?model ?m) ;TODO: make called predicate mode-aware
          (soot/soot-method-local-must-alias-analysis-strong ?m ?a)
          (ast-reference-model-soot-unit-local ?ast1 ?model ?unit1 ?local1)
          (ast-reference-model-soot-unit-local ?ast2 ?model ?unit2 ?local2) 
-         (succeeds (.mustAlias  ^StrongLocalMustAliasAnalysis ?a ?local1 ?unit1 ?local2 ?unit2))))
+         (el/succeeds (.mustAlias  ^StrongLocalMustAliasAnalysis ?a ?local1 ?unit1 ?local2 ?unit2))))
 
   
 

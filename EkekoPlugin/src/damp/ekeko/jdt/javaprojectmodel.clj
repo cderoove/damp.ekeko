@@ -155,23 +155,25 @@
 (defn method-overriders
 ;  (memoize 
 ;    (fn  
-      [^MethodDeclaration m]
-  (let [mbinding (.resolveBinding m)]
-    (mapcat
-      ;(apply concat (pmap
-      (fn [itype] 
-              (if-let [subclass (ielement-to-declaration itype)]
-                (filter 
-                  (fn [d] 
-                    (and (instance? MethodDeclaration d)
-                         (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding)))
-                  (if
-                    (instance? AnonymousClassDeclaration subclass)
-                    (.bodyDeclarations ^AnonymousClassDeclaration subclass)
-                    (.getMethods ^TypeDeclaration subclass)))
-                []))
-            (type-declaration-subclasses-itypes (.getParent m)))))
-      
+      [m] 
+      ;^MethodDeclaration no type argument here because includes org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration
+      ;when IMethodBinding.isAnnotationMember returns true (TODO: check this out)
+      (let [mbinding (.resolveBinding m)]
+        (mapcat
+          ;(apply concat (pmap
+          (fn [itype] 
+            (if-let [subclass (ielement-to-declaration itype)]
+              (filter 
+                (fn [d] 
+                  (and (instance? MethodDeclaration d)
+                       (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding)))
+                (if
+                  (instance? AnonymousClassDeclaration subclass)
+                  (.bodyDeclarations ^AnonymousClassDeclaration subclass)
+                  (.getMethods ^TypeDeclaration subclass)))
+              []))
+          (type-declaration-subclasses-itypes (.getParent m)))))
+
    
 (defn targets-of-constructor-invocation [n]
   (if-let [cb (.resolveConstructorBinding n)]

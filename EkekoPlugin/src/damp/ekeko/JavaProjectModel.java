@@ -309,15 +309,21 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		ICompilationUnit[] icus = frag.getCompilationUnits();
 		SubMonitor sub = SubMonitor.convert(monitor, icus.length);
 		for(ICompilationUnit icu : icus) {
-			CompilationUnit cu;
-			if(compilationUnitHasCompilationErrors(icu)) {
-				cu = parseCompilationUnitWithErrors(icu, sub.newChild(1));
-			} else {
-				cu = parseCompilationUnitWithoutErrors(icu, sub.newChild(1));
-			}
+			CompilationUnit cu = parseCompilationUnit(icu, sub);
 			if(cu != null)
 				icu2ast.put(icu, cu);
 		}		
+	}
+	
+	protected CompilationUnit parseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
+		SubMonitor sub = SubMonitor.convert(monitor, 1);
+		CompilationUnit cu;
+		if(compilationUnitHasCompilationErrors(icu)) {
+			cu = parseCompilationUnitWithErrors(icu, sub.newChild(1));
+		} else {
+			cu = parseCompilationUnitWithoutErrors(icu, sub.newChild(1));
+		}
+		return cu;
 	}
 	
 	//overridden in PPAJavaProjectModel
@@ -403,7 +409,9 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 		
 	private void processNewCompilationUnit(ICompilationUnit icu) {
-		CompilationUnit cu = parse(icu,null);
+		CompilationUnit cu = parseCompilationUnit(icu, null);
+		if(cu == null)
+			return;
 		icu2ast.put(icu, cu);
 		addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		
@@ -411,14 +419,18 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	private void processRemovedCompilationUnit(ICompilationUnit icu) {
 		CompilationUnit old = icu2ast.remove(icu);
-		removeInformationFromVisitor(visitCompilationUnitForInformation(old));
+		if(old != null)
+			removeInformationFromVisitor(visitCompilationUnitForInformation(old));
 		
 	}
 	
 	private void processChangedCompilationUnit(ICompilationUnit icu) {
 		CompilationUnit old = icu2ast.remove(icu);
-		removeInformationFromVisitor(visitCompilationUnitForInformation(old));
-		CompilationUnit cu = parse(icu,null);
+		if(old != null)
+			removeInformationFromVisitor(visitCompilationUnitForInformation(old));
+		CompilationUnit cu = parseCompilationUnit(icu, null);
+		if(cu == null)
+			return;
 		icu2ast.put(icu, cu);
 		addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 	}

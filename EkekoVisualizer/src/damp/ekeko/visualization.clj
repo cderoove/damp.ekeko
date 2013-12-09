@@ -43,9 +43,9 @@
     :node|label
     (fn [method] (str (.getName method)))
     :edge|style 
-    (fn [src dest] graph/edge|directed)
+    (fn [src dest] damp.ekeko.visualization.view/edge|directed)
     :layout
-    graph/layout|tree
+    damp.ekeko.visualization.view/layout|tree
     )
     
   

@@ -56,6 +56,7 @@ Export-Package: baristaui.util;
    org.osgi.framework,
    org.eclipse.swt.widgets,
    org.eclipse.jdt.core.dom.rewrite",
+ damp.ekeko.gui,
  damp.ekeko.jdt,
  damp.ekeko.soot;
   uses:="soot,

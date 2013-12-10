@@ -666,9 +666,10 @@
   name|simple-string
   "Relation between a SimpleName ASTNode and its identifier string."
   [?name ?string]
-  (l/all 
+  (l/fresh [?wrappedstring]
     (ast :SimpleName ?name)
-    (has :identifier ?name ?string)))
+    (has :identifier ?name ?wrappedstring)
+    (value-raw ?wrappedstring ?string)))
 
 (defn
   name|qualified-string

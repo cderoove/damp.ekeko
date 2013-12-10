@@ -201,9 +201,9 @@
   typeliteral-type
   "Relation between a TypeLiteral (e.g., Integer.class) and its Type (e.g., java.lang.Integer)."
   [?literal ?type]
-  (l/fresh [?ast]
+  (l/fresh [?ast ?key]
            (typeliteral-ast|type ?literal ?ast)
-           (aststructure/ast|type-type ?ast ?type)))
+           (aststructure/ast|type-type ?key ?ast ?type)))
 
 
 

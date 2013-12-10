@@ -44,12 +44,12 @@
   typedeclaration-binding|type/3 which resolves a type ASTNode to an ITypeBinding."
   [?ast ?type]
   (l/conda [(el/v- ?type)
-          (l/fresh [?binding]
-                 (astbindings/ast|typedeclaration-binding|type ?ast ?binding)
-                 (bindings/binding-element ?binding ?type))]
-         [(el/v+ ?type)
-          (l/!= nil ?ast)
-          (el/equals ?ast (javaprojectmodel/ielement-to-declaration ?type))]))
+            (l/fresh [?binding]
+                     (astbindings/ast|typedeclaration-binding|type ?ast ?binding)
+                     (bindings/binding-element ?binding ?type))]
+           [(el/v+ ?type)
+            (l/!= nil ?ast)
+            (el/equals ?ast (javaprojectmodel/ielement-to-declaration ?type))]))
 
 (defn 
   typedeclaration-typedeclaration|super 

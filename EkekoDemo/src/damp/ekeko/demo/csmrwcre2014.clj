@@ -3,12 +3,15 @@
   (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
   (:use damp.ekeko)
+  (:use damp.ekeko.visualization)
+  (:use damp.ekeko.visualization.view)
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.soot soot])
   (:use [damp.ekeko.jdt ast astnode structure aststructure soot convenience markers rewrites])
   (:import [org.eclipse.ui.IMarkerResolution])
-  (:import [damp.ekeko.EkekoProblemFixer]))
-
+  (:import [damp.ekeko.EkekoProblemFixer])
+  (:import [org.eclipse.jdt.ui ISharedImages JavaUI]))
+           
 
 ;;The archive containing the source code can be found here: http://soft.vub.ac.be/~resteven/csmrwcrecase.zip
 ;;Ensure it has the Ekeko Nature by rightclicking on the project, configure, include in Ekeko Queries
@@ -26,17 +29,22 @@
 ;;Or by clicking on the warning popup and use the quick fix
 
 
-(defn typedeclaration|inhierarchy
+(defn 
+  typedeclaration|inhierarchy
   [?type-decl]
   (fresh [?astnode]
     (typedeclaration-name|qualified|string ?astnode "be.ac.chaq.model.ast.java.ASTNode")
     (typedeclaration-typedeclaration|super ?type-decl ?astnode)))
 
-(defn annotation|namedentityproperty [?annotation]
+(defn 
+  annotation|namedentityproperty
+  [?annotation]
   (all
     (annotation-name|qualified|string ?annotation "be.ac.chaq.model.entity.EntityProperty")))
 
-(defn annotation|ep-typeliteral [?annotation ?type-literal]
+(defn 
+  annotation|ep-typeliteral
+  [?annotation ?type-literal]
   (fresh [?member-pair ?name]
     (annotation|namedentityproperty ?annotation)
     (child :values ?annotation ?member-pair)
@@ -56,7 +64,9 @@
          (fresh [?typekind]
                 (ast|type-type ?typekind ?targ ?annotype))))
 
-(defn field-declaration|incorrect [?field-declaration]
+(defn 
+  field-declaration|incorrect
+  [?field-declaration]
   (fresh [?type-declaration ?field-type ?annotation]
     (annotation|namedentityproperty ?annotation)
     (fielddeclaration-annotation ?field-declaration ?annotation)
@@ -68,12 +78,15 @@
 
 ;;Install Marker
 (defn 
-  add-annotation-problem-marker [astnode]
+  add-annotation-problem-marker 
+  [astnode]
   (add-problem-marker astnode "Type Parameter is missing" "annotation"))
 
 ;;Rewrite Magic
 
-(defn fielddeclaration-getinfo [typedeclaration]
+(defn
+  fielddeclaration-getinfo
+  [typedeclaration]
   (first
     (ekeko [?annotation ?type]
            (fresh [?typeliteral]
@@ -82,14 +95,16 @@
                   (annotation|ep-typeliteral ?annotation ?typeliteral)
                   (has :type ?typeliteral ?type)))))
    
-
-(defn node-property [node keyword]
+;should be moved to rewriting namespace
+(defn 
+  node-property
+  [node keyword]
   (node-property-value
     node
     (node-property-descriptor-for-ekeko-keyword node keyword)))
 
 
-;;Marker Fixing
+;;Marker Fixing 
 
 (defn marker-quick-fix [marker]
   (let [fielddecl (ekekomarker-astnode marker)
@@ -111,12 +126,45 @@
   (damp.ekeko.EkekoProblemFixer/installNewResolution "annotation" (annotation-fixer)))
 
 
-;;Demo
+
+;;Marker Demo
 (defn 
-  demo
+  demo-marker
   []
   (map (comp add-annotation-problem-marker first) 
        (ekeko [?ast] (field-declaration|incorrect ?ast))))
+
+
+;; Visualization Demo
+(defn
+  demo-visualization
+  []
+  (let [labelprovider (damp.ekeko.gui.EkekoLabelProvider.)]
+    (ekeko-visualize
+      ;nodes
+      (ekeko [?t] 
+             (fresh [?root]
+                    (typedeclaration-name|qualified|string ?root "be.ac.chaq.model.ast.java.Expression")
+                    (conde [(equals ?t ?root)]
+                           [(typedeclaration-typedeclaration|super ?t ?root)])))
+      ;edges
+      (ekeko [?fromuser ?totype]
+             (fresh [?anno ?annotypelit ?annotype]
+                    (annotation|ep-typeliteral ?anno ?annotypelit)
+                    (ast-typedeclaration|encompassing ?anno ?fromuser)
+                    (typeliteral-type ?annotypelit ?annotype)
+                    (typedeclaration-type ?totype ?annotype)))
+      :node|label
+      (fn [typedeclaration] 
+        (.getText labelprovider  typedeclaration))
+      :node|image 
+      (fn [typedeclaration] 
+        (.getImage labelprovider typedeclaration))
+      :edge|style 
+      (fn [src dest] edge|directed)
+      :layout
+      layout|horizontaltree)))
+  
 
 
 (install-fixer)

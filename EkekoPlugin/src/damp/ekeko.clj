@@ -233,7 +233,7 @@
   (use 'codox.main)
   (codox.main/generate-docs {
              :name "Ekeko"
-             :version "2.0.4"
+             :version "2.0.8"
              :description "Applicative logic meta-programming using core.logic against an Eclipse workspace."
              :output-dir "/Users/cderoove/Desktop/docekeko"
              :sources ["src"]

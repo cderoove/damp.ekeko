@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="EkekoVisualizationFeature"
-      label="EkekoVisualizationFeature"
-      version="0.0.1.qualifier">
+      id="damp.ekeko.visualizer.feature"
+      label="EkekoVisualizerFeature"
+      version="1.0.2">
 
    <description url="http://www.example.com/description">
       Extension for the Ekeko plugin that enables visualizing query results as graphs drawn by  
@@ -34,7 +34,7 @@ Eclipse Zest (The Eclipse Visualization Toolkit).
          id="EkekoVisualizer"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="1.0.2"
          unpack="false"/>
 
 </feature>

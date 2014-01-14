@@ -15,6 +15,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -110,7 +115,35 @@ public class Activator extends AbstractUIPlugin {
 		}
 	}
 	
+	private static String CONSOLE_NAME = "Ekeko Console";
 	
+	public static MessageConsole getConsole() {
+	      ConsolePlugin plugin = ConsolePlugin.getDefault();
+	      IConsoleManager conMan = plugin.getConsoleManager();
+	      
+	      
+	      
+	      for(IConsole existing : conMan.getConsoles()) {
+	    	  if(CONSOLE_NAME.equals(existing.getName()))
+	    		  return (MessageConsole) existing;
+	      }
 
+	      MessageConsole myConsole = new MessageConsole(CONSOLE_NAME, getImageDescriptor("icons/ekeko16.png"));
+	      conMan.addConsoles(new IConsole[]{myConsole});
+	      myConsole.activate();
+	      return myConsole;	      
+	}
+	
+	
+	private static MessageConsoleStream consoleStream;
+	
+	public static MessageConsoleStream getConsoleStream() {
+		if(consoleStream == null || consoleStream.isClosed()) {
+			consoleStream = getConsole().newMessageStream();
+		}
+		return consoleStream;
+		
+	}
+	
 
 }

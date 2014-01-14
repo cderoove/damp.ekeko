@@ -54,7 +54,10 @@ public class REPLController {
 						if(provider != null)
 							provider.update();
 						String url = String.format("nrepl://%s:%s", "localhost", getServerPort());
-						Activator.log("Started Ekeko-hosted nREPL server: " + url);
+						String msg = "Started Ekeko-hosted nREPL server: " + url;
+						Activator.log(msg);
+						//new ccw should detect the url in console and open the corresponding repl view
+						Activator.getConsoleStream().println(msg);
 					} catch (Exception e) {
 						Activator.logError("Could not start Ekeko-hosted nREPL server", e);
 						throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,"Could not start plugin-hosted REPL server", e));

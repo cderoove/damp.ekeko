@@ -5,7 +5,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
-import damp.ekeko.EkekoBuilder;
 
 public class EkekoNature implements IProjectNature {
 
@@ -29,7 +28,7 @@ public class EkekoNature implements IProjectNature {
 		newCommands[newCommands.length - 1] = command;
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
-		System.out.println("Ekeko project nature added to: " + project.getName());
+		Activator.getConsoleStream().println("Ekeko project nature added to: " + project.getName());
 		//Should happen automatically
 		//EkekoModel.getInstance().fullProjectBuild(project, null);
 	}
@@ -47,7 +46,7 @@ public class EkekoNature implements IProjectNature {
 						commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				project.setDescription(description, null);
-				System.out.println("Ekeko project nature removed from: " + project.getName());
+				Activator.getConsoleStream().println("Ekeko project nature removed from: " + project.getName());
 				//Doesn't happen automatically
 				EkekoModel.getInstance().removeProjectModels(project);
 				return;

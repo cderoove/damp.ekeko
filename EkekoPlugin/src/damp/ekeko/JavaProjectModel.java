@@ -271,7 +271,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
 		String msg = "Populating JavaProjectModel for: " + javaProject.getElementName();
-		System.out.println(msg);
+		Activator.getConsoleStream().println(msg);
 		IPackageFragment[] packageFragments = javaProject.getPackageFragments();
 	    SubMonitor sub = SubMonitor.convert(monitor, msg, packageFragments.length);
 		for(IPackageFragment frag : packageFragments) {
@@ -328,7 +328,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	//overridden in PPAJavaProjectModel
 	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
-		System.out.println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
+		Activator.getConsoleStream().println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
 		monitor.worked(1);
 		return null;
 	}
@@ -343,7 +343,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		for(CompilationUnit cu : icu2ast.values()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
-		System.out.println("Gathered information from JDT compilation units in " + duration + "ms");	
+		Activator.getConsoleStream().println("Gathered information from JDT compilation units in " + duration + "ms");	
 	}
 
 	
@@ -385,15 +385,15 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 				ICompilationUnit icu = (ICompilationUnit) element;
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-					System.out.println("Added ICompilationUnit");
+					Activator.getConsoleStream().println("Processing Java Project Delta: Added ICompilationUnit");
 					processNewCompilationUnit(icu);
 					break;
 				case IResourceDelta.REMOVED:
-					System.out.println("Removed ICompilationUnit");
+					Activator.getConsoleStream().println("Processing Java Project Delta: Removed ICompilationUnit");
 					processRemovedCompilationUnit(icu);
 					break;
 				case IResourceDelta.CHANGED:
-					System.out.println("Changed ICompilationUnit");
+					Activator.getConsoleStream().println("Processing Java Project Delta: Changed ICompilationUnit");
 					processChangedCompilationUnit(icu);
 					break;
 				}

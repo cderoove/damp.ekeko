@@ -22,7 +22,7 @@
      (ast :MethodInvocation ?inv) 
      (child :arguments ?inv ?child))
 
-     See also:
+     See also::p
    ekeko* which opens a graphical view on the solutions."
   [logicvars & goals]
   `(run-nc* [resultvar#] 
@@ -103,21 +103,27 @@
           (ast :MethodInvocation ?inv) 
           (fresh [?exp]
                  (has :expression ?inv ?exp)
-                 (nullvalue ?exp)))
+                 (value|null ?exp)))
   
   (ekeko* [?inv ?child] (ast :MethodInvocation ?inv) (child :arguments ?inv ?child))
 
-  (ekeko* [?m ?o] (ast :MethodDeclaration ?m) (methoddeclaration-methoddeclaration|overrides ?m ?o))
+  (ekeko* [?m ?o] (methoddeclaration-methoddeclaration|overrides ?m ?o))
   
-  (ekeko* [?i ?m] (ast :MethodInvocation ?i) (methodinvocation-methoddeclaration ?i ?m))
+  (ekeko* [?i ?m] (methodinvocation-methoddeclaration ?i ?m))
   
   (ekeko* [?import] (ast :ImportDeclaration ?import))
 
   (ekeko* [?import ?package] (ast|importdeclaration-package ?import ?package))
   
   (ekeko* [?import ?package ?name] (ast|importdeclaration-package ?import ?package) (equals ?name (.getElementName ?package)))
-      
  
+  (ekeko* [?typedeclaration ?type]
+        (typedeclaration-type ?typedeclaration ?type))
+ 
+  (ekeko* [?typeoccurrencekind ?typeoccurrence ?type ?typedeclaration]
+           (ast|type-type ?typeoccurrencekind ?typeoccurrence ?type)
+           (typedeclaration-type ?typedeclaration ?type))
+  
   (ekeko* [?m ?cfg] (method-cfg ?m ?cfg))
   
   (ekeko* [?m ?cfg ?entry ?end]

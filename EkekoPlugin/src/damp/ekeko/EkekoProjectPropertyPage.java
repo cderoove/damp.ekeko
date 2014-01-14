@@ -29,12 +29,12 @@ import damp.ekeko.soot.ToggleSootNatureAction;
 public class EkekoProjectPropertyPage extends PropertyPage {
 
 	private static final String ENTRYPOINT_TITLE = "&Entry point for static analyses:";
-	public static final QualifiedName ENTRYPOINT_PROPERTY = new QualifiedName(Activator.PLUGIN_ID, "ENTRYPOINT");
+	public static final QualifiedName ENTRYPOINT_PROPERTY = new QualifiedName(EkekoPlugin.PLUGIN_ID, "ENTRYPOINT");
 	private static final String DEFAULT_ENTRYPOINT = "";
 	
 	private static final String SOOTARGS_TITLE = "&Soot arguments:";
 	private static final String SOOTARGS_TOOLTIP = "&If Ekeko Soot analyses are enabled, Soot is executed with these arguments whenever the project is built.";
-	public static final QualifiedName SOOTARGS_PROPERTY = new QualifiedName(Activator.PLUGIN_ID, "SOOTARGS");
+	public static final QualifiedName SOOTARGS_PROPERTY = new QualifiedName(EkekoPlugin.PLUGIN_ID, "SOOTARGS");
 	private static final String DEFAULT_SOOTARGS = SootProjectModel.DEFAULT_SOOTARGS;
 
 	private static final int TEXT_FIELD_WIDTH = 50;

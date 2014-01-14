@@ -37,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.ViewPart;
 
-import damp.ekeko.Activator;
+import damp.ekeko.EkekoPlugin;
 
 import barista.IResults;
 import baristaui.util.ExpandBarFixListener;
@@ -323,12 +323,12 @@ public class QueryView extends ViewPart {
 		});
 		moveVarUp.setToolTipText("move variable up");
 		// XXX
-		moveVarUp.setImage(Activator.getImage("icons/go-up.png"));
+		moveVarUp.setImage(EkekoPlugin.getImage("icons/go-up.png"));
 		moveVarUp.setEnabled(false);
 
 		refreshVariablesButton = new Button(varsComposite, SWT.NONE);
 		refreshVariablesButton.setToolTipText("refresh query results");
-		refreshVariablesButton.setImage(Activator.getImage("icons/view-refresh.png"));
+		refreshVariablesButton.setImage(EkekoPlugin.getImage("icons/view-refresh.png"));
 		refreshVariablesButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -345,7 +345,7 @@ public class QueryView extends ViewPart {
 		Button resetVariablesButton = new Button(varsComposite, SWT.PUSH);
 		resetVariablesButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		resetVariablesButton.setToolTipText("reset variables");
-		resetVariablesButton.setImage(Activator.getImage("icons/edit-clear.png"));
+		resetVariablesButton.setImage(EkekoPlugin.getImage("icons/edit-clear.png"));
 		resetVariablesButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -363,7 +363,7 @@ public class QueryView extends ViewPart {
 				moveVarUpInTable(selected, false);
 			}
 		});
-		moveVarDown.setImage(Activator.getImage("icons/go-down.png"));
+		moveVarDown.setImage(EkekoPlugin.getImage("icons/go-down.png"));
 		moveVarDown.setEnabled(false);
 
 		variableTable.addSelectionChangedListener(new ISelectionChangedListener() {

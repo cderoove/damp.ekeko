@@ -271,7 +271,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
 		String msg = "Populating JavaProjectModel for: " + javaProject.getElementName();
-		Activator.getConsoleStream().println(msg);
+		EkekoPlugin.getConsoleStream().println(msg);
 		IPackageFragment[] packageFragments = javaProject.getPackageFragments();
 	    SubMonitor sub = SubMonitor.convert(monitor, msg, packageFragments.length);
 		for(IPackageFragment frag : packageFragments) {
@@ -328,7 +328,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	//overridden in PPAJavaProjectModel
 	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
-		Activator.getConsoleStream().println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
+		EkekoPlugin.getConsoleStream().println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
 		monitor.worked(1);
 		return null;
 	}
@@ -343,7 +343,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		for(CompilationUnit cu : icu2ast.values()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
-		Activator.getConsoleStream().println("Gathered information from JDT compilation units in " + duration + "ms");	
+		EkekoPlugin.getConsoleStream().println("Gathered information from JDT compilation units in " + duration + "ms");	
 	}
 
 	
@@ -385,15 +385,15 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 				ICompilationUnit icu = (ICompilationUnit) element;
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-					Activator.getConsoleStream().println("Processing Java Project Delta: Added ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Added ICompilationUnit");
 					processNewCompilationUnit(icu);
 					break;
 				case IResourceDelta.REMOVED:
-					Activator.getConsoleStream().println("Processing Java Project Delta: Removed ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Removed ICompilationUnit");
 					processRemovedCompilationUnit(icu);
 					break;
 				case IResourceDelta.CHANGED:
-					Activator.getConsoleStream().println("Processing Java Project Delta: Changed ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Changed ICompilationUnit");
 					processChangedCompilationUnit(icu);
 					break;
 				}

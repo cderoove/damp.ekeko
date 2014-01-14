@@ -27,12 +27,12 @@ import org.osgi.framework.BundleContext;
 import ccw.util.osgi.ClojureOSGi;
 //import ccw.repl.REPLView;
 
-public class Activator extends AbstractUIPlugin {
+public class EkekoPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "damp.ekeko.plugin"; //$NON-NLS-1$
 	public static final String EKEKO_PROBLEM_MARKER = "damp.ekeko.plugin.ekekoproblemmarker";
 
-	private static Activator plugin;
+	private static EkekoPlugin plugin;
 
 	private static Map<String, Image> pluginImages = new HashMap<String, Image>();
 
@@ -52,7 +52,7 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 	
-	public static Activator getDefault() {
+	public static EkekoPlugin getDefault() {
 		return plugin;
 	}
 

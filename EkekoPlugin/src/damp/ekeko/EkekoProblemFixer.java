@@ -20,7 +20,7 @@ public class EkekoProblemFixer implements IMarkerResolutionGenerator {
 	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		try {
-			if(marker.getType().equals(Activator.EKEKO_PROBLEM_MARKER)){
+			if(marker.getType().equals(EkekoPlugin.EKEKO_PROBLEM_MARKER)){
 				String kindOfMarker = marker.getAttribute("ekekoKind", "none");
 				if(fixes.containsKey(kindOfMarker)){
 					Collection<IMarkerResolution> res = fixes.get(kindOfMarker);

@@ -38,7 +38,7 @@ public class REPLController {
 	
 	//starts repl in environment with correct class loader 
 	private synchronized void internalStartREPLServer() {
-		final Bundle ekekoBundle = Activator.getDefault().getBundle();
+		final Bundle ekekoBundle = EkekoPlugin.getDefault().getBundle();
 		ClojureOSGi.withBundle(ekekoBundle, new RunnableWithException() {
 			public Object run() throws Exception {
 				if (REPLServerSocket == null) {
@@ -55,12 +55,12 @@ public class REPLController {
 							provider.update();
 						String url = String.format("nrepl://%s:%s", "localhost", getServerPort());
 						String msg = "Started Ekeko-hosted nREPL server: " + url;
-						Activator.log(msg);
+						EkekoPlugin.log(msg);
 						//new ccw should detect the url in console and open the corresponding repl view
-						Activator.getConsoleStream().println(msg);
+						EkekoPlugin.getConsoleStream().println(msg);
 					} catch (Exception e) {
-						Activator.logError("Could not start Ekeko-hosted nREPL server", e);
-						throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,"Could not start plugin-hosted REPL server", e));
+						EkekoPlugin.logError("Could not start Ekeko-hosted nREPL server", e);
+						throw new CoreException(new Status(IStatus.ERROR, EkekoPlugin.PLUGIN_ID,"Could not start plugin-hosted REPL server", e));
 					}
 				}
 				return null;

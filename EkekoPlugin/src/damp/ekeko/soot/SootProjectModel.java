@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 
-import damp.ekeko.Activator;
+import damp.ekeko.EkekoPlugin;
 import damp.ekeko.EkekoProjectPropertyPage;
 import damp.ekeko.ProjectModel;
 
@@ -59,7 +59,7 @@ public class SootProjectModel extends ProjectModel {
 
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
-		Activator.getConsoleStream().println("Populating SootProjectModel for: " + getProject().getName());
+		EkekoPlugin.getConsoleStream().println("Populating SootProjectModel for: " + getProject().getName());
 		populateAnalysisInformation(monitor);
 	}
 
@@ -85,7 +85,7 @@ public class SootProjectModel extends ProjectModel {
 	private void startSoot() {
 		soot.G.reset();
 		String[] args =  sootMainArguments();
-		Activator.getConsoleStream().println("Starting Soot with arguments: " + Arrays.toString(args));
+		EkekoPlugin.getConsoleStream().println("Starting Soot with arguments: " + Arrays.toString(args));
 		EkekoSootMain.main(args);
 	}
 	

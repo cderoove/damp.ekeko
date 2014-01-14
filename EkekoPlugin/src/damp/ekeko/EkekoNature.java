@@ -28,7 +28,7 @@ public class EkekoNature implements IProjectNature {
 		newCommands[newCommands.length - 1] = command;
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
-		Activator.getConsoleStream().println("Ekeko project nature added to: " + project.getName());
+		EkekoPlugin.getConsoleStream().println("Ekeko project nature added to: " + project.getName());
 		//Should happen automatically
 		//EkekoModel.getInstance().fullProjectBuild(project, null);
 	}
@@ -46,7 +46,7 @@ public class EkekoNature implements IProjectNature {
 						commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				project.setDescription(description, null);
-				Activator.getConsoleStream().println("Ekeko project nature removed from: " + project.getName());
+				EkekoPlugin.getConsoleStream().println("Ekeko project nature removed from: " + project.getName());
 				//Doesn't happen automatically
 				EkekoModel.getInstance().removeProjectModels(project);
 				return;

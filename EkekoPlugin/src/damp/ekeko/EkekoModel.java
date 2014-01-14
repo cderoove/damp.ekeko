@@ -82,7 +82,7 @@ public class EkekoModel {
 	}
 	
 	public void removeProjectModels(IProject ip)  {
-		Activator.getConsoleStream().println("Removing an existing project from the model: " + ip.toString());
+		EkekoPlugin.getConsoleStream().println("Removing an existing project from the model: " + ip.toString());
 		Collection<IProjectModel> removed = projectModels.get(ip);
 		projectModels.removeAll(ip);
 		for(IProjectModel m : removed)
@@ -131,7 +131,7 @@ public class EkekoModel {
 	}
 	
 	public void clean() {
-		Activator.getConsoleStream().println("Cleaning the Ekeko model.");
+		EkekoPlugin.getConsoleStream().println("Cleaning the Ekeko model.");
 		projectModels.clear();
 	}
 	
@@ -147,7 +147,7 @@ public class EkekoModel {
 	
 	public void populate() {
 		final String msg = "Populating Ekeko project models for queried projects.";
-		Activator.getConsoleStream().println(msg);
+		EkekoPlugin.getConsoleStream().println(msg);
 		Job job = new Job(msg) {
 			protected IStatus run(final IProgressMonitor m) {
 				IProject[] iprojects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
@@ -209,7 +209,7 @@ public class EkekoModel {
 		String msg = "Adding a new project to the Ekeko model: " + project.toString();
 	    SubMonitor sub = SubMonitor.convert(monitor, msg, 1);
 		if(project.isOpen()) {
-			Activator.getConsoleStream().println(msg);
+			EkekoPlugin.getConsoleStream().println(msg);
 			List<? extends IProjectModel> models = newProjectModel(project);
 			for (IProjectModel model : models) {
 				model.populate(monitor);
@@ -242,7 +242,7 @@ public class EkekoModel {
 		IProject ip = resource.getProject();	
 		if(resourceType == IResource.PROJECT) {
 			if (!ip.hasNature(EkekoNature.NATURE_ID)) {
-				Activator.getConsoleStream().println("Removing project from Ekeko model as nature was removed: " + ip.toString());
+				EkekoPlugin.getConsoleStream().println("Removing project from Ekeko model as nature was removed: " + ip.toString());
 				removeProjectModels(ip);
 				return;
 			}					
@@ -250,7 +250,7 @@ public class EkekoModel {
 			case IResourceDelta.DESCRIPTION:
 				//TODO: check whether this really works ...
 				//nature can have been added or removed
-				Activator.getConsoleStream().println("Re-creating project models as its natures were changed: " + ip.toString());
+				EkekoPlugin.getConsoleStream().println("Re-creating project models as its natures were changed: " + ip.toString());
 				fullProjectBuild(ip,monitor);
 				return;
 			case IResourceDelta.ADDED:	
@@ -261,7 +261,7 @@ public class EkekoModel {
 				return;
 			}
 		}
-		Activator.getConsoleStream().println("Updating a project in the model: " + ip.toString());
+		EkekoPlugin.getConsoleStream().println("Updating a project in the model: " + ip.toString());
 		//TODO: take into account that project natures can have been added 
 		for (IProjectModel ipm : getProjectModel(ip)) {
 			ipm.processDelta(delta, monitor);

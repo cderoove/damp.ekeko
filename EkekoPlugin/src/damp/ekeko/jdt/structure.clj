@@ -429,10 +429,10 @@
          (itype-supertypehierarchy ?itype ?hierarchy)
          (el/equals ?subs (.getAllSubtypes ^ITypeHierarchy ?hierarchy ?itype))))
 
-(declare type-type|sub)
+(declare type-type|sub+)
 
 (defn 
-  type-type|super
+  type-type|super+
   "Successively unifies ?itype with every 
    supertype of the given IType ?itype, in bottom-up order. 
 
@@ -446,10 +446,10 @@
                      (itype-super-itypes ?itype ?supers)
                      (el/contains  ?supers ?super-itype))]
            [(el/v- ?itype)
-            (type-type|sub ?super-itype ?itype)]))
+            (type-type|sub+ ?super-itype ?itype)]))
 
 (defn 
-  type-type|sub
+  type-type|sub+
   "Successively unifies ?itype with every 
    subtype of the given IType ?itype. 
 
@@ -463,9 +463,4 @@
      (el/contains  ?subs ?sub-itype)))
 
 
-
-
   
-  
-  
-

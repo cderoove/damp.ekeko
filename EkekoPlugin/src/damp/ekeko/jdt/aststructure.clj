@@ -69,7 +69,7 @@
   [?typedeclaration ?supertypedeclaration]
   (l/fresh [?type ?type|super]
     (typedeclaration-type ?typedeclaration ?type)
-    (structure/type-type|super ?type ?type|super)
+    (structure/type-type|super+ ?type ?type|super)
     (typedeclaration-type ?supertypedeclaration ?type|super)))
 
 (defn

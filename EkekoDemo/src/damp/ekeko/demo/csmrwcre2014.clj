@@ -148,7 +148,7 @@
       (ekeko [?typedeclaration] 
              (fresh [?type ?typeroot]
                     (type-name|qualified|string ?typeroot "be.ac.chaq.model.ast.java.Expression")
-                    (type-type|super ?type ?typeroot)
+                    (type-type|super+ ?type ?typeroot)
                     (typedeclaration-type ?typedeclaration ?type)))
       ;edges
       (ekeko [?fromuser ?totype]
@@ -226,7 +226,7 @@
       (ekeko [?typedeclaration] 
              (fresh [?type ?typeroot]
                     (type-name|qualified|string ?typeroot "be.ac.chaq.model.ast.java.Expression")
-                    (type-type|super ?type ?typeroot)
+                    (type-type|super+ ?type ?typeroot)
                     (typedeclaration-type ?typedeclaration ?type)))
       ;edges
       (ekeko [?fromuser ?totype]

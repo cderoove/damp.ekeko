@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Ekeko Eclipse Plugin
 Bundle-SymbolicName: damp.ekeko.plugin;singleton:=true
 Bundle-Version: 2.0.8
-Bundle-Activator: damp.ekeko.Activator
+Bundle-Activator: damp.ekeko.EkekoPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,

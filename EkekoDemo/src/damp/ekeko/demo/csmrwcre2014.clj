@@ -67,7 +67,7 @@
 (defn 
   field-declaration|incorrect
   [?field-declaration]
-  (fresh [?type-declaration ?field-type ?annotation]
+  (fresh [?type-declaration ?annotation ?field-type]
     (annotation|namedentityproperty ?annotation)
     (fielddeclaration-annotation ?field-declaration ?annotation)
     (ast-typedeclaration|encompassing ?field-declaration ?type-declaration)
@@ -76,11 +76,13 @@
     (fails
       (type-annotation|correct ?field-type ?annotation))))
 
+
+
 ;;Install Marker
 (defn 
   add-annotation-problem-marker 
   [astnode]
-  (add-problem-marker astnode "Type Parameter is missing" "annotation"))
+  (add-problem-marker astnode "Type parameter corresponding to Cha-Q annotation is missing" "annotation"))
 
 ;;Rewrite Magic
 
@@ -119,12 +121,13 @@
     (apply-and-reset-rewrites)
     (reset-and-delete-marker marker)))
 
+
+
 (defn annotation-fixer []
-  (create-quick-fix "Add Type Parameter from Annotation" marker-quick-fix))
+  (create-quick-fix "Add type parameter from Cha-Q annotation" marker-quick-fix))
 
 (defn install-fixer []
   (damp.ekeko.EkekoProblemFixer/installNewResolution "annotation" (annotation-fixer)))
-
 
 
 ;;Marker Demo
@@ -142,11 +145,11 @@
   (let [labelprovider (damp.ekeko.gui.EkekoLabelProvider.)]
     (ekeko-visualize
       ;nodes
-      (ekeko [?t] 
-             (fresh [?root]
-                    (typedeclaration-name|qualified|string ?root "be.ac.chaq.model.ast.java.Expression")
-                    (conde [(equals ?t ?root)]
-                           [(typedeclaration-typedeclaration|super ?t ?root)])))
+      (ekeko [?typedeclaration] 
+             (fresh [?type ?typeroot]
+                    (type-name|qualified|string ?typeroot "be.ac.chaq.model.ast.java.Expression")
+                    (type-type|super ?type ?typeroot)
+                    (typedeclaration-type ?typedeclaration ?type)))
       ;edges
       (ekeko [?fromuser ?totype]
              (fresh [?anno ?annotypelit ?annotype]
@@ -168,3 +171,137 @@
 
 
 (install-fixer)
+
+
+
+(comment
+
+  ;; Actual demo script
+  ;; ------------------
+
+  
+  ;;launches a logic query of which the solutions are all AST nodes of type :Annotation
+  (ekeko [?node]
+         (ast :Annotation ?node))
+  
+  ;;logic queries can be embedded in functional expressions
+  (let [type :Annotation]
+    (count 
+      (ekeko [?node] (ast type ?node))))
+  
+  ;;solutions are tuples of variable bindings (1-tuple of binding for ?ast) that satisfy the constraints 
+  (map 
+    (comp class first) ;function composition, takes class of first element of 1-tuple
+    (ekeko [?node] (ast :Annotation ?node)))
+  ;;note that each ?ast binding is an instance of org.eclipse.jdt.core.dom.NormalAnnotation
+
+  ;;open inspector on solutions 
+  (ekeko* [?node ?parent] 
+          (ast :Annotation ?node)
+          (ast-parent ?node ?parent)) 
+  
+  ;;let's restrict solutions to annotations on non-fielddeclarations
+  (ekeko* [?node ?parent] 
+          (ast :Annotation ?node)
+          (ast-parent ?node ?parent)
+          (ast :FieldDeclaration ?parent)) 
+    
+  ;;and to annotations of the correct type
+  (ekeko* [?annotation] 
+          (fresh [?annotype] ;introduces fresh variable in scope, won't show up in solutions
+                 (type-name|qualified|string ?annotype "be.ac.chaq.model.entity.EntityProperty") 
+                 (ast|annotation-type ?annotation ?annotype)))
+
+  ;;first use of predicate that sits above AST level
+  ;;for other relations provided by the Ekeko library:
+  ;;see documentation at http://cderoove.github.com/damp.ekeko/
+
+  ;;show documentation pop-up
+  
+  ;;also provides functions for quick visualizations
+  ;;nodes and edges correspond to query solutions
+  (let [labelprovider (damp.ekeko.gui.EkekoLabelProvider.)]
+    (ekeko-visualize
+      ;nodes
+      (ekeko [?typedeclaration] 
+             (fresh [?type ?typeroot]
+                    (type-name|qualified|string ?typeroot "be.ac.chaq.model.ast.java.Expression")
+                    (type-type|super ?type ?typeroot)
+                    (typedeclaration-type ?typedeclaration ?type)))
+      ;edges
+      (ekeko [?fromuser ?totype]
+             (fresh [?anno ?annotypelit ?annotype]
+                    (annotation|ep-typeliteral ?anno ?annotypelit)
+                    (ast-typedeclaration|encompassing ?anno ?fromuser)
+                    (typeliteral-type ?annotypelit ?annotype)
+                    (typedeclaration-type ?totype ?annotype)))
+      :node|label
+      (fn [typedeclaration] 
+        (.getText labelprovider  typedeclaration))
+      :node|image 
+      (fn [typedeclaration] 
+        (.getImage labelprovider typedeclaration))
+      :edge|style 
+      (fn [src dest] edge|directed)
+      :layout
+      layout|horizontaltree))
+  
+   ;;find field declarations of which the type and the annotation do not correspond
+
+   
+   ;;functions for marking solutions in query
+   (def
+     marked-fields 
+     (map (comp add-annotation-problem-marker first) 
+          (ekeko [?ast] (field-declaration|incorrect ?ast))))
+   
+   ;;open editor on ReturnStatement
+   ;;execute quick fix
+   ;;described in paper
+
+   (for [marked marked-fields] 
+     (reset-and-delete-marker marked))
+   
+
+  ;;relies on functions for program manipulation
+  ;;can be invoked directly
+  ;;following fixes all at once
+  (for [[field fieldtype annotype]
+        ;;subjects of change
+        (ekeko [?field ?fieldtype ?annotype] 
+               (fresh [?anno ?annotypeliteral]
+                      (field-declaration|incorrect ?field)
+                      (has :type ?field ?fieldtype)
+                      (fielddeclaration-annotation ?field ?anno)
+                      (annotation|ep-typeliteral ?anno ?annotypeliteral)
+                      (has :type ?annotypeliteral ?annotype)))]
+    ;;actual changes
+    (let [fieldtype-copy (copy-astnode fieldtype)
+          annotype-copy (copy-astnode annotype)
+          new-type (create-parameterized-type fieldtype-copy)]
+      (change-property-node field :type new-type)
+      (add-node-cu (.getRoot field) new-type :typeArguments annotype-copy 0)))
+ 
+  ;;have scheduled changes
+  ;;stil need to apply them
+  (apply-and-reset-rewrites)
+ 
+  
+  ;;performance questions?
+  (ekeko* [?c ?t] (classfile-type ?c ?t))
+  
+
+)
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   

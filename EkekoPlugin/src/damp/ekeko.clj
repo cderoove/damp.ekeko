@@ -25,10 +25,10 @@
      See also::p
    ekeko* which opens a graphical view on the solutions."
   [logicvars & goals]
-  `(run-nc* [resultvar#] 
-         (fresh [~@logicvars]
-                (equals resultvar# [~@logicvars])
-                ~@goals)))
+  `(doall (run-nc* [resultvar#] 
+                (fresh [~@logicvars]
+                       (equals resultvar# [~@logicvars])
+                       ~@goals))))
 
 (defmacro 
   ekeko*
@@ -44,10 +44,10 @@
   [vars & goals]
   `(let [querystr# (text/pprint-query-str '(ekeko* [~@vars] ~@goals))
          start# (System/nanoTime)
-         resultsqc# (run-nc* [resultvar#] 
-                          (fresh [~@vars]
-                                 (equals resultvar# [~@vars])
-                                 ~@goals))
+         resultsqc# (doall (run-nc* [resultvar#] 
+                                 (fresh [~@vars]
+                                        (equals resultvar# [~@vars])
+                                        ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
      (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
@@ -71,10 +71,10 @@
   [n vars & goals]
   `(let [querystr# (text/pprint-query-str '(ekeko-n* [~@vars] ~@goals))
          start# (System/nanoTime)
-         resultsqc# (run-nc ~n [resultvar#] 
-                          (fresh [~@vars]
-                                 (equals resultvar# [~@vars])
-                                 ~@goals))
+         resultsqc# (doall (run-nc ~n [resultvar#] 
+                                 (fresh [~@vars]
+                                        (equals resultvar# [~@vars])
+                                        ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
      (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))

@@ -13,6 +13,7 @@
 ;; Basic Structural Relations
 ;; --------------------------
 
+
 (defn 
   ast|type-type
   "Relation between a type ASTNode ?ast, its keyword kind ?key, and the IType ?type it refers to.
@@ -24,6 +25,15 @@
          (astbindings/ast|type-binding|type ?key ?ast ?binding)
          (bindings/binding-element ?binding ?type)))
 
+(defn
+  ast|annotation-type 
+  "Relation between an Annotation ?ast and the IType ?type it refers to."
+  [?ast ?type]
+  (l/fresh [?abinding ?tbinding]
+    (astbindings/ast|annotation-binding|annotation ?ast ?abinding)
+    (el/equals ?tbinding (.getAnnotationType ?abinding))
+    (bindings/binding-element ?tbinding ?type)))
+            
 (defn
    ast|importdeclaration-package
    "Relation between an import declaration ASTNode ?import 
@@ -48,8 +58,9 @@
                      (astbindings/ast|typedeclaration-binding|type ?ast ?binding)
                      (bindings/binding-element ?binding ?type))]
            [(el/v+ ?type)
-            (l/!= nil ?ast)
-            (el/equals ?ast (javaprojectmodel/ielement-to-declaration ?type))]))
+            (l/!= nil ?type)
+            (el/equals ?ast (javaprojectmodel/ielement-to-declaration ?type))
+            (l/!= nil ?ast)]))
 
 (defn 
   typedeclaration-typedeclaration|super 

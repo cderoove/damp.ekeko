@@ -127,15 +127,15 @@
   "Relation of IType instances ?t." 
   [?t]
   (l/conda [(el/v+ ?t) 
-          (el/succeeds (instance? IType ?t))]
-         [(el/v- ?t) 
-          (l/conde
-            [(l/fresh [?classfile]
-                    (classfile-type ?classfile ?t))]
-            [(l/fresh [?compilationunit ?toplevelt]
-                    (compilationunit-type ?compilationunit ?toplevelt)
-                    (l/conde [(l/== ?toplevelt ?t)]
-                           [(type-membertype ?toplevelt ?t)]))])]))
+            (el/succeeds (instance? IType ?t))]
+           [(el/v- ?t) 
+            (l/conde
+              [(l/fresh [?classfile]
+                        (classfile-type ?classfile ?t))]
+              [(l/fresh [?compilationunit ?toplevelt]
+                        (compilationunit-type ?compilationunit ?toplevelt)
+                        (l/conde [(l/== ?toplevelt ?t)]
+                                 [(type-membertype ?toplevelt ?t)]))])]))
 
 
 (defn
@@ -422,6 +422,14 @@
          (itype-supertypehierarchy ?itype ?hierarchy)
          (el/equals ?supers (.getAllSupertypes ^ITypeHierarchy ?hierarchy ?itype))))
 
+(defn-
+  itype-sub-itypes
+  [?itype ?subs]
+  (l/fresh [?hierarchy]
+         (itype-supertypehierarchy ?itype ?hierarchy)
+         (el/equals ?subs (.getAllSubtypes ^ITypeHierarchy ?hierarchy ?itype))))
+
+(declare type-type|sub)
 
 (defn 
   type-type|super
@@ -431,12 +439,28 @@
    Note that the JDT does not consider java.lang.Object
    to be a supertype of any interface type."
   [?itype ?super-itype]
-  (l/fresh [?supers]
-     (type ?itype)
-     (l/!= nil ?super-itype)
-     (itype-super-itypes ?itype ?supers)
-     (el/contains  ?supers ?super-itype)))
+  (l/conda [(el/v+ ?itype)
+            (type ?itype)
+            (l/fresh [?supers]
+                     (l/!= nil ?super-itype)
+                     (itype-super-itypes ?itype ?supers)
+                     (el/contains  ?supers ?super-itype))]
+           [(el/v- ?itype)
+            (type-type|sub ?super-itype ?itype)]))
 
+(defn 
+  type-type|sub
+  "Successively unifies ?itype with every 
+   subtype of the given IType ?itype. 
+
+   Note that the JDT does not consider java.lang.Object
+   to be a supertype of any interface type."
+  [?itype ?sub-itype]
+  (l/fresh [?subs]
+           (type ?itype)
+           (l/!= nil ?sub-itype)
+     (itype-sub-itypes ?itype ?subs)
+     (el/contains  ?subs ?sub-itype)))
 
 
 

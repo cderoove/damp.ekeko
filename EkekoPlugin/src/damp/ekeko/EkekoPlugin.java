@@ -1,7 +1,5 @@
 package damp.ekeko;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,28 +13,26 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import ccw.util.BundleUtils;
 import ccw.util.osgi.ClojureOSGi;
 //import ccw.repl.REPLView;
-import ccw.util.osgi.RunnableWithException;
-import clojure.lang.Keyword;
-import clojure.lang.Var;
 
-public class Activator extends AbstractUIPlugin {
+public class EkekoPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "damp.ekeko.plugin"; //$NON-NLS-1$
 	public static final String EKEKO_PROBLEM_MARKER = "damp.ekeko.plugin.ekekoproblemmarker";
 
-	private static Activator plugin;
+	private static EkekoPlugin plugin;
 
 	private static Map<String, Image> pluginImages = new HashMap<String, Image>();
 
@@ -51,12 +47,12 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		stopREPLServer();
+		REPLController.getCurrent().stopREPLServer();
 		plugin = null;
 		super.stop(context);
 	}
 	
-	public static Activator getDefault() {
+	public static EkekoPlugin getDefault() {
 		return plugin;
 	}
 
@@ -80,72 +76,6 @@ public class Activator extends AbstractUIPlugin {
 
 	public static void log (String msg) {
 		plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, msg));
-	}
-
-	private ServerSocket ackREPLServer;
-
-	public synchronized void startREPLServer() throws CoreException {
-			if (ackREPLServer == null) {
-		        try {
-		        	Var startServer = BundleUtils.requireAndGetVar(getBundle().getSymbolicName(), "clojure.tools.nrepl.server/start-server");
-		        	Object defaultHandler = BundleUtils.requireAndGetVar(
-		        	        getBundle().getSymbolicName(),
-		        	        "clojure.tools.nrepl.server/default-handler").invoke();
-		        	Object handler = BundleUtils.requireAndGetVar(
-		        	        getBundle().getSymbolicName(),
-		        	        "clojure.tools.nrepl.ack/handle-ack").invoke(defaultHandler);
-		            ackREPLServer = (ServerSocket)((Map)startServer.invoke(Keyword.intern("handler"), handler)).get(Keyword.intern("server-socket"));
-		            Activator.log("Started Ekeko-hosted nREPL server: nrepl://localhost:" + ackREPLServer.getLocalPort());
-		        } catch (Exception e) {
-		            Activator.logError("Could not start Ekeko-hosted nREPL server", e);
-		            throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID,"Could not start plugin-hosted REPL server", e));
-		        }
-	    	}
-			
-			
-			
-		
-	}
-	
-	
-
-	public synchronized void myStartREPLServer() throws Exception {
-		//starts repl in environment with correct class loader 
-		ClojureOSGi.withBundle(getDefault().getBundle(), new RunnableWithException() {
-			public Object run() throws Exception {
-				startREPLServer();				
-				return null;
-			}});
-		
-		int port = ackREPLServer.getLocalPort();
-		String url = String.format("nrepl://%s:%s", "localhost", port);
-		//disabled because we cannot depend on ccw.core
-		//REPLView.connect(url,port,true);
-			
-		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-		MessageDialog.openInformation(shell, 
-				"Ekeko-hosted nREPL server started", 
-				"Successfully started an Ekeko-hosted nREPL server on port " + port  + ".\n" +
-				"Connect to this repl using the 'Connect to REPL' dialog in the Window menu.");		
-	}
-	
-	private void stopREPLServer() {
-		if (ackREPLServer != null) {
-			try {
-				ackREPLServer.close();
-			} catch (IOException e) {
-				logError("Error while trying to close Ekeko-hosted nREPL server", e);
-			}
-		}
-	}
-
-	public int getREPLServerPort() throws Exception {
-		if (ackREPLServer == null) {
-			myStartREPLServer();
-		}
-		
-		return ackREPLServer.getLocalPort();
 	}
 
 	public static Image getImage(String string) {
@@ -185,6 +115,35 @@ public class Activator extends AbstractUIPlugin {
 		}
 	}
 	
+	private static String CONSOLE_NAME = "Ekeko Console";
+	
+	public static MessageConsole getConsole() {
+	      ConsolePlugin plugin = ConsolePlugin.getDefault();
+	      IConsoleManager conMan = plugin.getConsoleManager();
+	      
+	      
+	      
+	      for(IConsole existing : conMan.getConsoles()) {
+	    	  if(CONSOLE_NAME.equals(existing.getName()))
+	    		  return (MessageConsole) existing;
+	      }
 
+	      MessageConsole myConsole = new MessageConsole(CONSOLE_NAME, getImageDescriptor("icons/ekeko16.png"));
+	      conMan.addConsoles(new IConsole[]{myConsole});
+	      myConsole.activate();
+	      return myConsole;	      
+	}
+	
+	
+	private static MessageConsoleStream consoleStream;
+	
+	public static MessageConsoleStream getConsoleStream() {
+		if(consoleStream == null || consoleStream.isClosed()) {
+			consoleStream = getConsole().newMessageStream();
+		}
+		return consoleStream;
+		
+	}
+	
 
 }

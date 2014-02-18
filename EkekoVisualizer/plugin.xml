@@ -11,7 +11,7 @@
       <view
             allowMultiple="true"
             category="EkekoVisualization"
-            class="damp.ekeko.visualization.EkekoVisualizationView"
+            class="damp.ekeko.gui.views.EkekoVisualizationView"
             id="damp.ekeko.visualization.EkekoVisualizationView"
             name="Ekeko Visualization">
       </view>

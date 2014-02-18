@@ -1,25 +1,24 @@
 package damp.ekeko;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.ITypeHierarchyChangedListener;
@@ -28,7 +27,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTRequestor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -47,11 +45,9 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.internal.compiler.ast.AnnotationMethodDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
-
 
 import com.google.common.collect.Iterables;
 
@@ -95,9 +91,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	private Set<ASTNode> invocationLikeNodes;
 	
 	private ConcurrentHashMap<MethodDeclaration,ControlFlowGraph> controlFlowGraphs;
-
-
-	
 	
 	private Set<Statement> statements;	
 	private Set<Expression> expressions;
@@ -188,7 +181,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return controlFlowGraphs.get(m);
 	}
 	
-	
 	public ITypeHierarchy getTypeHierarchy(IType type) throws JavaModelException {
 		ITypeHierarchy typeHierarchy;
 		if (!itype2typehierarchy.containsKey(type)) {
@@ -200,6 +192,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return typeHierarchy;
 	}
 
+	//no longer called, but kept for the bug information
 	public CompilationUnit[] parse(ICompilationUnit[] icus, IProgressMonitor monitor) {
 		final CompilationUnit[] compilationUnits = new CompilationUnit[icus.length];
 		
@@ -228,6 +221,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return (CompilationUnit) parser.createAST(monitor);
 	}
 	
+		
 
 	public void clean() {
 		super.clean();
@@ -273,25 +267,83 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	}
 	
+	
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
-		System.out.println("Populating JavaProjectModel for: " + javaProject.getElementName());
-		for(IPackageFragment frag : javaProject.getPackageFragments()) {
-			ICompilationUnit[] icus = frag.getCompilationUnits();
-			CompilationUnit[] cus = parse(icus,monitor);
-			for(int i=0;i<icus.length;i++) 
-				icu2ast.put(icus[i], cus[i]);
-		}
-	
+		String msg = "Populating JavaProjectModel for: " + javaProject.getElementName();
+		EkekoPlugin.getConsoleStream().println(msg);
+		IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+	    SubMonitor sub = SubMonitor.convert(monitor, msg, packageFragments.length);
+		for(IPackageFragment frag : packageFragments) {
+			if(sub.isCanceled()) {
+				buildCanceled();
+				return;
+			}
+			parsePackageFragment(frag, sub);
+			sub.worked(1);
+		}	
 		gatherInformationFromCompilationUnits();
 	}
+	
+	
+	public static Collection<IMarker> getCompilationErrors(ICompilationUnit icu) {
+		LinkedList<IMarker> errors = new LinkedList<IMarker>();
+		IResource resource = icu.getResource();	
+		try {
+			for (IMarker marker: resource.findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER,true,IResource.DEPTH_INFINITE)) {
+				Integer severityType = (Integer) marker.getAttribute(IMarker.SEVERITY);
+				if (severityType.intValue() == IMarker.SEVERITY_ERROR)
+					errors.add(marker);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return errors;
+	}
+
+	public static boolean compilationUnitHasCompilationErrors(ICompilationUnit icu) {
+		return !getCompilationErrors(icu).isEmpty();
+	}
+
+	private void parsePackageFragment(IPackageFragment frag, IProgressMonitor monitor) throws JavaModelException {
+		ICompilationUnit[] icus = frag.getCompilationUnits();
+		SubMonitor sub = SubMonitor.convert(monitor, icus.length);
+		for(ICompilationUnit icu : icus) {
+			CompilationUnit cu = parseCompilationUnit(icu, sub);
+			if(cu != null)
+				icu2ast.put(icu, cu);
+		}		
+	}
+	
+	protected CompilationUnit parseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
+		SubMonitor sub = SubMonitor.convert(monitor, 1);
+		CompilationUnit cu;
+		if(compilationUnitHasCompilationErrors(icu)) {
+			cu = parseCompilationUnitWithErrors(icu, sub.newChild(1));
+		} else {
+			cu = parseCompilationUnitWithoutErrors(icu, sub.newChild(1));
+		}
+		return cu;
+	}
+	
+	//overridden in PPAJavaProjectModel
+	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
+		EkekoPlugin.getConsoleStream().println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
+		monitor.worked(1);
+		return null;
+	}
+	
+	protected CompilationUnit parseCompilationUnitWithoutErrors(ICompilationUnit icu, IProgressMonitor monitor) {
+		return parse(icu, monitor);
+	}
+	
 	
 	protected void gatherInformationFromCompilationUnits() {
 		final long startTime = System.currentTimeMillis();
 		for(CompilationUnit cu : getCompilationUnits()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
-		System.out.println("Gathered information from JDT compilation units in " + duration + "ms");	
+		EkekoPlugin.getConsoleStream().println("Gathered information from JDT compilation units in " + duration + "ms");	
 	}
 
 	
@@ -333,15 +385,15 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 				ICompilationUnit icu = (ICompilationUnit) element;
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-					System.out.println("Added ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Added ICompilationUnit");
 					processNewCompilationUnit(icu);
 					break;
 				case IResourceDelta.REMOVED:
-					System.out.println("Removed ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Removed ICompilationUnit");
 					processRemovedCompilationUnit(icu);
 					break;
 				case IResourceDelta.CHANGED:
-					System.out.println("Changed ICompilationUnit");
+					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Changed ICompilationUnit");
 					processChangedCompilationUnit(icu);
 					break;
 				}
@@ -357,7 +409,9 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 		
 	private void processNewCompilationUnit(ICompilationUnit icu) {
-		CompilationUnit cu = parse(icu,null);
+		CompilationUnit cu = parseCompilationUnit(icu, null);
+		if(cu == null)
+			return;
 		icu2ast.put(icu, cu);
 		addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		
@@ -365,14 +419,18 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	private void processRemovedCompilationUnit(ICompilationUnit icu) {
 		CompilationUnit old = icu2ast.remove(icu);
-		removeInformationFromVisitor(visitCompilationUnitForInformation(old));
+		if(old != null)
+			removeInformationFromVisitor(visitCompilationUnitForInformation(old));
 		
 	}
 	
 	private void processChangedCompilationUnit(ICompilationUnit icu) {
 		CompilationUnit old = icu2ast.remove(icu);
-		removeInformationFromVisitor(visitCompilationUnitForInformation(old));
-		CompilationUnit cu = parse(icu,null);
+		if(old != null)
+			removeInformationFromVisitor(visitCompilationUnitForInformation(old));
+		CompilationUnit cu = parseCompilationUnit(icu, null);
+		if(cu == null)
+			return;
 		icu2ast.put(icu, cu);
 		addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 	}

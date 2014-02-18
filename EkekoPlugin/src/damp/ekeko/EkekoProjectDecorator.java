@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 
 public class EkekoProjectDecorator extends LabelProvider implements  ILightweightLabelDecorator {
 
-	private ImageDescriptor icon = Activator.getImageDescriptor("icons/ekeko7.png");
+	private ImageDescriptor icon = EkekoPlugin.getImageDescriptor("icons/ekeko7.png");
 	
 	
 	public void decorate(Object element, IDecoration decoration) {

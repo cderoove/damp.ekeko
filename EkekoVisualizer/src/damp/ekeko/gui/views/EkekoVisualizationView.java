@@ -1,9 +1,11 @@
-package damp.ekeko.visualization;
+package damp.ekeko.gui.views;
 
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
@@ -29,6 +31,8 @@ public class EkekoVisualizationView extends ViewPart implements IZoomableWorkben
 
 	private GraphViewer viewer;
 	private Graph graph;
+
+	private LocalResourceManager resourceManager;
 	
 	public EkekoVisualizationView() {
 	}
@@ -40,12 +44,19 @@ public class EkekoVisualizationView extends ViewPart implements IZoomableWorkben
 	public GraphViewer getViewer() {
 		return viewer;
 	}
+	
+	public LocalResourceManager getResourceManager() {
+		return resourceManager;
+	}
 
 	
 	public void createPartControl(Composite parent) {
 		//using a dummy viewer on top of the graph for the zoom contribution
 	    viewer = new GraphViewer(parent, SWT.BORDER); 
 	    graph = viewer.getGraphControl();
+	    
+	    resourceManager = new LocalResourceManager(JFaceResources.getResources(), graph);
+	    
 	    
 		//graph = new Graph(parent, SWT.BORDER);
 		

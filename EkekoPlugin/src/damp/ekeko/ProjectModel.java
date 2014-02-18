@@ -7,6 +7,8 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import damp.util.Natures;
+
 public class ProjectModel implements IProjectModel {
 
 	private IProject project;
@@ -34,5 +36,15 @@ public class ProjectModel implements IProjectModel {
 	
 	public void addedToEkekoModel(EkekoModel m, Collection<IProjectModel> projectModels) {
 	}
+	
+	protected void buildCanceled()  {
+		clean();
+		try {
+			Natures.removeNature(project, EkekoNature.NATURE_ID);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 }

@@ -5,6 +5,8 @@
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic]))
 
+(def differs !=)
+
 (defn- 
   ekeko-lvar-sym?
   [s]

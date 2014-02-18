@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
+import damp.ekeko.EkekoPlugin;
 import damp.ekeko.EkekoNature;
 
 public class SootNature implements IProjectNature{
@@ -29,12 +30,12 @@ public class SootNature implements IProjectNature{
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}}
-		System.out.println("SOOT nature added to: " + project.getName());
+		EkekoPlugin.getConsoleStream().println("SOOT nature added to: " + project.getName());
 	}
 
 	@Override
 	public void deconfigure() throws CoreException {
-		System.out.println("SOOT nature nature removed from: " + project.getName());
+		EkekoPlugin.getConsoleStream().println("SOOT nature nature removed from: " + project.getName());
 
 	}
 

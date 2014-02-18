@@ -7,7 +7,7 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.RT;
 import clojure.lang.Symbol;
 import clojure.lang.Var;
-import damp.ekeko.Activator;
+import damp.ekeko.EkekoPlugin;
 
 public class ClojureOSGi {
 	private static volatile boolean initialized;
@@ -16,7 +16,7 @@ public class ClojureOSGi {
 		
 		System.out.println("ClojureOSGi: Static initialization, loading clojure.core");
 		System.out.flush();
-		ClassLoader loader = new BundleClassLoader(Activator.getDefault().getBundle());
+		ClassLoader loader = new BundleClassLoader(EkekoPlugin.getDefault().getBundle());
 		ClassLoader saved = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(loader);

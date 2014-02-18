@@ -6,7 +6,7 @@
   (:use clojure.core.logic)
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.soot soot])
-  (:use [damp.ekeko.jdt reification basic soot])
+  (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
   (:use [damp.qwal])
   (:require [damp.ekeko.util [text :as text]])
   (:require [damp.ekeko [gui :as gui]]))
@@ -22,13 +22,13 @@
      (ast :MethodInvocation ?inv) 
      (child :arguments ?inv ?child))
 
-     See also:
+     See also::p
    ekeko* which opens a graphical view on the solutions."
   [logicvars & goals]
-  `(run-nc* [resultvar#] 
-         (fresh [~@logicvars]
-                (equals resultvar# [~@logicvars])
-                ~@goals)))
+  `(doall (run-nc* [resultvar#] 
+                (fresh [~@logicvars]
+                       (equals resultvar# [~@logicvars])
+                       ~@goals))))
 
 (defmacro 
   ekeko*
@@ -44,10 +44,10 @@
   [vars & goals]
   `(let [querystr# (text/pprint-query-str '(ekeko* [~@vars] ~@goals))
          start# (System/nanoTime)
-         resultsqc# (run-nc* [resultvar#] 
-                          (fresh [~@vars]
-                                 (equals resultvar# [~@vars])
-                                 ~@goals))
+         resultsqc# (doall (run-nc* [resultvar#] 
+                                 (fresh [~@vars]
+                                        (equals resultvar# [~@vars])
+                                        ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
      (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
@@ -71,10 +71,10 @@
   [n vars & goals]
   `(let [querystr# (text/pprint-query-str '(ekeko-n* [~@vars] ~@goals))
          start# (System/nanoTime)
-         resultsqc# (run-nc ~n [resultvar#] 
-                          (fresh [~@vars]
-                                 (equals resultvar# [~@vars])
-                                 ~@goals))
+         resultsqc# (doall (run-nc ~n [resultvar#] 
+                                 (fresh [~@vars]
+                                        (equals resultvar# [~@vars])
+                                        ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
      (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
@@ -103,50 +103,32 @@
           (ast :MethodInvocation ?inv) 
           (fresh [?exp]
                  (has :expression ?inv ?exp)
-                 (nullvalue ?exp)))
+                 (value|null ?exp)))
   
   (ekeko* [?inv ?child] (ast :MethodInvocation ?inv) (child :arguments ?inv ?child))
 
-  (ekeko* [?m ?o] (ast :MethodDeclaration ?m) (fresh [?os]
-                                                  (equals ?os (damp.ekeko.jdt.javaprojectmodel/method-overriders ?m))
-                                                  (contains ?os ?o)))
+  (ekeko* [?m ?o] (methoddeclaration-methoddeclaration|overrides ?m ?o))
   
-  (ekeko* [?i ?m] (ast :MethodInvocation ?i) (fresh [?ts]
-                                                  (equals ?ts (damp.ekeko.jdt.javaprojectmodel/invocation-targets ?i))
-                                                  (contains ?ts ?m)))
+  (ekeko* [?i ?m] (methodinvocation-methoddeclaration ?i ?m))
   
   (ekeko* [?import] (ast :ImportDeclaration ?import))
+
+  (ekeko* [?import ?package] (ast|importdeclaration-package ?import ?package))
   
-  (ekeko* [?import ?binding] (import-declaration-imports-binding ?import ?binding))
-  
-  (ekeko* [?n ?key ?binding] (ast-declares-binding  ?n ?key ?binding))
-  
-  (ekeko* [?import ?package] (import-declaration-imports-package ?import ?package))
-  
-  (ekeko* [?import ?package ?name] (import-declaration-imports-package ?import ?package) (equals ?name (.getName ?package)))
-  
-  (ekeko* [?import ?package ?components] (import-declaration-imports-package ?import ?package) (equals ?components (vec (.getNameComponents ?package))))
-    
-  
-  (ekeko* [?qualifiedPackageName ?qualifiedTypeName ?typeNode] 
-          (fresh [?typeBinding ?packageBinding]
-                 (ast :Type ?typeNode) 
-                 (!= nil ?typeBinding)
-                 (equals ?typeBinding (.resolveBinding ?typeNode))
-                 (equals false (.isFromSource ?typeBinding))
-                 (equals false (.isPrimitive ?typeBinding))
-                 (equals ?qualifiedTypeName (.getQualifiedName ?typeBinding))
-                 (!= nil ?packageBinding)
-                 (equals ?packageBinding (.getPackage ?typeBinding))
-                 (equals ?qualifiedPackageName (.getName ?packageBinding)) 
-                 ))
-  
+  (ekeko* [?import ?package ?name] (ast|importdeclaration-package ?import ?package) (equals ?name (.getElementName ?package)))
+ 
+  (ekeko* [?typedeclaration ?type]
+        (typedeclaration-type ?typedeclaration ?type))
+ 
+  (ekeko* [?typeoccurrencekind ?typeoccurrence ?type ?typedeclaration]
+           (ast|type-type ?typeoccurrencekind ?typeoccurrence ?type)
+           (typedeclaration-type ?typedeclaration ?type))
   
   (ekeko* [?m ?cfg] (method-cfg ?m ?cfg))
   
   (ekeko* [?m ?cfg ?entry ?end]
           (method-cfg ?m ?cfg) 
-          (method-cfg-entry ?m ?entry)
+          (method-cfg|entry ?m ?entry)
           (fresh [?beforeReturn ?return]
                  (qwal ?cfg ?entry ?end []
                        (qcurrent [currentStatement]
@@ -159,7 +141,7 @@
   (ekeko-n* 100 [?m ?beforeReturn ?return]
             (fresh [?end ?entry ?cfg]
                    (method-cfg ?m ?cfg)
-                   (method-cfg-entry ?m ?entry)
+                   (method-cfg|entry ?m ?entry)
                    (qwal ?cfg ?entry ?end 
                          []
                          (q=>*)
@@ -257,7 +239,7 @@
   (use 'codox.main)
   (codox.main/generate-docs {
              :name "Ekeko"
-             :version "2.0.4"
+             :version "2.0.8"
              :description "Applicative logic meta-programming using core.logic against an Eclipse workspace."
              :output-dir "/Users/cderoove/Desktop/docekeko"
              :sources ["src"]

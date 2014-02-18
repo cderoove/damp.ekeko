@@ -588,7 +588,8 @@
 (defn- subclass-nodes-of-type [t]
   (let [c (astnode/class-for-ekeko-keyword t)
         s (supers c)]
-    (cond (contains? s org.eclipse.jdt.core.dom.Expression)
+    (cond (and (not (= c org.eclipse.jdt.core.dom.SimpleName))
+               (contains? s org.eclipse.jdt.core.dom.Expression))
             (filter (fn [n] (instance? c n))
               (nodes-of-type :Expression))
           (contains? s org.eclipse.jdt.core.dom.Statement)
@@ -617,7 +618,7 @@
                (child :package ?cu ?packageDeclaration))))
 
 
-(defn- nodes-of-type [t]
+(defn nodes-of-type [t]
   (let [models (javaprojectmodel/java-project-models)]
     (case t
       :CompilationUnit (mapcat (fn [java-project-model] (.getCompilationUnits ^JavaProjectModel java-project-model)) models)

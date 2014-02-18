@@ -288,7 +288,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	protected void gatherInformationFromCompilationUnits() {
 		final long startTime = System.currentTimeMillis();
-		for(CompilationUnit cu : icu2ast.values()) 	
+		for(CompilationUnit cu : getCompilationUnits()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
 		System.out.println("Gathered information from JDT compilation units in " + duration + "ms");	

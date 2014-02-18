@@ -543,7 +543,8 @@
 (defn- subclass-nodes-of-type [t]
   (let [c (astnode/class-for-ekeko-keyword t)
         s (supers c)]
-    (cond (contains? s org.eclipse.jdt.core.dom.Expression)
+    (cond (and (not (= c org.eclipse.jdt.core.dom.SimpleName))
+               (contains? s org.eclipse.jdt.core.dom.Expression))
             (filter (fn [n] (instance? c n))
               (nodes-of-type :Expression))
           (contains? s org.eclipse.jdt.core.dom.Statement)

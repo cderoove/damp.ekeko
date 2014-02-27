@@ -70,7 +70,10 @@
   (.removeListener (ekeko-model) ?l))
 
 
-
+;;helper to solve project models being out of sync
+;;just remove them all
+(defn remove-all-queried-models []
+  (.clear (all-project-models)))
 
 
 

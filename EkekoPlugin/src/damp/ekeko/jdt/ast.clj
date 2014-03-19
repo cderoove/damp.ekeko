@@ -84,20 +84,27 @@
    API documentation of org.eclipse.jdt.core.dom.ASTNode 
    and org.eclipse.jdt.core.dom.StructuralPropertyDescriptor"
   [?keyword ?node ?child]
-   (l/conda [(el/v+ ?node) (l/conda [(el/v+ ?keyword) 
-                              (l/fresh [?childretrievingf]
-                                    (el/equals ?childretrievingf (?keyword (astnode/reifiers ?node)))
-                                    (l/!= ?childretrievingf nil)
-                                    (el/equals ?child (?childretrievingf)))]
-                             [(el/v- ?keyword) (l/fresh [?keywords]
-                                                  (el/equals ?keywords (keys (astnode/reifiers ?node)))
-                                                  (el/contains ?keywords ?keyword)
-                                                  (has ?keyword ?node ?child))])]
-          [(el/v- ?node) (l/conda [(el/v+ ?child) (l/all (el/equals ?node (astnode/owner ?child)) 
-                                               (has ?keyword ?node ?child))]
-                             [(el/v- ?child) (l/fresh [?astkeyw]
-                                              (ast ?astkeyw ?node)
-                                              (has ?keyword ?node ?child))])]))
+  (l/conda [(el/v+ ?node) 
+            (l/fresh [?astkeyw]
+                   (ast ?astkeyw ?node))
+            (l/conda [(el/v+ ?keyword) 
+                      (l/fresh [?childretrievingf]
+                               (el/equals ?childretrievingf (?keyword (astnode/reifiers ?node)))
+                               (l/!= ?childretrievingf nil)
+                               (el/equals ?child (?childretrievingf)))]
+                     [(el/v- ?keyword)
+                      (l/fresh [?keywords]
+                               (el/equals ?keywords (keys (astnode/reifiers ?node)))
+                               (el/contains ?keywords ?keyword)
+                               (has ?keyword ?node ?child))])]
+           [(el/v- ?node)
+            (l/conda [(el/v+ ?child)
+                      (l/all (el/equals ?node (astnode/owner ?child)) 
+                             (has ?keyword ?node ?child))]
+                     [(el/v- ?child)
+                      (l/fresh [?astkeyw]
+                               (ast ?astkeyw ?node)
+                               (has ?keyword ?node ?child))])]))
 
 
 (defn 

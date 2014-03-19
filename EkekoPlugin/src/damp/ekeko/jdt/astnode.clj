@@ -321,7 +321,11 @@
                   (lstvalue? current) (:value current)
                   :default [])]
         (recur (concat offspring values)
-               (concat (rest worklist) (filter ast? values)))))))                   
+               (concat (rest worklist) 
+                       (filter (fn [value]
+                                 (or (ast? value)
+                                     (lstvalue? value)))
+                               values)))))))                   
            
 
 

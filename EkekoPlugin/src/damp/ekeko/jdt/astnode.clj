@@ -25,47 +25,51 @@
 ; Helper Predicates
 ; -----------------
 
-(defmacro 
+(defn 
   ast?
   [x]
-  `(instance? ASTNode ~x))
+  (instance? ASTNode x))
 
-(defmacro
+(defn
   value?
   [x]
-  `(and 
-     (map? ~x)
-     (= :Value (:type ~x))))
+  (and 
+    (map? x)
+    (= :Value (:type x))))
 
-(defmacro
+(defn
   lstvalue?
   [x]
-  `(and
-     (value? ~x)
-     (instance? java.util.List (:value ~x))))
+  (and
+    (value? x)
+    (instance? java.util.List (:value x))))
   
 
-(defmacro
+(defn
   nilvalue?
   [x]
-  `(and
-     (value? ~x)
-     (nil? (:value ~x))))
+  (and
+    (value? x)
+    (nil? (:value x))))
 
-(defmacro
+(defn
   primitivevalue?
   [x]
-  `(and
-     (value? ~x)
-     (not (instance? java.util.List (:value ~x)))
-     (not (nil? (:value ~x)))))
+  (and
+    (value? x)
+    (not (instance? java.util.List (:value x)))
+    (not (nil? (:value x)))))
   
 
-(defmacro expression? [node]
-  `(instance? Expression ~node))
+(defn
+  expression?
+  [node]
+  (instance? Expression node))
 
-(defmacro statement? [node]
-  `(instance? Statement ~node))
+(defn
+  statement?
+  [node]
+  (instance? Statement node))
 
 
 
@@ -209,6 +213,15 @@
 
 ;TODO: switch to record as soon as core.logic no longer reifies records as maps
 ;(defrecord PropertyValueWrapper [owner property value])
+
+
+;NOTE: not necessary to memoize:
+;(identical? ((:modifiers (node-ekeko-properties node))) ((:modifiers (node-ekeko-properties node))))
+;=> false;
+;but:
+;(= ((:modifiers (node-ekeko-properties node))) ((:modifiers (node-ekeko-properties node))))
+
+
 (defn
   make-value
   [owner property value]
@@ -270,6 +283,47 @@
   [n]
   (map (fn [retrievalf] (retrievalf))
        (vals (node-ekeko-properties n))))
+
+(defn
+  node-ancestors
+  [^ASTNode n]
+  (loop [ancestors []
+         parent (.getParent n)]
+    (if 
+      parent
+      (recur (conj ancestors parent)
+             (.getParent parent))
+      ancestors)))
+     
+(defn
+  value-ancestors
+  [v]
+  (loop [ancestors []
+         parent (owner v)]
+    (if 
+      parent
+      (recur (conj ancestors parent)
+             (owner parent))
+      ancestors)))
+
+(defn
+  nodeorvalue-offspring
+  [n]
+  (loop [offspring []
+         worklist [n]]
+    (if 
+      (empty? worklist)
+      offspring
+      (let [current 
+            (first worklist)
+            values  
+            (cond (ast? current) (node-propertyvalues current)
+                  (lstvalue? current) (:value current)
+                  :default [])]
+        (recur (concat offspring values)
+               (concat (rest worklist) (filter ast? values)))))))                   
+           
+
 
 ; Bindings
 ; --------

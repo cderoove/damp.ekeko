@@ -144,12 +144,14 @@
                    (child+ ?m ?ch))   
 
   See also:
-  Ternary predicate child/3"
+  - Ternary predicate child/3.
+  - Binary predicate has+/2 which implements the super-relation
+    between any two values." 
   [?node ?child]
   (l/fresh [?keyw ?ch]
-    (child ?keyw ?node ?ch)
-    (l/conde [(l/== ?ch ?child)]
-           [(child+ ?ch ?child)])))
+           (child ?keyw ?node ?ch)
+           (l/conde [(l/== ?ch ?child)]
+                    [(child+ ?ch ?child)])))
 
 ;tabled version is much slower (169294ms vs 5990ms on jHotDraw)
 ;but might be faster if multiple child+ conditions are used in a query
@@ -161,7 +163,6 @@
 ;          (l/conde [(l/== ?ch ?child)]
 ;                [(tabled-child+ ?ch ?child)]))))    
   
-
 (defn
   value
   "Relation of ASTNode property values that aren't ASTNode themselves:
@@ -174,8 +175,6 @@
                  (ast ?kind ?ast)
                  (has ?property ?ast ?val)
                  (value ?val))]))
-  
-
 
 (defn
   value|null
@@ -217,12 +216,114 @@
    which function as the root of the AST.
    
    See also:
-   API documentation of org.eclipse.jdt.core.dom.ASTNode" 
+   - API documentation of org.eclipse.jdt.core.dom.ASTNode
+   - Condition (has ?property ?parent ?value),
+   which also works for primitive values and lists that stem from an AST." 
   [?ast ?parent]
   (l/fresh [?key]
-    (ast ?key ?ast)
-    (el/equals ?parent (.getParent ^ASTNode ?ast))
+           (ast ?key ?ast)
+           (el/equals ?parent (.getParent ^ASTNode ?ast))
+           (l/!= nil ?parent)))
+
+(defn
+  value-parent
+  [?value ?parent]
+  "Relation between an ASTNode property ?value that isn't an ASTNode itself
+   (a primitive value, null, or a list) and its parent ASTNode."
+  (l/all
+    (value ?value)
+    (el/equals ?parent (astnode/owner ?value))
     (l/!= nil ?parent)))
+
+(defn
+  astorvalue-parent
+  [?astorvalue ?parent]
+  "Relation between an ASTNode or a property value and their parent ASTNode."
+  (l/conde 
+    [(value-parent ?astorvalue ?parent)]
+    [(ast-parent ?astorvalue ?parent)])) 
+ 
+(declare ast-root)
+
+(defn
+  value-root
+  "Relation between a non-ASTNode property value and its root CompilationUnit."
+  [?value ?root]
+  (l/fresh [?parent]
+         (value-parent ?value ?parent)
+         (ast-root ?parent ?root)))
+
+(defn
+  astorvalue-parent
+  [?astorvalue ?parent]
+  "Relation between an ASTNode or a property value and their parent ASTNode."
+  (l/conde 
+    [(value-parent ?astorvalue ?parent)]
+    [(ast-parent ?astorvalue ?parent)])) 
+
+(defn
+  astorvalue-root
+  "Relation between an ASTNode or a property value and their root CompilationUnit."
+  [?astorvalue ?root]
+  (l/conde 
+    [(value-root ?astorvalue ?root)]
+    [(ast-root ?astorvalue ?root)])) 
+ 
+  
+(defn
+  ast-parent+
+  "Relation between an ASTNode and one of its ancestor ASTNodes.
+
+  See also:
+  - binary predicate value-parent+/2 which works for property values that aren't nodes
+  - binary predicate astorvalue-parent+/2 which works for both"
+  [?ast ?ancestor]
+  (l/fresh [?key]
+         (ast ?key ?ast)
+         (el/contains (astnode/node-ancestors ?ast) ?ancestor)))
+
+(defn
+  value-parent+
+  "Relation between an ASTNode property value that isn't an ASTNode itself
+   (a primitive value, null, or a list) and one of its ancestor ASTNodes.
+
+  See also:
+  - binary predicate ast-parent+/2 which works for ASTNodes
+  - binary predicate astorvalue-parent+/2 which works for both"
+  [?value ?ancestor]
+  (l/all
+    (value ?value)
+    (el/contains (astnode/value-ancestors ?value) ?ancestor)))
+  
+(defn
+  astorvalue-parent+
+  [?astorvalue ?ancestor]
+  "Relation between an ASTNode or a property value and one of their ancestor ASTNodes."
+  (l/conde 
+    [(value-parent+ ?astorvalue ?ancestor)]
+    [(ast-parent+ ?astorvalue ?ancestor)])) 
+
+
+(defn
+  astorvalue-offspring+
+  "Relation between an ASTNode or a list that stems from an ASTNode 
+   and one of its offspring nodes or their values (i.e., complete recursive descent).
+
+   Note that this predicate will produce bindings 
+      ?offspring->list
+      ?offspring->list members 
+
+   See also: binary predicate child+/2, which implements the sub-relation 
+   between two ASTNodes only."
+  [?astorlist ?offspring]
+  (l/fresh [?key]
+           (l/conde [(ast ?key ?astorlist)]
+                    [(value|list ?astorlist)])
+           (el/contains (astnode/nodeorvalue-offspring ?astorlist) ?offspring)))
+  
+(def has+ astorvalue-offspring+) 
+
+
 
 (defn 
   ast-root

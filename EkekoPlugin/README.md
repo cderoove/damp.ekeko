@@ -56,6 +56,7 @@ Included dependencies:
 ) (Eclipse Public License)
 * Anders Hessellund's intra-procedural JDT control flow graph [dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph](http://www.itu.dk/people/hessellund/smartemf/index.php
 ) (Apache license)
+* [Tim Molderez](http://ansymo.ua.ac.be/people/tim-molderez)' Clojure/Java object inspector [Inspector Jay](https://github.com/timmolderez/inspector-jay) (BSD 3-Clause license) 
 * Sable's Java Optimization Framework [Soot](http://www.sable.mcgill.ca/soot/
 ) (LGPL)
 

@@ -119,6 +119,14 @@
             name="Ekeko Query Results"
             restorable="false">
       </view>
+      <view
+            allowMultiple="true"
+            category="InspectorJay"
+            class="damp.ekeko.inspector.JPanelView"
+            id="damp.ekeko.inspector.JPanelView"
+            name="Inspector Jay"
+            restorable="false">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">

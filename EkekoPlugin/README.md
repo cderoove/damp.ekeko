@@ -31,9 +31,14 @@ See the [damp.ekeko wiki](https://github.com/cderoove/damp.ekeko/wiki) for infor
 
 See the [damp.ekeko API documentation](http://cderoove.github.com/damp.ekeko/) for an overview of all relations and functions that are included.
 
+See the following publication for the motivation behind Ekeko and possible applications: 
+> [Building Development Tools Interactively using the Ekeko Meta-Programming Library](http://soft.vub.ac.be/Publications/2013/vub-soft-tr-13-22.pdf)<br/> 
+> Coen De Roover, Reinout Stevens<br/>
+> Proceedings of the IEEE CSMR-WCRE 2014 Software Evolution Week (CSMR-WCRE14), Tool Demo Track, Antwerp (Belgium)
+
 ## License  
 
-Copyright © 2012-2013 Ekeko contributors: 
+Copyright © 2012-2014 Ekeko contributors: 
 
 * [Coen De Roover](http://soft.vub.ac.be/~cderoove/): initial design, implementation and documentation
  
@@ -51,6 +56,7 @@ Included dependencies:
 ) (Eclipse Public License)
 * Anders Hessellund's intra-procedural JDT control flow graph [dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph](http://www.itu.dk/people/hessellund/smartemf/index.php
 ) (Apache license)
+* [Tim Molderez](http://ansymo.ua.ac.be/people/tim-molderez)' Clojure/Java object inspector [Inspector Jay](https://github.com/timmolderez/inspector-jay) (BSD 3-Clause license) 
 * Sable's Java Optimization Framework [Soot](http://www.sable.mcgill.ca/soot/
 ) (LGPL)
 

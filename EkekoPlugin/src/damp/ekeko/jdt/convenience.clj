@@ -164,6 +164,25 @@
     (ast/ast :FieldDeclaration ?memberdec)))
 
 
+;; MethodDeclaration
+;; -----------------
+
+(defn methodinvocation|name 
+  "Relation between a MethodInvocation and its name."
+  [?methodinvoc ?name]
+  (l/all
+    (ast/ast :MethodInvocation ?methodinvoc)
+    (ast/has :name ?methodinvoc ?name)))
+
+
+(defn methodinvocation|named
+  "Relation between a MethodInvocation and the String representation of its name"
+  [?methodinvoc ?string]
+  (l/fresh [?name]
+    (methodinvocation|name ?methodinvoc ?name)
+    (ast/name|simple-string ?name ?string)))
+
+
 ;; Misc
 ;; ----
 

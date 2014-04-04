@@ -138,26 +138,6 @@
             (el/contains (:value ?ch) ?child)])))
             
 
-(defn
-  parent
-  "Optimised predicate that reifies the relationship between an ASTNode and its parent.
-   While child/child+ goes over all the possible keywords this one just goes over the parent hierarchy."
-  [?node ?parent]
-  (l/fresh [?type]
-    (ast ?type ?node)
-    (el/equals ?parent (.getParent ?node))
-    (l/!= ?parent nil)))
-
-(defn
-  parent+
-  "Transitive closure of the parent relation."
-  [?node ?parent]
-  (l/fresh [?a-parent]
-    (parent ?node ?a-parent)
-    (l/conde
-      [(l/== ?a-parent ?parent)]
-      [(parent+ ?a-parent ?parent)])))
-
 
 (defn 
   child+

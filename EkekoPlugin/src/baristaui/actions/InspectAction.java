@@ -1,7 +1,5 @@
 package baristaui.actions;
 
-import org.eclipse.jdt.astview.ASTViewPlugin;
-import org.eclipse.jdt.astview.views.ASTView;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;

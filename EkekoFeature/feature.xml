@@ -36,7 +36,6 @@ External dependencies:
    <url>
       <update label="Ekeko Update Site" url="http://soft.vub.ac.be/~cderoove/eclipse/"/>
       <discovery label="Counterclockwise Update Site" url="http://updatesite.ccw-ide.org/stable/"/>
-      <discovery label="ASTView Update Site" url="http://www.eclipse.org/jdt/ui/update-site"/>
    </url>
 
    <requires>
@@ -50,10 +49,10 @@ External dependencies:
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.jdt.ui"/>
-      <import plugin="org.eclipse.jdt.astview" version="1.1.8" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.launching"/>
       <import plugin="org.eclipse.debug.core"/>
       <import feature="ccw.feature"/>
+      <import plugin="damp.libs"/>
    </requires>
 
    <plugin

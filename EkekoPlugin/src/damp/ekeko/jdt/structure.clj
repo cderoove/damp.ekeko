@@ -172,8 +172,8 @@
     (el/equals ?n (.getElementName ^IType ?t))))
 
 
-(defn
-  aux 
+(defn-
+  auxfor-type-name|qualified|string 
   [n]
   (into []
         (into #{}
@@ -198,7 +198,7 @@
              (type ?t)
              (type-name|qualified|string ?t ?n)]
              [(el/v+ ?n)
-              (el/contains  (aux ?n) ?t)
+              (el/contains  (auxfor-type-name|qualified|string  ?n) ?t)
               (l/!= nil ?t)])]))
 
          

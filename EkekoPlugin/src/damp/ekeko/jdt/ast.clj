@@ -137,6 +137,8 @@
            [(el/succeeds (astnode/lstvalue? ?ch))
             (el/contains (:value ?ch) ?child)])))
             
+
+
 (defn 
   child+
   "Transitive closure of the child relation.
@@ -159,6 +161,25 @@
            (child ?keyw ?node ?ch)
            (l/conde [(l/== ?ch ?child)]
                     [(child+ ?ch ?child)])))
+
+
+(defn
+  aux
+  "Same behaviour as has if keyword is a ChildProperty of SimpleProperty.
+   Same behaviour as child if keyword is a ChildListProperty.
+
+   See also:
+   Ternary predicate has/3 and child/3"
+  [?keyword ?node ?value]
+  (l/fresh [?ch]
+    (has ?keyword ?node ?ch)
+    (l/conda
+      [(el/succeeds (astnode/ast? ?ch)) ;;ChildProperty
+       (l/== ?value ?ch)]
+      [(el/succeeds (astnode/lstvalue? ?ch)) ;;ChildListProperty
+       (el/contains (:value ?ch) ?value)]
+      [(el/succeeds (astnode/primitivevalue? ?ch))
+       (l/featurec ?ch {:value ?value})]))) ;;SimpleProperty
 
 ;tabled version is much slower (169294ms vs 5990ms on jHotDraw)
 ;but might be faster if multiple child+ conditions are used in a query
@@ -819,5 +840,4 @@
   (l/fresh [?identifier]
          (name|simple-string ?name-a ?identifier)
          (name|simple-string ?name-b ?identifier)))
-
     

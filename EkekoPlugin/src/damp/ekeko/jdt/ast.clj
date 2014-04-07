@@ -175,13 +175,14 @@
   "Relation of ASTNode property values that aren't ASTNode themselves:
    nil, primitive values and lists."
   [?val]
-  (l/conda [(el/v+ ?val)
-          (el/succeeds (astnode/value? ?val))]
-         [(el/v- ?val)
-          (l/fresh [?kind ?ast ?property]
-                 (ast ?kind ?ast)
-                 (has ?property ?ast ?val)
-                 (value ?val))]))
+  (l/conda
+    [(el/v+ ?val)
+     (el/succeeds (astnode/value? ?val))]
+    [(el/v- ?val)
+     (l/fresh [?kind ?ast ?property]
+              (ast ?kind ?ast)
+              (has ?property ?ast ?val)
+              (value ?val))]))
 
 (defn
   value|null
@@ -276,7 +277,6 @@
     [(value-root ?astorvalue ?root)]
     [(ast-root ?astorvalue ?root)])) 
  
-  
 (defn
   ast-parent+
   "Relation between an ASTNode and one of its ancestor ASTNodes.

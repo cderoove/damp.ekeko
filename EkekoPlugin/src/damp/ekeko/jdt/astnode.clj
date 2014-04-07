@@ -228,6 +228,13 @@
   {:type :Value
    :owner owner :property property :value value})
 
+(defn
+  value-unwrapped
+  [value]
+  (when
+    (value? value)
+    (:value value)))
+
 (defn 
   node-ekeko-properties
   [n]

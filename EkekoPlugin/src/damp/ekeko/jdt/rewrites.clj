@@ -71,7 +71,8 @@
     (.insertAt list-rewrite newnode index nil)))
 
 
-(defn replace-node 
+(defn 
+  replace-node 
   "Replace node with newnode."
   [node newnode]
   (let [cu (.getRoot node)

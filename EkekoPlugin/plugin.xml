@@ -71,10 +71,10 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                label="Ekeko"
-               mnemonic="EK"
                id="damp.ekeko.menus.ekekoMenu">
             <command
                   commandId="damp.ekeko.commands.startREPL"
+                  icon="icons/ekeko16.png"
                   label="Start nREPL"
                   tooltip="Start Ekeko-hosted nREPL server">
             </command>

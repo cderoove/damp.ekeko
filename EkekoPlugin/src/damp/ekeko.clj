@@ -8,6 +8,7 @@
   (:use [damp.ekeko.soot soot])
   (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
   (:use [damp.qwal])
+  (:require [damp.ekeko.inspector inspector])
   (:require [damp.ekeko.util [text :as text]])
   (:require [damp.ekeko [gui :as gui]]))
 

@@ -27,6 +27,12 @@
     (-> viewpart (.setJPanel (inspector-panel results)))
     viewpart))
 
+(defn
+  show-inspector-view
+  "Opens Inspector Jay on given argument."
+  [object]
+  (gui/eclipse-uithread-return (fn [] (get-inspector-view object))))
+
 (defmacro 
   ekeko+
   "Runs an Ekeko query and opens an Inspector Jay view to inspect the results
@@ -36,4 +42,11 @@
                              (fresh [~@vars]
                                (equals resultvar# [~@vars])
                                ~@goals)))]
-     (gui/eclipse-uithread-return (fn [] (get-inspector-view resultsqc#)))))
+     (show-inspector-view resultsqc#)))
+
+(defn
+  register-callbacks
+  []
+  (set! (baristaui.actions.InspectAction/FN_INSPECT_USING_JAY) show-inspector-view))
+
+(register-callbacks)

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <relativePath>../pom.xml</relativePath>
+    <groupId>damp.ekeko</groupId>
+    <artifactId>parent</artifactId>
+	<version>2.0.9</version> <!-- bump this -->
+  </parent>
+
+  <artifactId>damp.libs</artifactId>
+  <packaging>eclipse-plugin</packaging>
+</project> 

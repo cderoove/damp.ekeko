@@ -1,0 +1,4 @@
+#does not seem to update the versions in the pom
+#mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
+
+mvn clean verify

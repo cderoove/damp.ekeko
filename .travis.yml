@@ -2,3 +2,4 @@ language: java
 jdk:
   - oraclejdk7
 script: mvn clean verify
+after_failure: "cat /home/travis/build/cderoove/damp.ekeko/EkekoTests/target/work/data/.metadata/.log"

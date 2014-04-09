@@ -75,7 +75,6 @@
 				<artifactId>target-platform-configuration</artifactId>
 				<configuration>
 					<environments>
-                        <!--
                         <environment>
 							<os>linux</os>
 							<ws>gtk</ws>
@@ -96,8 +95,6 @@
 							<ws>win32</ws>
 							<arch>x86_64</arch>
 						</environment>
-						 -->
-                        
                          <environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>

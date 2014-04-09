@@ -13,6 +13,7 @@
 	<modules>
 		<module>./DampDependencies</module>
 		<module>./EkekoPlugin</module>
+        	<module>./EkekoTests</module>
 		<module>./EkekoFeature</module>
         <!-- These have to get their own version, and refer to this artefact.
          
@@ -74,7 +75,8 @@
 				<artifactId>target-platform-configuration</artifactId>
 				<configuration>
 					<environments>
-						<environment>
+                        <!--
+                        <environment>
 							<os>linux</os>
 							<ws>gtk</ws>
 							<arch>x86</arch>
@@ -94,13 +96,16 @@
 							<ws>win32</ws>
 							<arch>x86_64</arch>
 						</environment>
-						<environment>
+						 -->
+                        
+                         <environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
 				</configuration>
+                <version>${tycho.version}</version>
 			</plugin>
             
             <plugin>

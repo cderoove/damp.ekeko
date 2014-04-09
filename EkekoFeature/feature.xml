@@ -51,8 +51,9 @@ External dependencies:
       <import plugin="org.eclipse.jdt.ui"/>
       <import plugin="org.eclipse.jdt.launching"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import feature="ccw.feature"/>
       <import plugin="damp.libs"/>
+      <import feature="ccw.feature"/>
+      <import feature="org.eclipse.jdt" version="3.9.2.v20140221-1700"/>
    </requires>
 
    <plugin

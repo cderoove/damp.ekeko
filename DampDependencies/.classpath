@@ -6,6 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/inspector-jay-0.2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="codoxlibs/codox.core-0.6.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="codoxlibs/hiccup-1.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="codoxlibs/java.classpath-0.1.1.jar"/>
@@ -13,6 +14,5 @@
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/java.jdbc-0.3.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/sqlite-jdbc-3.7.15-SNAPSHOT-2.jar"/>
-	<classpathentry kind="lib" path="libs/inspector-jay-0.2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

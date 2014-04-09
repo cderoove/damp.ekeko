@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: damp.ekeko.demo.plugin
-Bundle-SymbolicName: EkekoDemo
+Bundle-SymbolicName: damp.ekeko.demo.plugin
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- damp.ekeko.plugin;bundle-version="1.0.3",
  org.eclipse.jdt.core;bundle-version="3.8.1",
- damp.ekeko.visualizer.plugin;bundle-version="1.0.0"
+ damp.ekeko.visualizer.plugin;bundle-version="1.0.0",
+ damp.ekeko.plugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: damp.ekeko.plugin, damp.libs

@@ -7,9 +7,9 @@ Bundle-Activator: damp.ekeko.visualization.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  damp.libs,
- damp.ekeko.plugin,
  org.eclipse.zest.core,
- org.eclipse.zest.layouts
+ org.eclipse.zest.layouts,
+ damp.ekeko.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: damp.ekeko.plugin, damp.libs

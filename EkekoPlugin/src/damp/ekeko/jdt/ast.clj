@@ -18,7 +18,7 @@
     [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
      IJavaProject WorkingCopyOwner IMethod]
     [org.eclipse.jdt.core.dom Expression IVariableBinding ASTParser AST IBinding Type TypeDeclaration 
-     QualifiedName SimpleName ITypeBinding MethodDeclaration
+     QualifiedName SimpleName ITypeBinding MethodDeclaration 
      MethodInvocation ClassInstanceCreation SuperConstructorInvocation SuperMethodInvocation
      SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit
      Annotation IAnnotationBinding TypeLiteral]))
@@ -454,7 +454,7 @@
                         :SuperConstructorInvocation] ?key) ;TODO: define a constant for this
           ]))
  
-(declare ast|expression-binding|type)
+  
 
 (defn 
   ast|expression|reference
@@ -462,8 +462,13 @@
    the keyword ?keyw representing its kind."
   [?keyw ?ast]
   (l/fresh [?binding]
-         (ast|expression-binding|type ?keyw ?ast ?binding)
-         (el/succeeds (not (.isPrimitive ^ITypeBinding ?binding))))) 
+        ; (ast|expression-binding|type ?keyw ?ast ?binding)
+        ;not using this relation to avoid circular dependencies
+        (ast :Expression ?ast)
+        (ast ?keyw ?ast)
+        (el/equals ?binding (.resolveTypeBinding ^Expression ?ast))
+        (el/succeeds (not (.isPrimitive ^ITypeBinding ?binding))))) 
+
 
 (defn 
   ast|parameter|name

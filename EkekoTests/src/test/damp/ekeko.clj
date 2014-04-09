@@ -143,13 +143,13 @@
 ;; Test Suite
 ;; ----------
 
-;note: (runtests) will report that one more test has been run (successfully)
+;note: (run-tests) will report that one more test has been run (successfully)
 ;than those that are listed here .. seems "normal"
+
 
 (deftest
    test-suite 
-   (test-ekeko)
-   )
+   (test-ekeko))
 
 (defn 
   test-ns-hook 

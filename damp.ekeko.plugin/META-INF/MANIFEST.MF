@@ -21,7 +21,10 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  libs/tools.nrepl-0.2.1.jar
-Export-Package: baristaui.util;
+Export-Package: barista,
+ baristaui.actions,
+ baristaui.menus,
+ baristaui.util;
   uses:="org.eclipse.jface.action,
    org.eclipse.jdt.core.dom,
    org.eclipse.swt.events,
@@ -35,6 +38,10 @@ Export-Package: baristaui.util;
    org.eclipse.swt.graphics,
    org.eclipse.ui.part,
    org.eclipse.swt.widgets",
+ baristaui.views.queryResult.column,
+ baristaui.views.queryResult.table,
+ baristaui.views.queryResult.tree,
+ baristaui.views.queryResult.variableTable,
  ccw.util;uses:="org.osgi.framework,clojure.lang",
  ccw.util.osgi;uses:="org.osgi.framework",
  damp,
@@ -56,6 +63,7 @@ Export-Package: baristaui.util;
    org.eclipse.swt.widgets,
    org.eclipse.jdt.core.dom.rewrite",
  damp.ekeko.gui,
+ damp.ekeko.inspector,
  damp.ekeko.jdt,
  damp.ekeko.soot;
   uses:="soot,

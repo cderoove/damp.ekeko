@@ -10,3 +10,5 @@ Require-Bundle: org.junit,
  org.eclipse.core.resources,
  org.eclipse.equinox.registry,
  org.eclipse.jdt
+Export-Package: test.damp,
+ test.damp.ekeko

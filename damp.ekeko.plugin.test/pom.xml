@@ -5,7 +5,7 @@
 	<parent>
 		<relativePath>../pom.xml</relativePath>
 		<groupId>damp.ekeko</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>damp.ekeko</artifactId>
 		<version>2.0.9-SNAPSHOT</version> <!-- bump this -->
 	</parent>
 

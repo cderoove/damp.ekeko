@@ -2,57 +2,44 @@
 <project>
     
     
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
     
-	<groupId>damp.ekeko</groupId>
-	<artifactId>parent</artifactId>
-	<version>2.0.9</version> <!-- bump this -->
-    
-    
-	<packaging>pom</packaging>
-	<modules>
-		<module>./DampDependencies</module>
-		<module>./EkekoPlugin</module>
-        	<module>./EkekoTests</module>
-		<module>./EkekoFeature</module>
-        <!-- These have to get their own version, and refer to this artefact.
-         
-         <module>./EkekoVisualizer</module>
-         <module>./EkekoVisualizerFeature</module>
-         
-         
-         <module>../damp.ekeko.aspectj/EkekoAspectJ</module>
-         <module>../damp.ekeko.aspectj/EkekoAspectJFeature</module>
-         <module>../damp.ekeko.snippets/EkekoSnippets</module>
-         <module>../damp.ekeko.snippets/EkekoSnippetsFeature</module>
-         -->
-        
-		<!-- Might have to extract this into a project for continuous integration. -->
-        
-		<module>./EkekoUpdateSite</module>
-	</modules>
+    <groupId>damp.ekeko</groupId>
+    <artifactId>parent</artifactId>
+    <version>2.0.9-SNAPSHOT</version> <!-- bump this -->
     
     
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tycho.version>0.20.0</tycho.version>
-		<kepler-repo.url>http://download.eclipse.org/releases/kepler</kepler-repo.url>
-	</properties>
+    <packaging>pom</packaging>
+    <modules>
+        <module>./damp.libs</module>
+        <module>./damp.ekeko.plugin</module>
+        <module>./damp.ekeko.plugin.test</module>
+        <module>./damp.ekeko.feature</module>
+        <module>./damp.ekeko.visualizer.plugin</module>
+        <module>./damp.ekeko.visualizer.feature</module>
+    </modules>
     
-	<repositories>
-		<repository>
-			<id>kepler</id>
-			<url>${kepler-repo.url}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>Counterclockwise stable versions Site</id>
-			<url>http://updatesite.ccw-ide.org/stable</url>
-			<layout>p2</layout>
-		</repository>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <tycho.version>0.20.0</tycho.version>
+        <kepler-repo.url>http://download.eclipse.org/releases/kepler</kepler-repo.url>
+    </properties>
+    
+    <repositories>
+        <repository>
+            <id>kepler</id>
+            <url>${kepler-repo.url}</url>
+            <layout>p2</layout>
+        </repository>
+        <repository>
+            <id>Counterclockwise stable versions Site</id>
+            <url>http://updatesite.ccw-ide.org/stable</url>
+            <layout>p2</layout>
+        </repository>
         
         
-	</repositories>
+    </repositories>
     
     <distributionManagement>
         <repository>
@@ -61,49 +48,49 @@
         </repository>
     </distributionManagement>
     
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<extensions>true</extensions>
-			</plugin>
-            
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<configuration>
-					<environments>
-                        <environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86_64</arch>
-						</environment>
-                         <environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments>
-				</configuration>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-maven-plugin</artifactId>
                 <version>${tycho.version}</version>
-			</plugin>
+                <extensions>true</extensions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <configuration>
+                    <environments>
+                        <environment>
+                            <os>linux</os>
+                            <ws>gtk</ws>
+                            <arch>x86</arch>
+                        </environment>
+                        <environment>
+                            <os>linux</os>
+                            <ws>gtk</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>win32</os>
+                            <ws>win32</ws>
+                            <arch>x86</arch>
+                        </environment>
+                        <environment>
+                            <os>win32</os>
+                            <ws>win32</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>macosx</os>
+                            <ws>cocoa</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                    </environments>
+                </configuration>
+                <version>${tycho.version}</version>
+            </plugin>
             
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
@@ -112,7 +99,7 @@
             </plugin>
             
             
-		</plugins>
+        </plugins>
         
         <extensions>
             <extension>
@@ -126,6 +113,6 @@
         
         
         
-	</build>
+    </build>
     
 </project> 

@@ -6,11 +6,17 @@
 		<relativePath>../pom.xml</relativePath>
 		<groupId>damp.ekeko</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.0.9</version> <!-- bump this -->
+		<version>2.0.9-SNAPSHOT</version> <!-- bump this -->
 	</parent>
 
 	<artifactId>damp.ekeko.plugin.test</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
+
+    <properties>
+        <os-jvm-flags/> <!-- for the default case -->
+    </properties>
+
+
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -24,7 +30,8 @@
 				<configuration>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>false</useUIThread>
-					<argLine>-Xms128m -Xmx2048m</argLine>
+					<argLine>-Xms128m -Xmx2048m ${os-jvm-flags}</argLine>
+                    <showEclipseLog>true</showEclipseLog>
 					<product>org.eclipse.sdk.ide</product>
 					<application>org.eclipse.ui.ide.workbench</application>
 
@@ -69,4 +76,5 @@
 
 
 
+	<version>2.0.9-SNAPSHOT</version>
 </project> 

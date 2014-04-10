@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tycho-compatible unit tests for Ekeko
 Bundle-SymbolicName: damp.ekeko.plugin.test
-Bundle-Version: 2.0.9
-Fragment-Host: damp.ekeko.plugin;bundle-version="2.0.9"
+Bundle-Version: 2.0.9.qualifier
+Fragment-Host: damp.ekeko.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit,
  org.eclipse.ui.ide,

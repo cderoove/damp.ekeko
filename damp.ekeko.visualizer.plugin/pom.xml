@@ -6,9 +6,10 @@
     <relativePath>../pom.xml</relativePath>
     <groupId>damp.ekeko</groupId>
     <artifactId>parent</artifactId>
-	<version>2.0.9</version> <!-- bump this -->
+	<version>2.0.9-SNAPSHOT</version> <!-- bump this -->
   </parent>
 
-  <artifactId>damp.libs</artifactId>
+  <artifactId>damp.ekeko.visualizer.plugin</artifactId>
   <packaging>eclipse-plugin</packaging>
+  <version>1.0.2-SNAPSHOT</version>
 </project> 

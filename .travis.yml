@@ -5,4 +5,4 @@ script: mvn clean verify
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-after_failure: "cat /home/travis/build/cderoove/damp.ekeko/EkekoTests/target/work/data/.metadata/.log"
+after_failure: "cat /home/travis/build/cderoove/damp.ekeko/damp.ekeko.plugin.test/target/work/data/.metadata/.log"

@@ -44,7 +44,7 @@
     <distributionManagement>
         <repository>
             <id>soft</id>
-            <url>sftp://soft.vub.ac.be/~cderoove/public_html/eclipse/</url>
+            <url>scp://soft.vub.ac.be/~cderoove/public_html/eclipse/</url>
         </repository>
     </distributionManagement>
     

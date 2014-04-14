@@ -53,6 +53,7 @@
 (defn
   against-project-named
   [n enable-soot? f]
+  (println "Testing against project named " n ": " f)
   (against-project (ws/workspace-project-named n) enable-soot? f))
 
 

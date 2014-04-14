@@ -2,21 +2,17 @@ package test.damp;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.dialogs.IOverwriteQuery;
-import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
-import org.eclipse.ui.wizards.datatransfer.ImportOperation;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
 
 import ccw.util.osgi.ClojureOSGi;
@@ -30,14 +26,21 @@ import clojure.lang.Var;
 
 public class EkekoTestHelper {
 		
-	public static void ensureProjectImported(Bundle bundle, String enclosingFolderRelativeToBundle, String projectName) throws Exception {
+	public static void ensureProjectImported(Bundle bundle, String enclosingFolderRelativeToBundle, String projectName) throws Exception  {
 		//Bundle bundle = FrameworkUtil.getBundle(EkekoTest.class);
 		//URL entry = bundle.getResource("/resources/TestCases/" + projectName + "/.project");
 		//String fileName = entry.getFile();
 		
 		//Bundle bundle = FrameworkUtil.getBundle(EkekoTestHelper.class);
 		URL fileURL = bundle.getResource(enclosingFolderRelativeToBundle + projectName + "/.project");
-		File file = new File(FileLocator.resolve(fileURL).toURI());
+		File file;
+		try {
+			file = new File(FileLocator.resolve(fileURL).toURI());
+		} catch (Exception e) {
+			System.out.println("Could not resolve project URL:" + enclosingFolderRelativeToBundle + projectName + "/.project");
+			e.printStackTrace();
+			throw e;
+		}
 		
 		//URL url = new URL("platform:/plugin/damp.ekeko.plugin.test/resources/TestCases/" + projectName + "/.project");
 		//URLConnection connection = url.openConnection();
@@ -51,44 +54,71 @@ public class EkekoTestHelper {
 		
 	}
 		
+
+	public static void ensureProjectImported(File dotProjectFile) throws CoreException, OperationCanceledException, InterruptedException {
+
+		IProjectDescription description = ResourcesPlugin.getWorkspace().loadProjectDescription(new Path(dotProjectFile.getAbsolutePath()));
+		System.out.println("Importing project into workspace: " + description.getName());
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
+		project.create(description, null);
+		project.open(null);
+		System.out.println("Waiting for project to build: " + project);
+		waitForWorkspaceBuildsToFinish();
+	}
 	
+	/*
 	public static void ensureProjectImported(File dotProjectFile) throws Exception {
 		InputStream inputStream = new FileInputStream(dotProjectFile);
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProjectDescription loadedProjectDescription = workspace.loadProjectDescription(inputStream);
 		String projectName = loadedProjectDescription.getName();
-		IProject project = workspace.getRoot().getProject(projectName);
+		final IProject project = workspace.getRoot().getProject(projectName);
 		if(project.exists())
 			return;
 		
 		System.out.println("Importing project into namespace: " + projectName);
 		
 		IOverwriteQuery overwriteQuery = new IOverwriteQuery() {
-			public String queryOverwrite(String file) { return NO_ALL; }
+			public String queryOverwrite(String file) { return ALL; }
 		};
 
 		
 		final ImportOperation importOperation = new ImportOperation(project.getFullPath(), dotProjectFile, FileSystemStructureProvider.INSTANCE, overwriteQuery);
-		importOperation.setCreateContainerStructure(true); //copies into ws such that original is not modified
+		importOperation.setCreateContainerStructure(true); 
 		Display.getDefault().asyncExec(new Runnable() {			
 			@Override
 			public void run() {
 				try {
 					importOperation.run(new NullProgressMonitor());
+					//project.open(null);
+					
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
+				} 
 				
 			}
 		});	
 		
-		System.out.println("Project: " + project);
+		
+		System.out.println("Waiting for project to build: " + project);
+		waitForWorkspaceBuildsToFinish();
+
+		
 
 		
 	}
 
+	*/
+	
+	public static void waitForWorkspaceBuildsToFinish() throws OperationCanceledException, InterruptedException {
+		IJobManager jobManager = Job.getJobManager();
+		jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		System.out.println("Build finished.");
+	}	
+	
+	
 	
 	public static void testClojureNamespace(Bundle bundle, final String namespace) {
 		

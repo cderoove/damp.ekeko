@@ -479,6 +479,7 @@
          (l/== ?keyw :SimpleName)
          (ast ?keyw ?name) 
          (el/equals ?nameBinding (.resolveBinding ^SimpleName ?name))
+         (el/succeeds (instance? IVariableBinding ?nameBinding))
          (el/succeeds (.isParameter ^IVariableBinding ?nameBinding))
          (ast-parent ?name ?parent)
          (ast :SingleVariableDeclaration ?parent)))

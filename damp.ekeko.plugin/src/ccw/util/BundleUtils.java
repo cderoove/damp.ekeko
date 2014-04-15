@@ -15,7 +15,6 @@ import clojure.lang.Var;
 public final class BundleUtils {
 	
 	private BundleUtils() {
-		// Not intended to be instanciated
 	}
 
 	/**

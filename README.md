@@ -4,7 +4,7 @@ Applicative logic meta-programming using Clojure's [core.logic](https://github.c
 
 Overview:
 
-* [EclipsePlugin](https://github.com/cderoove/damp.ekeko/tree/master/EkekoPlugin) the actual Eclipse plugin
-* [EclipseFeature](https://github.com/cderoove/damp.ekeko/tree/master/EkekoFeature) its accompanying Eclipse feature
+* [damp.ekeko.plugin](https://github.com/cderoove/damp.ekeko/tree/master/damp.ekeko.plugin) the actual Eclipse plugin
+* [damp.ekeko.feature](https://github.com/cderoove/damp.ekeko/tree/master/damp.ekeko.feature) its accompanying Eclipse feature
 
-See [README.md](https://github.com/cderoove/damp.ekeko/blob/master/EkekoPlugin/README.md) of [EclipsePlugin](https://github.com/cderoove/damp.ekeko/tree/master/EkekoPlugin) for more information.
+See [README.md](https://github.com/cderoove/damp.ekeko/blob/master/damp.ekeko.plugin/README.md) of [damp.ekeko.plugin](https://github.com/cderoove/damp.ekeko/tree/master/damp.ekeko.plugin) for more information.

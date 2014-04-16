@@ -1,4 +1,4 @@
-# damp.ekeko.EkekoVisualizer
+# damp.ekeko.visualizer.plugin
 
 Ekeko is a clojure library for querying and manipulating an Eclipse workspace. EkekoVisualizer is an extension that enables visualizing query results using
 Zest (The Eclipse Visualization Toolkit).

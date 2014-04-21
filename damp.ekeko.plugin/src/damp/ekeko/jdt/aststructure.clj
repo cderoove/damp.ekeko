@@ -33,6 +33,14 @@
     (astbindings/ast|annotation-binding|annotation ?ast ?abinding)
     (el/equals ?tbinding (.getAnnotationType ?abinding))
     (bindings/binding-element ?tbinding ?type)))
+
+(defn
+  ast|expression-type 
+  "Relation between an Expression ?ast and its declared IType ?type."
+  [?ast ?type]
+  (l/fresh [?key ?tbinding]
+    (astbindings/ast|expression-binding|type ?key ?ast ?tbinding)
+    (bindings/binding-element ?tbinding ?type)))
             
 (defn
    ast|importdeclaration-package

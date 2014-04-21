@@ -13,8 +13,21 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import clojure.lang.IFn;
+
 public class SOULLabelProvider extends LabelProvider {
 
+	public static IFn FN_ISWRAPPER;
+	public static IFn FN_GETWRAPPEDVALUE;
+	
+	public static boolean isEkekoWrapperForValue(Object object) {
+		return (Boolean) FN_ISWRAPPER.invoke(object);
+	}
+	
+	public static Object getWrappedValue(Object wrapper) {
+		return FN_GETWRAPPEDVALUE.invoke(wrapper);
+	}
+	
 	
 	@Override
 	public String getText(Object element) {
@@ -24,7 +37,7 @@ public class SOULLabelProvider extends LabelProvider {
 	
 	public String prettyPrint(Object object) {
 		if(object == null) {
-			return "nil";
+			return "null";
 		}
 		if (object instanceof CompilationUnit) {
 			CompilationUnit cu = (CompilationUnit) object;
@@ -40,15 +53,24 @@ public class SOULLabelProvider extends LabelProvider {
 			return meth.getName().getFullyQualifiedName();
 		}
 		
-		
+
 		
 		if (object instanceof ASTNode) {
 			ASTNode node = (ASTNode) object;
-			String txt = node.toString().split("\n")[0];
-			if(txt.length()>150){
-				txt = txt.substring(0, 150);
+			String txt = node.toString().replaceAll("\\r\\n|\\r|\\n", " ");
+			//String txt = node.toString().split("\n")[0];
+			//if(txt.length()>300){
+			//	txt = txt.substring(0, 300);
+			//}
+			//return txt + " ...";
+		}
+		
+		if(isEkekoWrapperForValue(object)) {
+			Object value = getWrappedValue(object);
+			if(value == null) {
+				return "null";
 			}
-			return txt+" ...";
+			return value.toString();
 		}
 		
 		return super.getText(object);

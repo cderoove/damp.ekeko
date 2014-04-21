@@ -1,7 +1,6 @@
 package baristaui.views.queryResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +36,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.ViewPart;
 
-import damp.ekeko.EkekoPlugin;
-
-import barista.IResults;
 import baristaui.util.ExpandBarFixListener;
 import baristaui.util.MarkerUtility;
 import baristaui.views.queryResult.column.ColumnSelectionListener;
@@ -48,6 +44,7 @@ import baristaui.views.queryResult.tree.SOULTreeLabelProvider;
 import baristaui.views.queryResult.tree.TreeResultContentProvider;
 import baristaui.views.queryResult.tree.TreeViewerConfigurator;
 import baristaui.views.queryResult.variableTable.VariableTableConfigurator;
+import damp.ekeko.EkekoPlugin;
 
 public class QueryView extends ViewPart {
 
@@ -94,6 +91,7 @@ public class QueryView extends ViewPart {
 	private SOULLabelProvider provider;
 	
 	private TreeViewerConfigurator conf;
+	private Composite main_1;
 
 
 	public String getViewID() {
@@ -144,13 +142,13 @@ public class QueryView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 
-		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		main.setLayout(layout);
+		main_1 = new Composite(parent, SWT.NONE);
+		GridLayout gl_main_1 = new GridLayout(2, false);
+		main_1.setLayout(gl_main_1);
 
-		createVariablesConfig(main);
+		createVariablesConfig(main_1);
 
-		Composite buttons = new Composite(main, SWT.NONE);
+		Composite buttons = new Composite(main_1, SWT.NONE);
 		buttons.setLayout(new GridLayout(2, true));
 		/*
 		 * allResults = new Button(buttons, SWT.NONE); GridData gd = new
@@ -173,6 +171,7 @@ public class QueryView extends ViewPart {
 		 */
 		Button markResultsButton = new Button(buttons, SWT.TOGGLE);
 		markResultsButton.setText("Mark Results");
+		new Label(buttons, SWT.NONE);
 		markResultsButton.addSelectionListener(new SelectionAdapter() {
 			private boolean marking = false;
 
@@ -183,14 +182,15 @@ public class QueryView extends ViewPart {
 			}
 		});
 
-		createStatsBar(main);
+		createStatsBar(main_1);
 
-		views = new TabFolder(main, SWT.BORDER);
+		views = new TabFolder(main_1, SWT.NONE);
 		views.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tableResultViewTab = createTableItem(views);
 		columnResultViewTab = createColumnItem(views);
 		treeResultView = createTreeItem(views);
+		new Label(main_1, SWT.NONE);
 
 	}
 
@@ -231,6 +231,7 @@ public class QueryView extends ViewPart {
 	}
 
 	private void createStatsBar(Composite main) {
+		new Label(main_1, SWT.NONE);
 		ExpandBar queryStatsBar = new ExpandBar(main, SWT.NONE);
 		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		layoutData.horizontalSpan = 2;
@@ -253,6 +254,7 @@ public class QueryView extends ViewPart {
 
 		Label queryLabel = new Label(statsC, SWT.NONE);
 		queryLabel.setText("Original Query:");
+		new Label(statsC, SWT.NONE);
 		queryTxt = new Text(statsC, SWT.BORDER_DASH | SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL | SWT.H_SCROLL);
 
 		GridData txtGD = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -482,7 +484,7 @@ public class QueryView extends ViewPart {
 		// columnLayout.widthHint = 200;
 
 		for (int i = 0; i < variables.length; i++) {
-			columns[i] = new TableViewer(columnView, SWT.V_SCROLL);
+			columns[i] = new TableViewer(columnView, SWT.V_SCROLL | SWT.BORDER);
 			columns[i].getTable().setLayoutData(columnLayout);
 			columns[i].setContentProvider(provider);
 			columns[i].setLabelProvider(labelProvider);

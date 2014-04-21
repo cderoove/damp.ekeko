@@ -49,14 +49,14 @@
    API documentation of org.eclipse.jdt.core.dom.ASTNode"
   [?keyword ?node]
   (l/conda [(el/v+ ?node) (l/conda [(el/v+ ?keyword) (l/all (el/succeeds-without-exception (instance? (astnode/class-for-ekeko-keyword ?keyword) ?node)))]
-                            [(el/v- ?keyword) (l/all (el/succeeds (astnode/ast? ?node))
-                                                (el/equals ?keyword (astnode/ekeko-keyword-for-class-of ?node)))])]
-         [(el/v- ?node) (l/conda [(el/v+ ?keyword) (l/fresh [?nodes]
-                                                  (el/equals ?nodes (nodes-of-type ?keyword))
-                                                  (el/contains ?nodes ?node))]
-                            [(el/v- ?keyword) (l/fresh [?keywords]
-                                                  (el/contains astnode/ekeko-keywords-for-ast-classes ?keyword)
-                                                  (ast ?keyword ?node))])]))
+                                   [(el/v- ?keyword) (l/all (el/succeeds (astnode/ast? ?node))
+                                                            (el/equals ?keyword (astnode/ekeko-keyword-for-class-of ?node)))])]
+           [(el/v- ?node) (l/conda [(el/v+ ?keyword) (l/fresh [?nodes]
+                                                              (el/equals ?nodes (nodes-of-type ?keyword))
+                                                    (el/contains ?nodes ?node))]
+                                   [(el/v- ?keyword) (l/fresh [?keywords]
+                                                              (el/contains astnode/ekeko-keywords-for-ast-classes ?keyword)
+                                                              (ast ?keyword ?node))])]))
 
 ;TODO: reify actual property descriptors 
 (defn

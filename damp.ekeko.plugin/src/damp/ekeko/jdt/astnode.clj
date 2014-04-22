@@ -365,3 +365,11 @@
   (= IBinding/MEMBER_VALUE_PAIR (binding-kind b)))
 
 
+
+(defn
+  register-callbacks
+  []
+  (set! (baristaui.views.queryResult.SOULLabelProvider/FN_ISWRAPPER) value?)
+  (set! (baristaui.views.queryResult.SOULLabelProvider/FN_GETWRAPPEDVALUE) value-unwrapped))
+
+(register-callbacks)

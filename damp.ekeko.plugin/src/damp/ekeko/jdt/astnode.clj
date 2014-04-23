@@ -176,36 +176,32 @@
   property-descriptors-per-node-class
   (memoize 
     (fn []
-      (let [classes (node-classes)]
-        (zipmap classes
-                (map (fn [c] (nodeclass-property-descriptors c))
-                     classes))))))
+      (zipmap node-classes
+              (map (fn [c] (nodeclass-property-descriptors c))
+                   node-classes)))))
 
 (def 
   owner-properties-per-node-class
-  (memoize 
-    (fn 
-      []
-      (let [allproperties (apply concat (vals (property-descriptors-per-node-class)))
-            ownerperclass (atom {})]
-        (doseq [p allproperties] ;not simpelvalue
-          ; (when (not (property-descriptor-simple? p))
-          (swap! ownerperclass (fn [oldmap]
-                                 (merge-with concat
-                                             ;concat is to be used when a value already exists for a key
-                                             oldmap
-                                             {((cond
-                                                 (property-descriptor-simple? p) property-descriptor-value-class
-                                                 (property-descriptor-child? p) property-descriptor-child-node-class
-                                                 (property-descriptor-list? p) property-descriptor-element-node-class)
-                                                p) ;key
-                                              [
-                                               ;[(ekeko-keyword-for-property-descriptor p)
-                                               ; (ekeko-keyword-for-class (property-descriptor-owner-node-class p))]
-                                               p
-                                               ] ;value to be concatenated
-                                              }))))
-        @ownerperclass))))
+  (let [allproperties (apply concat (vals (property-descriptors-per-node-class)))
+        ownerperclass (atom {})]
+    (doseq [p allproperties] ;not simpelvalue
+      ; (when (not (property-descriptor-simple? p))
+      (swap! ownerperclass (fn [oldmap]
+                             (merge-with concat
+                                         ;concat is to be used when a value already exists for a key
+                                         oldmap
+                                         {((cond
+                                             (property-descriptor-simple? p) property-descriptor-value-class
+                                             (property-descriptor-child? p) property-descriptor-child-node-class
+                                             (property-descriptor-list? p) property-descriptor-element-node-class)
+                                            p) ;key
+                                          [
+                                           ;[(ekeko-keyword-for-property-descriptor p)
+                                           ; (ekeko-keyword-for-class (property-descriptor-owner-node-class p))]
+                                           p
+                                           ] ;value to be concatenated
+                                          }))))
+    @ownerperclass))
   
 
 ;; Ekeko-specific properties
@@ -235,21 +231,31 @@
     (value? value)
     (:value value)))
 
-(defn 
+
+
+
+(def 
+  node-ekeko-properties-for-class
+  (memoize
+    (fn [^Class nc]
+      (let [descriptors (nodeclass-property-descriptors nc)]
+        (zipmap (map (fn [^StructuralPropertyDescriptor p] 
+                       (keyword (property-descriptor-id p)))
+                     descriptors)
+                (map (fn [^StructuralPropertyDescriptor p]
+                       (fn [n] 
+                         (let [value (node-property-value n p)]
+                           (if 
+                             (ast? value)
+                             value
+                             (make-value n p value)))))
+                     descriptors))))))
+
+(defn
   node-ekeko-properties
-  [n]
-  (let [descriptors (node-property-descriptors n)]
-    (zipmap (map (fn [^StructuralPropertyDescriptor p] 
-                   (keyword (property-descriptor-id p)))
-                 descriptors)
-            (map (fn [^StructuralPropertyDescriptor p]
-                   (fn [] 
-                     (let [value (node-property-value n p)]
-                       (if 
-                         (ast? value)
-                         value
-                         (make-value n p value)))))
-                 descriptors))))
+  [node]
+  (node-ekeko-properties-for-class (class node)))
+
 (defprotocol 
   IHasOwner
   (owner [n-or-wrapper]))
@@ -283,13 +289,15 @@
 (extend 
   ASTNode
   IAST
-  {:reifiers (fn [this] (node-ekeko-properties this))})
+  {:reifiers (fn [this] 
+               (node-ekeko-properties-for-class (class this)))})
                           
 (defn 
   node-propertyvalues
   [n]
-  (map (fn [retrievalf] (retrievalf))
-       (vals (node-ekeko-properties n))))
+  (map 
+    (fn [retrievalf] (retrievalf n))
+    (vals (reifiers n))))
 
 (defn
   node-ancestors

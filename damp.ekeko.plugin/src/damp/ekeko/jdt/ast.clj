@@ -91,7 +91,7 @@
                       (l/fresh [?childretrievingf]
                                (el/equals ?childretrievingf (?keyword (astnode/reifiers ?node)))
                                (l/!= ?childretrievingf nil)
-                               (el/equals ?child (?childretrievingf)))]
+                               (el/equals ?child (?childretrievingf ?node)))]
                      [(el/v- ?keyword)
                       (l/fresh [?keywords]
                                (el/equals ?keywords (keys (astnode/reifiers ?node)))

@@ -39,6 +39,10 @@ See the following publication for the motivation behind Ekeko and possible appli
 > Coen De Roover, Reinout Stevens<br/>
 > Proceedings of the IEEE CSMR-WCRE 2014 Software Evolution Week (CSMR-WCRE14), Tool Demo Track, Antwerp (Belgium)
 
+There is also a screencast accompanying this publication:
+[![Ekeko Demonstration](http://img.youtube.com/vi/cPehkX5MvFg/0.jpg)](https://www.youtube.com/watch?v=cPehkX5MvFg)
+
+
 ## License  
 
 Copyright © 2012-2014 Ekeko contributors: 

@@ -65,9 +65,7 @@ public class EkekoPlugin extends AbstractUIPlugin {
 		ClojureOSGi.require(b, "clojure.stacktrace"); 
 		ClojureOSGi.require(b, "clojure.test");  
 		ClojureOSGi.require(b, "clojure.tools.nrepl.server"); 
-		ClojureOSGi.require(b, "ccw.debug.serverrepl"); 
-		//ClojureOSGi.require(bundleContext, "damp.ekeko"); 
-		
+		ClojureOSGi.require(b, "ccw.debug.serverrepl"); 	
 	}
 
 	public static void logError(String msg, Throwable e) {

@@ -11,9 +11,9 @@ import baristaui.views.queryResult.tree.TreeResultContentProvider.Node;
 
 public class SOULTreeLabelProvider extends LabelProvider {
 
-	private SOULLabelProvider provider;
+	private LabelProvider provider;
 	
-	public SOULTreeLabelProvider(SOULLabelProvider p)  {
+	public SOULTreeLabelProvider(LabelProvider p)  {
 		 super();
 		 provider = p;
 	}

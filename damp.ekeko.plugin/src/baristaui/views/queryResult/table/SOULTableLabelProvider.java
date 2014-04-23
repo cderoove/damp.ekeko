@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import baristaui.views.queryResult.SOULLabelProvider;
@@ -18,9 +19,9 @@ public class SOULTableLabelProvider extends ColumnLabelProvider {
 
 	private String key;
 	
-	private SOULLabelProvider soulProvider;
+	private LabelProvider soulProvider;
 	
-	public SOULTableLabelProvider(String key, SOULLabelProvider p) {
+	public SOULTableLabelProvider(String key, LabelProvider p) {
 		super();
 		soulProvider = p;
 		this.key = key;

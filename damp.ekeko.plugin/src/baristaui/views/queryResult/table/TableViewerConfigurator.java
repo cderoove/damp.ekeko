@@ -3,6 +3,7 @@ package baristaui.views.queryResult.table;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -15,9 +16,9 @@ public class TableViewerConfigurator {
 	
 	private TableViewer viewer;
 
-	private SOULLabelProvider provider;
+	private LabelProvider provider;
 	
-	public TableViewerConfigurator(SOULLabelProvider p) {
+	public TableViewerConfigurator(LabelProvider p) {
 		provider = p;
 	}
 	

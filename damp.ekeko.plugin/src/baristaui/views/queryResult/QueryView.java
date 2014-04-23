@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -88,7 +89,7 @@ public class QueryView extends ViewPart {
 
 	private String viewID;
 
-	private SOULLabelProvider provider;
+	private LabelProvider provider;
 	
 	private TreeViewerConfigurator conf;
 	private Composite main_1;
@@ -104,7 +105,7 @@ public class QueryView extends ViewPart {
 		tableConf = new TableViewerConfigurator(provider);
 	}
 	
-	public void setLabelProvider(SOULLabelProvider p) {
+	public void setLabelProvider(LabelProvider p) {
 		provider = p;
 		conf = new TreeViewerConfigurator(provider);
 		tableConf = new TableViewerConfigurator(provider);

@@ -3,6 +3,7 @@ package baristaui.views.queryResult.tree;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import barista.IResults;
@@ -12,11 +13,11 @@ public class TreeViewerConfigurator {
 
 	private TreeViewer viewer;
 
-	private SOULLabelProvider provider;
+	private LabelProvider provider;
 	
-	public TreeViewerConfigurator(SOULLabelProvider p) {
+	public TreeViewerConfigurator(LabelProvider provider) {
 		super();
-		provider = p;
+		this.provider = provider;
 	}
 	
 	public void configureFor(Map<String, List<Object>> results, String[] variables){

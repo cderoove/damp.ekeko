@@ -20,6 +20,8 @@
 	</modules>
 
 
+
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho.version>0.20.0</tycho.version>
@@ -106,7 +108,7 @@
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
+				<artifactId>wagon-ssh</artifactId>
 				<version>2.6</version>
 			</extension>
 		</extensions>

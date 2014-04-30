@@ -112,13 +112,41 @@
 ;  [exp]
 ;  `(== false ~exp))
 
-(defmacro
-  contains
+
+
+(defn
+  contains|memberbased
   "Relation between a collection (seq c) and one of its elements e."
   [c e]
-  `(fresh [s#]
-     (equals s# (seq ~c))
-     (membero ~e s#)))
+  (fresh [s]
+    (equals s (seq c))
+    (membero e s)))
+   
+
+;^java.lang.Iterator
+;for efficiency, assumes i is still a valid iterator
+(defn-
+  iterator-element
+  [i e]
+  (project [i]
+           (conde [(== e (.next i))]
+                  [(== true (.hasNext  i))
+                   (iterator-element i e)])))
+  
+             
+(defn
+  contains|iteratorbased
+  "Same as contains|memberbased/2, but uses iterators to obtain the elements of c.
+   It is therefore not implemented in terms of membero/2."
+  [c e]
+  (fresh [i] 
+        (project [c]
+                 (== i (.iterator c))
+                 (project [i]
+                          (== true (.hasNext i))
+                          (iterator-element i e)))))
+
+(def contains contains|iteratorbased)
 
 (defmacro
   v+ 

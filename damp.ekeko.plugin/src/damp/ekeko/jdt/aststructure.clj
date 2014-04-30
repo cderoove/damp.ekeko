@@ -84,18 +84,20 @@
   methoddeclaration-methoddeclaration|overrides
   "Relation between a MethodDeclaration ?m and one of its overriding MethodDeclatations ?overrider."
   [?m ?overrider]
-  (l/all
+  (l/fresh [?overriders]
     (ast/ast :MethodDeclaration ?m)
-    (el/contains (damp.ekeko.jdt.javaprojectmodel/method-overriders ?m) ?overrider)
+    (el/equals ?overriders (damp.ekeko.jdt.javaprojectmodel/method-overriders ?m)) 
+    (el/contains ?overriders ?overrider)
     (ast/ast :MethodDeclaration ?overrider)))
 
 (defn
   methodinvocation-methoddeclaration
   "Relation between a MethodInvocation ?i and one of the possible MethodDeclarations ?m it may call."
   [?i ?m]
-  (l/all
+  (l/fresh [?targets]
     (ast/ast :MethodInvocation ?i)
-    (el/contains (javaprojectmodel/invocation-targets ?i) ?m)
+    (el/equals ?targets (javaprojectmodel/invocation-targets ?i))
+    (el/contains ?targets ?m)
     (ast/ast :MethodDeclaration ?m)))
 
 (defn 

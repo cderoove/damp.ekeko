@@ -51,9 +51,10 @@
   packagefragment|root-packagefragment
   "Relation between a IPackageFragmentRoot ?r and one of its IPckageFragment instances ?p." 
   [?r ?f]
-  (l/all 
+  (l/fresh [?fragments] 
     (packagefragment|root ?r)
-    (el/contains  (javaprojectmodel/packagefragmentroot-fragments ?r) ?f)))
+    (el/equals ?fragments (javaprojectmodel/packagefragmentroot-fragments ?r))
+    (el/contains ?fragments ?f)))
 
 
 (defn
@@ -76,9 +77,10 @@
   packagefragment-classfile
   "Relation between an IPackageFragment ?f and one of its IClassFile instances ?c."
   [?f ?c]
-  (l/all
+  (l/fresh [?files]
     (packagefragment ?f)
-    (el/contains  (.getClassFiles ^IPackageFragment ?f) ?c)))
+    (el/equals ?files (.getClassFiles ^IPackageFragment ?f))
+    (el/contains ?files ?c)))
 
 (defn 
   classfile
@@ -91,9 +93,10 @@
   packagefragment-compilationunit
   "Relation between an IPackageFragment ?f and one of its ICompilationUnit instances ?c."
   [?f ?c]
-  (l/all
+  (l/fresh [?cus]
     (packagefragment ?f)
-    (el/contains  (.getCompilationUnits ^IPackageFragment ?f) ?c)))
+    (el/equals ?cus (.getCompilationUnits ^IPackageFragment ?f))
+    (el/contains ?cus ?c)))
 
 (defn 
   compilationunit
@@ -114,9 +117,10 @@
   compilationunit-type
   "Relation between an ICompilationUnit ?c and one of the top-level IType instances ?t it declares."
   [?c ?t]
-  (l/all
+  (l/fresh [?types]
     (compilationunit ?c)
-    (el/contains  (.getTypes ^ICompilationUnit ?c) ?t)))
+    (el/equals ?types (.getTypes ^ICompilationUnit ?c))
+    (el/contains ?types ?t)))
 
 
 
@@ -159,9 +163,10 @@
   type-membertype
   "Relation of IType ?t and one of its immediate member types ?mt."
   [?t ?mt]
-  (l/all
+  (l/fresh [?types]
     (type ?t)
-    (el/contains  (.getTypes ^IType ?t) ?mt)))
+    (el/equals ?types  (.getTypes ^IType ?t))
+    (el/contains ?types ?mt)))
 
 (defn
   type-name|simple|string
@@ -198,8 +203,10 @@
              (type ?t)
              (type-name|qualified|string ?t ?n)]
              [(el/v+ ?n)
-              (el/contains  (auxfor-type-name|qualified|string  ?n) ?t)
-              (l/!= nil ?t)])]))
+              (l/fresh [?types]
+                     (el/equals ?types (auxfor-type-name|qualified|string  ?n))
+                     (el/contains ?types ?t)
+                     (l/!= nil ?t))])]))
 
          
 (defn
@@ -208,18 +215,20 @@
 
    Note that their are none for binary types."
   [?t ?i]
-  (l/all
+  (l/fresh [?inits]
     (type ?t)
-    (el/contains  (.getInitializers ^IType ?t) ?t)))
+    (el/equals ?inits  (.getInitializers ^IType ?t))
+    (el/contains ?inits ?t)))
 
 
 (defn
   type-method
   "Relation between IType ?t and one if its declared IMethod instances ?m."
   [?t ?m]
-  (l/all
+  (l/fresh [?ms]
     (type ?t)
-    (el/contains  (.getMethods ^IType ?t) ?m)))
+    (el/equals ?ms (.getMethods ^IType ?t))
+    (el/contains ?ms ?m)))
 
 (defn 
   method
@@ -254,9 +263,10 @@
   type-field
   "Relation between IType ?t and one if its declared IField instances ?f."
   [?t ?f]
-  (l/all
+  (l/fresh [?fs]
     (type ?t)
-    (el/contains  (.getFields ^IType ?t) ?f)))
+    (el/equals ?fs (.getFields ^IType ?t))
+    (el/contains ?fs ?f)))
 
 (defn 
   field

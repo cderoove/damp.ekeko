@@ -53,7 +53,7 @@
                                                             (el/equals ?keyword (astnode/ekeko-keyword-for-class-of ?node)))])]
            [(el/v- ?node) (l/conda [(el/v+ ?keyword) (l/fresh [?nodes]
                                                               (el/equals ?nodes (nodes-of-type ?keyword))
-                                                    (el/contains ?nodes ?node))]
+                                                              (el/contains ?nodes ?node))]
                                    [(el/v- ?keyword) (l/fresh [?keywords]
                                                               (el/contains astnode/ekeko-keywords-for-ast-classes ?keyword)
                                                               (ast ?keyword ?node))])]))
@@ -107,6 +107,8 @@
                                (has ?keyword ?node ?child))])]))
 
 
+(declare value-raw)
+
 (defn 
   child 
    "Reifies the relation between an ASTNode instance ?node 
@@ -135,7 +137,9 @@
            [(el/succeeds (astnode/ast? ?ch))
             (l/== ?child ?ch)] 
            [(el/succeeds (astnode/lstvalue? ?ch))
-            (el/contains (:value ?ch) ?child)])))
+            (l/fresh [?rawlist]
+                   (value-raw ?ch ?rawlist)
+                   (el/contains ?rawlist ?child))])))
             
 
 
@@ -177,9 +181,12 @@
       [(el/succeeds (astnode/ast? ?ch)) ;;ChildProperty
        (l/== ?value ?ch)]
       [(el/succeeds (astnode/lstvalue? ?ch)) ;;ChildListProperty
-       (el/contains (:value ?ch) ?value)]
+       (l/fresh [?rawlist]
+              (value-raw ?ch ?rawlist)
+              (el/contains ?rawlist ?value))]
       [(el/succeeds (astnode/primitivevalue? ?ch))
-       (l/featurec ?ch {:value ?value})]))) ;;SimpleProperty
+       (value-raw ?ch ?value)
+       ]))) ;;SimpleProperty
 
 ;tabled version is much slower (169294ms vs 5990ms on jHotDraw)
 ;but might be faster if multiple child+ conditions are used in a query
@@ -306,9 +313,10 @@
   - binary predicate value-parent+/2 which works for property values that aren't nodes
   - binary predicate astorvalue-parent+/2 which works for both"
   [?ast ?ancestor]
-  (l/fresh [?key]
+  (l/fresh [?key ?ancestors]
          (ast ?key ?ast)
-         (el/contains (astnode/node-ancestors ?ast) ?ancestor)))
+         (el/equals ?ancestors (astnode/node-ancestors ?ast))
+         (el/contains ?ancestors ?ancestor)))
 
 (defn
   value-parent+
@@ -319,9 +327,10 @@
   - binary predicate ast-parent+/2 which works for ASTNodes
   - binary predicate astorvalue-parent+/2 which works for both"
   [?value ?ancestor]
-  (l/all
+  (l/fresh [?ancestors]
     (value ?value)
-    (el/contains (astnode/value-ancestors ?value) ?ancestor)))
+    (el/equals ?ancestors (astnode/value-ancestors ?value))
+    (el/contains ?ancestors ?ancestor)))
   
 (defn
   astorvalue-parent+
@@ -344,10 +353,11 @@
    See also: binary predicate child+/2, which implements the sub-relation 
    between two ASTNodes only."
   [?astorlist ?offspring]
-  (l/fresh [?key]
+  (l/fresh [?key ?alloffspring]
            (l/conde [(ast ?key ?astorlist)]
                     [(value|list ?astorlist)])
-           (el/contains (astnode/nodeorvalue-offspring ?astorlist) ?offspring)))
+           (el/equals ?alloffspring (astnode/nodeorvalue-offspring ?astorlist))
+           (el/contains ?alloffspring ?offspring)))
   
 (def has+ astorvalue-offspring+) 
 
@@ -447,11 +457,14 @@
           (ast ?key ?node)]
          [(el/v+ ?node)
           (ast ?key ?node)
-          (el/contains [:MethodInvocation 
-                        :SuperMethodInvocation
-                        :ClassInstanceCreation 
-                        :ConstructorInvocation 
-                        :SuperConstructorInvocation] ?key) ;TODO: define a constant for this
+          (l/fresh [?keys]
+                 (el/equals ?keys 
+                     [:MethodInvocation 
+                      :SuperMethodInvocation
+                      :ClassInstanceCreation 
+                      :ConstructorInvocation 
+                      :SuperConstructorInvocation])
+                 (el/contains ?keys ?key)) ;TODO: define a constant for this
           ]))
  
   
@@ -565,10 +578,11 @@
    See also: 
    Ternary predicate ast/3"
   [?key ?ast ?mod]
-  (l/all
-    (el/contains [:AnnotationTypeMemberDeclaration :FieldDeclaration :MethodDeclaration :SingleVariableDeclaration :TypeDeclaration :EnumDeclaration :EnumConstantDeclaration :AnnotationTypeDeclaration] ?key)
-    (ast|declaration ?key ?ast)
-    (child :modifiers ?ast ?mod)))
+  (l/fresh [?keys]
+           (el/equals ?keys [:AnnotationTypeMemberDeclaration :FieldDeclaration :MethodDeclaration :SingleVariableDeclaration :TypeDeclaration :EnumDeclaration :EnumConstantDeclaration :AnnotationTypeDeclaration])
+           (el/contains ?keys ?key)
+           (ast|declaration ?key ?ast)
+           (child :modifiers ?ast ?mod)))
 
 ;; Control Flow Graph
 ;; ------------------
@@ -710,7 +724,8 @@
 
 (defn- nodes-of-type [t]
   (let [models (javaprojectmodel/java-project-models)]
-    (case t
+    (case 
+      t
       :CompilationUnit (mapcat (fn [java-project-model] (.getCompilationUnits ^JavaProjectModel java-project-model)) models)
       :MethodDeclaration (mapcat (fn [java-project-model]  (.getMethodDeclarations ^JavaProjectModel java-project-model)) models)
       :TypeDeclaration (mapcat (fn [java-project-model]  (.getTypeDeclarations ^JavaProjectModel java-project-model)) models)

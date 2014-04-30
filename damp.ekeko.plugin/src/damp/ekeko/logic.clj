@@ -3,7 +3,10 @@
     :author "Coen De Roover"}
    damp.ekeko.logic 
   (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic]))
+  (:use [clojure.core.logic])
+  (:import [java.util Iterator]
+           [java.lang Iterable]) 
+  )
 
 (def differs !=)
 
@@ -117,10 +120,10 @@
 (defn
   contains|memberbased
   "Relation between a collection (seq c) and one of its elements e."
-  [c e]
-  (fresh [s]
-    (equals s (seq c))
-    (membero e s)))
+  [?c ?e]
+  (fresh [?s]
+    (equals ?s (seq ?c))
+    (membero ?e ?s)))
    
 
 ;^java.lang.Iterator
@@ -129,8 +132,8 @@
   iterator-element
   [i e]
   (project [i]
-           (conde [(== e (.next i))]
-                  [(== true (.hasNext  i))
+           (conde [(== e (.next ^Iterator i))]
+                  [(== true (.hasNext  ^Iterator i))
                    (iterator-element i e)])))
   
              
@@ -138,13 +141,14 @@
   contains|iteratorbased
   "Same as contains|memberbased/2, but uses iterators to obtain the elements of c.
    It is therefore not implemented in terms of membero/2."
-  [c e]
-  (fresh [i] 
-        (project [c]
-                 (== i (.iterator c))
-                 (project [i]
-                          (== true (.hasNext i))
-                          (iterator-element i e)))))
+  [?c ?e]
+  (fresh [?i ?foo] 
+         (succeeds (instance? Iterable ?c))
+         (project [?c]
+                  (== ?i (.iterator ^Iterable ?c))
+                  (project [?i]
+                           (== true (.hasNext ^Iterator ?i))
+                           (iterator-element ?i ?e)))))
 
 (def contains contains|iteratorbased)
 

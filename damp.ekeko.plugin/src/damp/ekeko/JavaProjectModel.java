@@ -2,6 +2,7 @@ package damp.ekeko;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,6 +95,8 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	private Set<Statement> statements;	
 	private Set<Expression> expressions;
+	private Set<ASTNode> nodes;
+
 	
 	private ConcurrentHashMap<IType,ITypeHierarchy> itype2typehierarchy;
 	
@@ -254,6 +257,10 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 
 		expressions = java.util.Collections.newSetFromMap(new ConcurrentHashMap<Expression,Boolean>());
 		statements = java.util.Collections.newSetFromMap(new ConcurrentHashMap<Statement,Boolean>());
+		
+		nodes = java.util.Collections.newSetFromMap(new ConcurrentHashMap<ASTNode,Boolean>());
+		
+
 		
 		itype2typehierarchy = new ConcurrentHashMap<IType, ITypeHierarchy>();
 	
@@ -598,15 +605,13 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 		
 	protected void addInformationFromVisitor(TableGatheringVisitor v) {		
-		for(Expression e : v.expressions)
-			expressions.add(e);
+		nodes.addAll(v.visitedNodes);
 		
-		for(Statement s : v.statements)
-			statements.add(s);
+		expressions.addAll(v.expressions);
+		
+		statements.addAll(v.statements);
 		
 		for(TypeDeclaration t : v.typeDeclarations) {
-		
-			
 			String key = keyForTypeDeclaration(t);
 			if(key != null)
 				typeDeclarations.put(key,t);
@@ -623,28 +628,20 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			addControlFlowGraphInformationForMethodDeclaration(m);
 		}
 		
-		for(FieldDeclaration f : v.fieldDeclarations) 
-			fieldDeclarations.add(f);		
+		fieldDeclarations.addAll(v.fieldDeclarations);
 		
-		for(SingleVariableDeclaration svd : v.singleVariableDeclarations) 
-			singleVariableDeclarations.add(svd)	;
+		singleVariableDeclarations.addAll(v.singleVariableDeclarations);
 		
-		for(EnumConstantDeclaration ecd : v.enumConstantDeclarations) 
-			enumConstantDeclarations.add(ecd);
+		enumConstantDeclarations.addAll(v.enumConstantDeclarations);
 		
-
-		for(AnnotationTypeMemberDeclaration atmd : v.annotationTypeMemberDeclarations) 
-			annotationTypeMemberDeclarations.add(atmd);
+		annotationTypeMemberDeclarations.addAll(v.annotationTypeMemberDeclarations);
 		
-		for(Type t : v.types) 
-			types.add(t);
+		types.addAll(v.types);
 		
-		for(ASTNode n : v.fieldAccessLikeNodes) 
-			fieldAccessLikeNodes.add(n);
-
-		for(ASTNode n : v.invocationLikeNodes) 
-			invocationLikeNodes.add(n);
-
+		fieldAccessLikeNodes.addAll(v.fieldAccessLikeNodes);
+		
+		invocationLikeNodes.addAll(v.invocationLikeNodes);
+		
 
 		
 		for(EnumDeclaration e : v.enumDeclarations) {
@@ -684,12 +681,12 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 
 	protected void removeInformationFromVisitor(TableGatheringVisitor v) {
-		for(Expression e : v.expressions)
-			expressions.remove(e);
 		
-		for(Statement s : v.statements)
-			statements.remove(s);
+		nodes.removeAll(v.visitedNodes);
+		
+		expressions.removeAll(v.expressions);
 
+		statements.removeAll(v.statements);
 		
 		for(TypeDeclaration t : v.typeDeclarations) {
 			String key = keyForTypeDeclaration(t);
@@ -708,28 +705,21 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			controlFlowGraphs.remove(m);			
 		}
 		
-		for(FieldDeclaration f : v.fieldDeclarations) 
-			fieldDeclarations.remove(f);
 		
-		for(Type t : v.types) 
-			types.remove(t);
+		fieldDeclarations.removeAll(v.fieldDeclarations);
 		
-		for(ASTNode n : v.fieldAccessLikeNodes) 
-			fieldAccessLikeNodes.remove(n);
-
-		for(ASTNode n : v.invocationLikeNodes) 
-			invocationLikeNodes.remove(n);
+		types.removeAll(v.types);
 		
-		for(AnnotationTypeMemberDeclaration atmd : v.annotationTypeMemberDeclarations) 
-			annotationTypeMemberDeclarations.remove(atmd);
+		fieldAccessLikeNodes.removeAll(v.fieldAccessLikeNodes);
 
+		invocationLikeNodes.removeAll(v.invocationLikeNodes);
 		
-		for(SingleVariableDeclaration svd : v.singleVariableDeclarations) 
-			singleVariableDeclarations.remove(svd);
+		annotationTypeMemberDeclarations.removeAll(v.annotationTypeMemberDeclarations);
 
-		for(EnumConstantDeclaration ecd : v.enumConstantDeclarations) 
-			enumConstantDeclarations.remove(ecd);
+		singleVariableDeclarations.removeAll(v.singleVariableDeclarations);
 
+		enumConstantDeclarations.removeAll(v.enumConstantDeclarations);
+		
 		for(EnumDeclaration e : v.enumDeclarations) {
 			String key = keyForEnumDeclaration(e);
 			if(key != null)
@@ -771,9 +761,20 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		applyRewriteToICU(rewrite,(ICompilationUnit)icu);
 	}
 
-
 	
+	public Iterable<ASTNode> getNodes() {
+		return nodes;
+	}
 
+	public <T extends ASTNode> Iterable<T> getNodesOfType(Class<T> classType) {
+		HashSet<T> nodesOfType = new HashSet<T>(this.nodes.size());
+		for(ASTNode node :  this.nodes) {
+			if(classType.isInstance(node)) {
+				nodesOfType.add((T) node);				
+			}
+		}
+		return nodesOfType;
+	}
 	
 }
 

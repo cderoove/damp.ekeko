@@ -193,6 +193,17 @@
     (succeeds (samesets ?col1 ?col2))))
     
   
+
+(comment
+  ;;benchmarks of the two contains variants
+  
+  (in-ns 'damp.ekeko.logic)
+  (use 'criterium.core)
+  (let [collection (range 1 1000)]
+    (bench (damp.ekeko/ekeko [?e] (contains|iteratorbased collection ?e))))
+  
+  )
+  
   
 
 

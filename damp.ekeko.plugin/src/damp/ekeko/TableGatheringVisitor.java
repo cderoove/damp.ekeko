@@ -1,16 +1,18 @@
 package damp.ekeko;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -33,29 +35,30 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.WildcardType;
 
 public class TableGatheringVisitor extends ASTVisitor {
 	
-	public ArrayList<TypeDeclaration> typeDeclarations = new ArrayList<TypeDeclaration>();
-	public ArrayList<EnumDeclaration> enumDeclarations = new ArrayList<EnumDeclaration>();
-	public ArrayList<AnonymousClassDeclaration> anonymousClassDeclarations = new ArrayList<AnonymousClassDeclaration>();
-	public ArrayList<MethodDeclaration> methodDeclarations = new ArrayList<MethodDeclaration>();
-	public ArrayList<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
-	public ArrayList<AnnotationTypeDeclaration> annotationTypeDeclarations = new ArrayList<AnnotationTypeDeclaration>();
-	public ArrayList<Statement> statements = new ArrayList<Statement>();
-	public ArrayList<Expression> expressions = new ArrayList<Expression>();
-	public ArrayList<SingleVariableDeclaration> singleVariableDeclarations = new ArrayList<SingleVariableDeclaration>();
-	public ArrayList<EnumConstantDeclaration> enumConstantDeclarations = new ArrayList<EnumConstantDeclaration>();
-	public ArrayList<AnnotationTypeMemberDeclaration> annotationTypeMemberDeclarations = new ArrayList<AnnotationTypeMemberDeclaration>();
-	public ArrayList<Type> types = new ArrayList<Type>();
-	//were necessary to speed up the QaliMap analyses
-	public ArrayList<ASTNode> fieldAccessLikeNodes = new ArrayList<ASTNode>();
-	public ArrayList<ASTNode> invocationLikeNodes = new ArrayList<ASTNode>();
+	public HashSet<TypeDeclaration> typeDeclarations = new HashSet<TypeDeclaration>();
+	public HashSet<EnumDeclaration> enumDeclarations = new HashSet<EnumDeclaration>();
+	public HashSet<AnonymousClassDeclaration> anonymousClassDeclarations = new HashSet<AnonymousClassDeclaration>();
+	public HashSet<MethodDeclaration> methodDeclarations = new HashSet<MethodDeclaration>();
+	public HashSet<FieldDeclaration> fieldDeclarations = new HashSet<FieldDeclaration>();
+	public HashSet<AnnotationTypeDeclaration> annotationTypeDeclarations = new HashSet<AnnotationTypeDeclaration>();
+	public HashSet<Statement> statements = new HashSet<Statement>();
+	public HashSet<Expression> expressions = new HashSet<Expression>();
+	public HashSet<SingleVariableDeclaration> singleVariableDeclarations = new HashSet<SingleVariableDeclaration>();
+	public HashSet<EnumConstantDeclaration> enumConstantDeclarations = new HashSet<EnumConstantDeclaration>();
+	public HashSet<AnnotationTypeMemberDeclaration> annotationTypeMemberDeclarations = new HashSet<AnnotationTypeMemberDeclaration>();
+	public HashSet<Type> types = new HashSet<Type>();
+	//were necessary to speed up the Exapus-like analyses
+	public HashSet<ASTNode> fieldAccessLikeNodes = new HashSet<ASTNode>();
+	public HashSet<ASTNode> invocationLikeNodes = new HashSet<ASTNode>();
 
+	public HashSet<ASTNode> visitedNodes = new HashSet<ASTNode>();
+	
+	
 	public boolean visit(AnnotationTypeMemberDeclaration atmd) {
 		annotationTypeMemberDeclarations.add(atmd);
 		return true;
@@ -178,6 +181,7 @@ public class TableGatheringVisitor extends ASTVisitor {
 	}
 	 
 	public void preVisit(ASTNode n) {
+		visitedNodes.add(n);
 
 		if (n instanceof Expression) {
 	

@@ -689,25 +689,27 @@
 ; Node generators called by reification goals
 ; -------------------------------------------
 
-(defn- subclass-nodes-of-type [t]
-  (let [c (astnode/class-for-ekeko-keyword t)
-        s (supers c)]
-    (cond (and (not (= c org.eclipse.jdt.core.dom.SimpleName))
-               (contains? s org.eclipse.jdt.core.dom.Expression))
-            (filter (fn [n] (instance? c n))
-              (nodes-of-type :Expression))
-          (contains? s org.eclipse.jdt.core.dom.Statement)
-            (filter (fn [n] (instance? c n))
-              (nodes-of-type :Statement))
-          (contains? s org.eclipse.jdt.core.dom.Type)
-            (filter (fn [n] (instance? c n))
-              (nodes-of-type :Type))
-          :else 
-            (l/run-nc* [?n] 
-              (l/fresh [?cu]
-                (ast :CompilationUnit ?cu)
-                (child+ ?cu ?n)
-                (el/succeeds (instance? c ?n)))))))
+;(defn- subclass-nodes-of-type [t]
+;  (let [c (astnode/class-for-ekeko-keyword t)
+;        s (supers c)]
+;    (cond (and (not (= c org.eclipse.jdt.core.dom.SimpleName))
+;               (contains? s org.eclipse.jdt.core.dom.Expression))
+;            (filter (fn [n] (instance? c n))
+;              (nodes-of-type :Expression))
+;          (contains? s org.eclipse.jdt.core.dom.Statement)
+;            (filter (fn [n] (instance? c n))
+;              (nodes-of-type :Statement))
+;          (contains? s org.eclipse.jdt.core.dom.Type)
+;            (filter (fn [n] (instance? c n))
+;              (nodes-of-type :Type))
+;          :else 
+;            (l/run-nc* [?n] 
+;              (l/fresh [?cu]
+;                (ast :CompilationUnit ?cu)
+;                (child+ ?cu ?n)
+;                (el/succeeds (instance? c ?n)))))))
+
+
 
 (defn- logic-all-import-declarations []
   (l/run-nc* [?importDeclaration]
@@ -752,7 +754,12 @@
       :ClassInstanceCreation (filter (fn [n] (instance? ClassInstanceCreation n)) (nodes-of-type :MethodInvocationLike))
       :ConstructorInvocation (filter (fn [n] (instance? ConstructorInvocation n)) (nodes-of-type :MethodInvocationLike))
       :SuperConstructorInvocation (filter (fn [n] (instance? SuperConstructorInvocation n)) (nodes-of-type :MethodInvocationLike))                           
-      (try (subclass-nodes-of-type t) (catch ClassNotFoundException e [])))))
+      ;(try 
+      (let [clazz (astnode/class-for-ekeko-keyword t)]
+        (mapcat (fn [java-project-model]
+                  (.getNodesOfType ^JavaProjectModel java-project-model clazz))
+                models)))))
+      ;(catch ClassNotFoundException e []))))) ;;better to throw exception than to let a goal fail silently
                                 
 
       

@@ -142,13 +142,16 @@
   "Same as contains|memberbased/2, but uses iterators to obtain the elements of c.
    It is therefore not implemented in terms of membero/2."
   [?c ?e]
-  (fresh [?i ?foo] 
-         (succeeds (instance? Iterable ?c))
+  (fresh [?i ?asseq]  
          (project [?c]
-                  (== ?i (.iterator ^Iterable ?c))
-                  (project [?i]
-                           (== true (.hasNext ^Iterator ?i))
-                           (iterator-element ?i ?e)))))
+                  (== ?asseq (seq ?c)) ;seq on array converts it into an iterable
+                  (!= nil ?asseq)
+                  (project [?asseq]
+                            ;seq on empty collection (e.g., empty jdt java array) produces nil
+                            (== ?i (.iterator ^Iterable ?asseq))
+                           (project [?i]
+                                    (== true (.hasNext ^Iterator ?i))
+                                    (iterator-element ?i ?e))))))
 
 (def contains contains|iteratorbased)
 

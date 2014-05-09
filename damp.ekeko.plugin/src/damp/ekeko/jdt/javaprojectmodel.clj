@@ -165,6 +165,9 @@
             (if-let [subclass (ielement-to-declaration itype)]
               (filter 
                 (fn [d] 
+                  (println 
+                    (.getName (.getParent m))
+                    (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding))
                   (and (instance? MethodDeclaration d)
                        (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding)))
                 (if

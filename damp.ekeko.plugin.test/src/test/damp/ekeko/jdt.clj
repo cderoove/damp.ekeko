@@ -13,6 +13,7 @@
      [structure :as structure]
      [aststructure :as aststructure]
      [astbindings :as astbindings]
+     [convenience :as convenience]
      ])
   (:use clojure.test))
 
@@ -175,9 +176,41 @@
     (damp.ekeko/ekeko [?k ?e] 
                       (structure/element ?k ?e)
                       (structure/element ?k ?e))))
-       
+
+
+(deftest
+  structure-subtype
+  ^{:doc "Tests type-type|sub+ relation."}
+  (test/tuples-correspond 
+    (damp.ekeko/ekeko [?subtypename]
+           (l/fresh [?type ?subtype]
+                  (structure/type-name|qualified|string ?type "test.damp.ekeko.cases.compositevisitor.Component")
+                  (structure/type-type|sub+ ?type ?subtype)
+                  (structure/type-name|simple|string ?subtype ?subtypename)))
+    "#{(\"MustAliasLeaf\") (\"PrototypicalLeaf\") (\"SuperLogLeaf\") (\"Composite\") (\"MayAliasLeaf\") (\"EmptyLeaf\") (\"OnlyLoggingLeaf\")}"
+    ))
+
 
   
+(deftest
+  convenience-type-identifier
+  ^{:doc "Tests typedeclaration-identifier/2 relation."}
+  (test/tuples-correspond 
+    (damp.ekeko/ekeko [?t ?m ?o] 
+           (convenience/typedeclaration-identifier ?t "OnlyLoggingLeaf"))
+    "#{(\"public class OnlyLoggingLeaf extends Component {\\n  public void acceptVisitor(  ComponentVisitor v){\\n    System.out.println(\\\"Only logging.\\\");\\n  }\\n}\\n\" \"_0\" \"_1\")}"))
+
+
+(deftest
+  convenience-type-bodydeclaration-identifier
+  ^{:doc "Tests typedeclaration-identifier-bodydeclaration-identifier/4 relation."}
+  (test/tuples-correspond 
+    (damp.ekeko/ekeko [?t ?m]
+                      (convenience/typedeclaration-identifier-bodydeclaration-identifier ?t "OnlyLoggingLeaf" ?m "acceptVisitor" ))
+    "#{(\"public class OnlyLoggingLeaf extends Component {\\n  public void acceptVisitor(  ComponentVisitor v){\\n    System.out.println(\\\"Only logging.\\\");\\n  }\\n}\\n\" \"public void acceptVisitor(ComponentVisitor v){\\n  System.out.println(\\\"Only logging.\\\");\\n}\\n\")}"
+    ))
+
+
 
 ;; Test suite
 
@@ -205,10 +238,34 @@
     
     ;Model
     (test/against-project-named visitorproject false reification-modelunaries)
+    (test/against-project-named visitorproject false structure-subtype)
+    
     
     
     ;http://dev.clojure.org/jira/browse/LOGIC-111
     ;(test/against-project-named visitorproject false reification-modelelement)
+    
+    
+    ;Convenience
+    (test/against-project-named visitorproject false convenience-type-identifier)
+    (test/against-project-named visitorproject false convenience-type-bodydeclaration-identifier)
+    
+    
+    
+    ;silly eclipse!!!
+    ;how can this be??
+    ;(let [o 
+    ;     (ffirst (ekeko [?m]
+    ;                    (fresh [?t]
+    ;                           (typedeclaration-identifier-bodydeclaration-identifier ?t "OnlyLoggingLeaf" ?m "acceptVisitor"))))
+    ;     ob (.resolveBinding o)
+    ;     m
+    ;     (ffirst (ekeko [?m]
+    ;                    (fresh [?t]
+    ;                           (typedeclaration-identifier-bodydeclaration-identifier ?t "Component" ?m "acceptVisitor"))))
+    ;     mb (.resolveBinding m)
+    ;     ]
+    ; (.overrides ob mb))
     
     
     )

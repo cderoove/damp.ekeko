@@ -112,7 +112,7 @@
   (l/fresh [?tname]
            (ast/ast :TypeDeclaration ?typedec)
            (ast/has :name ?typedec ?tname)
-           (ast/has :identifier ?tname ?typeid)))
+           (ast/name|simple-string ?tname ?typeid)))
 
 (defn
   typedeclaration-identifier-bodydeclaration-identifier
@@ -130,7 +130,7 @@
                        (l/== ?named ?memberdec)])
              (l/fresh [?mname]
                       (ast/has :name ?named ?mname)
-                      (ast/has :identifier ?mname ?memberid)))))
+                      (ast/name|simple-string ?mname ?memberid)))))
 
 
 (defn

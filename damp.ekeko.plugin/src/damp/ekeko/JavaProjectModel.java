@@ -57,7 +57,6 @@ import dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph;
 public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChangedListener {
 	
 	protected IJavaProject javaProject;
-	private ASTParser parser; 
 	
 	protected ConcurrentHashMap<ICompilationUnit,CompilationUnit> icu2ast;
 	
@@ -103,10 +102,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	public JavaProjectModel(IProject p) {
 		super(p);
 		javaProject = JavaCore.create(p);
-		parser = ASTParser.newParser(AST.JLS4);
-		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setProject(javaProject);
-		parser.setResolveBindings(true);
 		clean();
 	}
 
@@ -212,12 +207,13 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return compilationUnits;
 	}
 	
-	public CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
+		
+	public static CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
 		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
-		parser = ASTParser.newParser(AST.JLS4); //seems better than reusing the existing one (ran out of memory on azureus otherwise)			
+		ASTParser parser = ASTParser.newParser(AST.JLS4); //seems better than reusing the existing one (ran out of memory on azureus otherwise)			
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setProject(javaProject);
+		parser.setProject(icu.getJavaProject());
 		parser.setStatementsRecovery(false);
 		parser.setBindingsRecovery(false);
 		parser.setSource(icu);

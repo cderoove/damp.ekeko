@@ -10,6 +10,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.zest.core,
  org.eclipse.zest.layouts,
  damp.ekeko.plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: damp.ekeko.plugin, damp.libs

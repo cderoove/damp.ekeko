@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.ui,
  damp.ekeko.visualizer.plugin,
  damp.ekeko.plugin
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Eclipse-RegisterBuddy: damp.ekeko.plugin, damp.libs
 Bundle-ClassPath: lib/clojure-1.5.1.jar,
  lib/core.logic-0.8.3.jar,

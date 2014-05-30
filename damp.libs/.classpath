@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="benchmarklibs/criterium-0.4.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="libs/clojure-1.5.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
@@ -15,5 +13,11 @@
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/java.jdbc-0.3.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/sqlite-jdbc-3.7.15-SNAPSHOT-2.jar"/>
+	<classpathentry exported="true" kind="lib" path="benchmarklibs/criterium-0.4.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/clojure-1.6.0.jar" sourcepath="libs/clojure-1.6.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/damp.libs/libs/clojure-1.6.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

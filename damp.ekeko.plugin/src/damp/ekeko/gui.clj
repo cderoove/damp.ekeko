@@ -54,6 +54,36 @@
     .getActiveWorkbenchWindow ;nil if called from non-ui thread 
     .getActivePage))
 
+(defn
+  workbench-activepart
+  "Returns the editor or view part that is currently active in the workbench. Must be called from UI thread."
+  []
+  (.getActivePart (workbench-activepage)))
+
+
+(defn
+  workbench-actionbars
+  "Returns the IActionBars of the workbench. Must be called from UI thread."
+  []
+  (-> 
+    (workbench-activepart)
+    (.getSite)
+    (.getActionBars)))
+
+(defn 
+  workbench-statuslinemanager
+  "Returns the StatusLineManager of the workbench. Must be called from UI thread."
+  []
+  (.getStatusLineManager (workbench-actionbars)))
+
+(defn
+  set-workbench-status|error!
+  "Displays an error message in the status line of the workbench.  Must be called from UI thread."
+  [txt]
+  (.setErrorMessage 
+    (workbench-statuslinemanager)
+    txt)) 
+
 
 ;; Selecting an IWorkingSet
 ;; ------------------------

@@ -85,6 +85,13 @@
     txt)) 
 
 
+(defn
+  workbench-activeditor
+  "Returns the current editor that has focus. Must be called from UI thread."
+  []
+  (.getActiveEditor (workbench-activepage)))
+
+
 ;; Selecting an IWorkingSet
 ;; ------------------------
 

@@ -44,7 +44,6 @@
     (value? x)
     (instance? java.util.List (:value x))))
   
-
 (defn
   nilvalue?
   [x]
@@ -59,8 +58,9 @@
     (value? x)
     (not (instance? java.util.List (:value x)))
     (not (nil? (:value x)))))
-  
 
+
+  
 (defn
   expression?
   [node]
@@ -371,6 +371,22 @@
 
 (defn binding-member-value-pair? [^IBinding b]
   (= IBinding/MEMBER_VALUE_PAIR (binding-kind b)))
+
+
+
+;; Misc
+;; ----
+
+;put below because it relies on protocol functions
+;declaring them ahead causes warning:
+;Warning: protocol #'damp.ekeko.jdt.astnode/IValueOfProperty is overwriting function owner-property
+(defn
+  valuelistmember? 
+  "Checks whether value is a member of a list."
+  [snippet-val]
+  (and (not (lstvalue? snippet-val))
+       (property-descriptor-list? (owner-property snippet-val))))
+
 
 
 

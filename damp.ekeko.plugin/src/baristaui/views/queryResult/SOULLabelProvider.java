@@ -4,7 +4,10 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.ITreeListAdapter;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
@@ -50,10 +53,21 @@ public class SOULLabelProvider extends LabelProvider {
 		
 		if (object instanceof MethodDeclaration) {
 			MethodDeclaration meth = (MethodDeclaration) object;
-			return meth.getName().getFullyQualifiedName();
+			String methName = meth.getName().getIdentifier();
+			
+			ASTNode parent = meth.getParent();
+			if(parent instanceof TypeDeclaration) {
+				TypeDeclaration typeDeclaration = (TypeDeclaration) parent;
+				String className = typeDeclaration.getName().getIdentifier();
+				return className + "." + methName;
+			}
+			IMethodBinding mb = meth.resolveBinding();
+			if(mb != null) {
+				ITypeBinding declaringClass = mb.getDeclaringClass();
+				return declaringClass.getName() + "." + methName;
+			} 
+			return methName;
 		}
-		
-
 		
 		if (object instanceof ASTNode) {
 			ASTNode node = (ASTNode) object;

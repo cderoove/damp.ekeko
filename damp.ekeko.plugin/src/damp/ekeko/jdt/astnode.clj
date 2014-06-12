@@ -384,8 +384,11 @@
   valuelistmember? 
   "Checks whether value is a member of a list."
   [snippet-val]
-  (and (not (lstvalue? snippet-val))
-       (property-descriptor-list? (owner-property snippet-val))))
+  (and 
+    (not (nil? snippet-val))
+    (not (lstvalue? snippet-val))
+    (when-let [ownerproperty (owner-property snippet-val)]
+      (property-descriptor-list? ownerproperty))))
 
 
 

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ekeko-driven Visualizations
+Bundle-SymbolicName: damp.ekeko.visualizer.plugin;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: damp.ekeko.visualization.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ damp.libs,
+ org.eclipse.zest.core,
+ org.eclipse.zest.layouts,
+ damp.ekeko.plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Eclipse-RegisterBuddy: damp.ekeko.plugin, damp.libs

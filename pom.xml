@@ -1,44 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    
-    
+
+
 	<modelVersion>4.0.0</modelVersion>
-    
+
 	<groupId>damp.ekeko</groupId>
-	<artifactId>parent</artifactId>
-	<version>2.0.9</version> <!-- bump this -->
-    
-    
+	<artifactId>damp.ekeko</artifactId>
+	<version>2.0.9-SNAPSHOT</version> <!-- bump this -->
+
+
 	<packaging>pom</packaging>
 	<modules>
-		<module>./DampDependencies</module>
-		<module>./EkekoPlugin</module>
-        	<module>./EkekoTests</module>
-		<module>./EkekoFeature</module>
-        <!-- These have to get their own version, and refer to this artefact.
-         
-         <module>./EkekoVisualizer</module>
-         <module>./EkekoVisualizerFeature</module>
-         
-         
-         <module>../damp.ekeko.aspectj/EkekoAspectJ</module>
-         <module>../damp.ekeko.aspectj/EkekoAspectJFeature</module>
-         <module>../damp.ekeko.snippets/EkekoSnippets</module>
-         <module>../damp.ekeko.snippets/EkekoSnippetsFeature</module>
-         -->
-        
-		<!-- Might have to extract this into a project for continuous integration. -->
-        
-		<module>./EkekoUpdateSite</module>
+		<module>./damp.libs</module>
+		<module>./damp.ekeko.plugin</module>
+		<module>./damp.ekeko.plugin.test</module>
+		<module>./damp.ekeko.feature</module>
+		<module>./damp.ekeko.visualizer.plugin</module>
+		<module>./damp.ekeko.visualizer.feature</module>
 	</modules>
-    
-    
+
+
+
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho.version>0.20.0</tycho.version>
+		<tycho-extras.version>0.20.0</tycho-extras.version>
 		<kepler-repo.url>http://download.eclipse.org/releases/kepler</kepler-repo.url>
 	</properties>
-    
+
 	<repositories>
 		<repository>
 			<id>kepler</id>
@@ -50,17 +40,17 @@
 			<url>http://updatesite.ccw-ide.org/stable</url>
 			<layout>p2</layout>
 		</repository>
-        
-        
+
+
 	</repositories>
-    
-    <distributionManagement>
-        <repository>
-            <id>soft</id>
-            <url>sftp://soft.vub.ac.be/~/public_html/eclipse/</url>
-        </repository>
-    </distributionManagement>
-    
+
+	<distributionManagement>
+		<repository>
+			<id>soft</id>
+			<url>scp://soft.vub.ac.be/~cderoove/public_html/eclipse/</url>
+		</repository>
+	</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -69,13 +59,13 @@
 				<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
-            
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<configuration>
 					<environments>
-                        <environment>
+						<environment>
 							<os>linux</os>
 							<ws>gtk</ws>
 							<arch>x86</arch>
@@ -95,37 +85,61 @@
 							<ws>win32</ws>
 							<arch>x86_64</arch>
 						</environment>
-                         <environment>
+						<environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
 				</configuration>
-                <version>${tycho.version}</version>
+				<version>${tycho.version}</version>
 			</plugin>
-            
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-versions-plugin</artifactId>
-                <version>${tycho.version}</version>
-            </plugin>
-            
-            
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+				<version>${tycho.version}</version>
+			</plugin>
+
+
+
 		</plugins>
-        
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.6</version>
-            </extension>
-        </extensions>
-        
-        
-        
-        
-        
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.6</version>
+			</extension>
+		</extensions>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-packaging-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.eclipse.tycho.extras</groupId>
+							<artifactId>tycho-buildtimestamp-jgit</artifactId>
+							<version>${tycho-extras.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<timestampProvider>jgit</timestampProvider>
+						<jgit.ignore>
+							pom.xml
+						</jgit.ignore>
+						<jgit.dirtyWorkingTree>ignore</jgit.dirtyWorkingTree>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+
+
+
 	</build>
-    
+
 </project> 

@@ -1,4 +1,7 @@
-(ns damp.ekeko.visualization.view
+(ns 
+    ^{:doc "Eclipse ZEST-based visualizations."
+  :author "Coen De Roover"}
+  damp.ekeko.visualization.view
   (:require [damp.ekeko [gui :as gui]])
   (:import [org.eclipse.zest.core.widgets GraphNode GraphConnection]
            [org.eclipse.zest.layouts.algorithms  CompositeLayoutAlgorithm TreeLayoutAlgorithm HorizontalTreeLayoutAlgorithm RadialLayoutAlgorithm GridLayoutAlgorithm SpringLayoutAlgorithm HorizontalShift]  
@@ -182,17 +185,18 @@
         (getLineWidth [src dest]
           (edge|width src dest))
         )
-    (shift-layout layout)
-    (proxy 
-      [ISelectionChangedListener]
-      []
-      (selectionChanged [event]
-        (let [selection (.getSelection event)
-              selected (.getFirstElement selection)]
-          (cond
-            (nil? selected) (void|selected)
-            (instance? EntityConnectionData selected) (edge|selected selected)
-            :else (node|selected selected)))))))
+   ;(shift-layout layout)
+   layout 
+   (proxy 
+     [ISelectionChangedListener]
+     []
+     (selectionChanged [event]
+       (let [selection (.getSelection event)
+             selected (.getFirstElement selection)]
+         (cond
+           (nil? selected) (void|selected)
+           (instance? EntityConnectionData selected) (edge|selected selected)
+           :else (node|selected selected)))))))
 
 (defn
   set-view-elements!

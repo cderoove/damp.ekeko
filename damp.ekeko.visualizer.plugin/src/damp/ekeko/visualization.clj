@@ -1,13 +1,16 @@
-(ns damp.ekeko.visualization
-  (:refer-clojure :exclude [== type])
-  (:use clojure.core.logic)
-  (:use [damp.ekeko logic])
-  (:use [damp.ekeko.soot soot])
-  (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
-  (:use [damp.qwal])
-  (:use [damp.ekeko])
-  (:use [damp.ekeko.visualization.view])
-  (:require [clojure.set]))
+(ns 
+  ^{:doc "Functions for visualizing Ekeko results."
+  :author "Coen De Roover"}
+  damp.ekeko.visualization
+    (:refer-clojure :exclude [== type])
+    (:use clojure.core.logic)
+    (:use [damp.ekeko logic])
+    (:use [damp.ekeko.soot soot])
+    (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
+    (:use [damp.qwal])
+    (:use [damp.ekeko])
+    (:use [damp.ekeko.visualization.view])
+    (:require [clojure.set]))
 
 
 (defn
@@ -63,6 +66,13 @@
     (fn [src dest] edge|directed)
     :layout
     layout|tree)
+  
+  
+  
+  
+  
+  
+  
     
   
   )

@@ -5,6 +5,8 @@
   (:refer-clojure :exclude [== type])
   (:require [clojure.core [logic :as l]])
   (:require 
+    [damp 
+     [qwal :as qwal]]
     [damp.ekeko
      [logic :as el] [ekekomodel :as ekekomodel]]
     [damp.ekeko.jdt 
@@ -13,7 +15,7 @@
     [java.util Map]
     [damp.ekeko JavaProjectModel]
     [damp.ekeko EkekoModel]
-    [dk.itu.smartemf.ofbiz.analysis ControlFlowGraph]
+    [edu.cmu.cs.crystal.cfg.eclipse EclipseCFG EclipseCFGEdge EclipseCFGNode]
     [org.eclipse.core.runtime IProgressMonitor]
     [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
      IJavaProject WorkingCopyOwner IMethod]
@@ -602,88 +604,147 @@
          (has :statements ?body ?slist)
          (value-raw ?slist ?statements)))
 
-(defn- 
-  jdt-method-cfg [m]
-  (let [cu (.getRoot ^MethodDeclaration m)]
-    (when-let [el (.getJavaElement ^CompilationUnit cu)]
-      (when-let [ijp (.getJavaProject el)]
-        (when-let [ejpm (.getJavaProjectModel ^EkekoModel (damp.ekeko.ekekomodel/ekeko-model) ijp)]
-          (.getControlFlowGraph ejpm m))))))
+;todo: perhaps just extend a cfg protocol to MethodDeclaration? 
+;would avoid having to look up the project model
+;question is how to cache within the protocol extension
+(defn
+  cfg-for-method 
+  [m]
+  (when-let [ejpm (javaprojectmodel/javaprojectmodel-for-astnode m)]
+    (.getControlFlowGraph ^JavaProjectModel ejpm m)))
 
-(defn-
-  qwal-graph-from-jdt-cfg [jdt-cfg]
-  {:nodes (seq (.keySet (.successors ^ControlFlowGraph jdt-cfg)))
-   :predecessors (fn 
-                   [node to]
-                   (l/all
-                     (l/project [node]
-                              (l/== to (seq (.get ^Map (.predecessors ^ControlFlowGraph jdt-cfg) node))))))
-   :successors (fn 
-                [node to]
-                (l/all
-                  (l/project [node]
-                           (l/== to (seq (.get ^Map (.successors ^ControlFlowGraph jdt-cfg) node))))))})
+
+;memoizing in order for query
+;(damp.ekeko/ekeko* [?m ?cfg ?entry ?end ?exit]
+;             (method-cfg-entry-exit ?m ?cfg ?entry ?exit)
+;            (method-cfg-entry-exit ?m ?cfg ?entry ?exit))
+;to succeed
+(def
+  qwal-graph-from-jdt-cfg
+  (memoize
+    (fn 
+      [jdt-cfg]
+      {:nodes 
+       nil ;is this still used? pain to compute beforehand
+       
+       :predecessors
+       (fn 
+         [node to]
+         (l/all
+           (l/project [node]
+                    (l/== to (map
+                               (fn [^EclipseCFGEdge edge]
+                                 (.getSource edge))
+                               (.getInputs ^EclipseCFGNode node))))))
+   
+       :successors
+       (fn 
+        [node to]
+        (l/all
+          (l/project [node]
+                     (l/== to (map
+                                (fn [^EclipseCFGEdge edge]
+                                  (.getSink edge))
+                                (.getOutputs ^EclipseCFGNode node))))))})))
  
 (defn 
-  method-cfg
-  "Relation between a MethodDeclaration ?m and its control
-   flow graph ?cfg, in a format suitable to be queried with
+  method-cfg-entry-exit
+  "Relation between a MethodDeclaration ?m, its control
+   flow graph ?cfg (an EclipseCFG), 
+   and its entry and exit points (both EclipseCFGNode instances), 
+   all in a format suitable to be queried with
    the regular path expressions provided by the damp.qwal libraries.
  
-  Examples:
-  ;;all methods of which all complete paths through their 
-  ;;control flow graph end in a ReturnStatement ?return that 
-  ;;is immediately preceded by exactly one other statement ?beforeReturn 
-   (ekeko* [?m ?cfg ?entry ?end]
-           (method-cfg ?m ?cfg) 
-           (method-cfg-entry ?m ?entry)
-           (l/fresh [?beforeReturn ?return]
-                  (l/project [?cfg]
-                           (qwal ?cfg ?entry ?end 
+   Example:
+
+   Methods in which there is at least one path on which ?nodebefore is an AST
+   node evaluated immediately before a ?return statement. A synthetic CFG node is allowed
+   in between ?nodebefore and ?return. One transition to a synthetic node and the exit point 
+   of the cfg is required. 
+   See src-crystal/cfgthrows.png and src-crystal/cfguberreturn.png for
+   example visualiations of control flow graphs.
+
+   (ekeko* [?m ?cfg ?entry ?exit ?nodebefore ?return ?syntheticbetween ?syntheticend]
+           (method-cfg-entry-exit ?m ?cfg ?entry ?exit)
+           (fresh [?beforeReturn ?return]
+                  (project [?cfg]
+                           (qwal ?cfg ?entry ?exit 
                                  []
-                                 (qcurrent [currentStatement] (el/equals currentStatement ?beforeReturn))
+                                 (q=>*)
+                                 (qcurrent [cfgnode]
+                                           (node|cfg-node|ast cfgnode ?nodebefore))
                                  q=>
-                                 (qcurrent [currentStatement] (el/equals currentStatement ?return) (ast :ReturnStatement ?return))))))
+                                 (q? (qcurrent [cfgnode]
+                                          (equals ?syntheticbetween cfgnode)
+                                          (node|cfg|syntethic ?syntheticbetween)) q=>)
+                                 (qcurrent [cfgnode] 
+                                           (node|cfg-node|ast cfgnode ?return)
+                                           (ast :ReturnStatement ?return))
+                                 q=>
+                                 (qcurrent [cfgnode] 
+                                           (equals ?syntheticend cfgnode)
+                                           (node|cfg|syntethic ?syntheticend))
+                                 
+                                 q=>))))
+
+   Equivalent, without information about synthetic nodes:
+   (ekeko* [?m ?cfg ?entry ?exit ?nodebefore ?return]
+           (method-cfg-entry-exit ?m ?cfg ?entry ?exit)
+           (fresh [?beforeReturn ?return]
+                  (project [?cfg]
+                           (qwal ?cfg ?entry ?exit 
+                                 []
+                                 (q=>*)
+                                 (qcurrent [cfgnode]
+                                           (node|cfg-node|ast cfgnode ?nodebefore))
+                                 q=>
+                                 (q? (qcurrent [cfgnode] (node|cfg|syntethic? cfgnode) q=>))
+
+                                 (qcurrent [cfgnode] 
+                                           (node|cfg-node|ast cfgnode ?return)
+                                           (ast :ReturnStatement ?return))
+                                 q=>
+                                 (qcurrent [cfgnode] (node|cfg|syntethic? cfgnode))
+                                 q=>
+                                 ))))
 
   See also:
-  Documentation of the damp.qwal library.
-  Predicates method-cfg-entry and method-cfg-exit which quantify 
-  over the symbolic entry and exit point of a method's control flow graph."
-  [?m ?cfg]
+  Documentation of the damp.qwal library."
+  [?m ?cfg ?entry ?exit]
   (l/fresh [?g] 
     (ast :MethodDeclaration ?m)
-    (el/equals ?g (jdt-method-cfg ?m))
+    (el/equals ?g (cfg-for-method ?m))
     (l/!= ?g nil)
-    (el/equals ?cfg (qwal-graph-from-jdt-cfg ?g))))
+    (el/equals ?cfg (qwal-graph-from-jdt-cfg ?g))
+    (el/equals ?entry (.getStartNode ^EclipseCFG ?g))
+    (el/equals ?exit (.getEndNode ^EclipseCFG ?g))))
 
-(defn-
-  method-statement|first
-  [?m ?s]
-  (l/fresh [?slist]
-       (method-statements ?m ?slist)
-       (el/succeeds (> (.size ^ASTNode$NodeList ?slist) 0)) 
-       (el/equals ?s (first ?slist))))       
+  
+(defn
+  node|cfg-node|ast
+  "Relation between a given EclipseCFGNode ?cfgnode and the ASTNode ?astnode that it wraps. 
+   Non-relational."
+  [?cfgnode ?astnode]
+  (l/all
+    (l/!=
+    (el/equals ?astnode (.getASTNode ^EclipseCFGNode ?cfgnode))))
+  
 
-(defn 
-  method-cfg|entry
-  "Relation between MethodDeclaration ?m and the statement ?entry 
-   that represents the entry point of its control flow graph."
-  [?m ?entry]
-  (l/all 
-    (method-statement|first ?m ?entry)))
+(defn
+  node|cfg|syntethic?
+   "Function for testing whether a given CFGNode is synthetic.
+    Synthetic CFG nodes do not correspond to an AST node, but to a methods' uber return or throws node."  
+   [^EclipseCFGNode cfgnode]
+   (nil? (.getASTNode cfgnode)))
 
-(defn 
-  method-cfg|exit 
-  "Relation between MethodDeclaration ?m and the Block ?exit that
-   represents the symbolic exit point of its control flow graph.
+(defn
+  node|cfg|syntethic
+   "Logic goal that succeeds when a given CFGNode is synthetic. Non-relational.
+    Synthetic CFG nodes do not correspond to an AST node, but to a methods' uber return or throws node."
+   [?cfgnode]
+   (l/all
+     (el/succeeds (node|cfg|syntethic? ?cfgnode))))
 
-  See also:
-  Predicate method-cfg/2 and documentation of the damp.qwal library."
-  [?m ?exit]
-  (l/all 
-   (ast :MethodDeclaration ?m)
-   (has :body ?m ?exit)
-   (ast :Block ?exit)))
 
 
 ; Node generators called by reification goals

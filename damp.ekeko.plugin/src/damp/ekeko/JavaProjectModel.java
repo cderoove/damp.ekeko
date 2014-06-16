@@ -52,7 +52,10 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.google.common.collect.Iterables;
 
-import dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph;
+import edu.cmu.cs.crystal.cfg.IControlFlowGraph;
+import edu.cmu.cs.crystal.cfg.eclipse.EclipseCFG;
+import edu.cmu.cs.crystal.cfg.eclipse.EclipseNodeFirstCFG;
+
 
 public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChangedListener {
 	
@@ -90,7 +93,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	private Set<ASTNode> invocationLikeNodes;
 	
-	private ConcurrentHashMap<MethodDeclaration,ControlFlowGraph> controlFlowGraphs;
+	private ConcurrentHashMap<MethodDeclaration,IControlFlowGraph<ASTNode>> controlFlowGraphs;
 	
 	private Set<Statement> statements;	
 	private Set<Expression> expressions;
@@ -175,8 +178,13 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return Iterables.concat(anonymousClassDeclarations.values(),anonymousClassDeclarationsWithoutBinding);
 	}
 	
-	public ControlFlowGraph getControlFlowGraph(MethodDeclaration m) {
-		return controlFlowGraphs.get(m);
+	public IControlFlowGraph<ASTNode> getControlFlowGraph(MethodDeclaration m) {
+		IControlFlowGraph<ASTNode> graph = controlFlowGraphs.get(m);
+		if(graph == null) {
+			graph = newControlFlowGraph(m);
+			controlFlowGraphs.putIfAbsent(m, graph);
+		}
+		return graph;
 	}
 	
 	public ITypeHierarchy getTypeHierarchy(IType type) throws JavaModelException {
@@ -260,7 +268,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 		itype2typehierarchy = new ConcurrentHashMap<IType, ITypeHierarchy>();
 	
-		controlFlowGraphs = new  ConcurrentHashMap<MethodDeclaration,ControlFlowGraph>();
+		controlFlowGraphs = new  ConcurrentHashMap<MethodDeclaration,IControlFlowGraph<ASTNode>>();
 		
 		types = java.util.Collections.newSetFromMap(new ConcurrentHashMap<Type,Boolean>());
 
@@ -440,10 +448,8 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	
 
-	private ControlFlowGraph newControlFlowGraph(MethodDeclaration m) {
-		if(m.getBody() == null)
-			return null;
-		return new ControlFlowGraph(m);			
+	private IControlFlowGraph<ASTNode> newControlFlowGraph(MethodDeclaration m) {
+		return new EclipseCFG(m);
 	}
 	
 	
@@ -621,7 +627,6 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 				methodDeclarations.put(key,m);
 			else 
 				methodDeclarationsWithoutBinding.add(m);			
-			addControlFlowGraphInformationForMethodDeclaration(m);
 		}
 		
 		fieldDeclarations.addAll(v.fieldDeclarations);
@@ -670,10 +675,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 
 	protected void addControlFlowGraphInformationForMethodDeclaration(MethodDeclaration m) {
-		ControlFlowGraph cfg = newControlFlowGraph(m);
-		if(cfg != null)
-			controlFlowGraphs.put(m,cfg);
-		
+		//empty because building the new graphs lazily
 	}
 
 	protected void removeInformationFromVisitor(TableGatheringVisitor v) {

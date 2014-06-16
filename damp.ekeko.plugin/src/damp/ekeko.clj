@@ -125,34 +125,29 @@
            (ast|type-type ?typeoccurrencekind ?typeoccurrence ?type)
            (typedeclaration-type ?typedeclaration ?type))
   
-  (ekeko* [?m ?cfg] (method-cfg ?m ?cfg))
-  
-  (ekeko* [?m ?cfg ?entry ?end]
-          (method-cfg ?m ?cfg) 
-          (method-cfg|entry ?m ?entry)
-          (fresh [?beforeReturn ?return]
-                 (qwal ?cfg ?entry ?end []
-                       (qcurrent [currentStatement]
-                                 (equals currentStatement ?beforeReturn))
-                       q=>
-                       (qcurrent [currentStatement]
-                                 (equals currentStatement ?return)
-                                 (ast :ReturnStatement ?return)))))
-  
-  (ekeko-n* 100 [?m ?beforeReturn ?return]
-            (fresh [?end ?entry ?cfg]
-                   (method-cfg ?m ?cfg)
-                   (method-cfg|entry ?m ?entry)
-                   (qwal ?cfg ?entry ?end 
-                         []
-                         (q=>*)
-                         (qcurrent [currentStatement] (equals currentStatement ?beforeReturn))
-                         (q=>*)
-                         (qcurrent [currentStatement] (equals currentStatement ?beforeReturn))
-                         (q=>*)
-                         (qcurrent [currentStatement] (equals currentStatement ?return) (ast :ReturnStatement ?return)))))
-  
-  ;following assume whole-program analyses have been enabled on a single project
+  (ekeko* [?m ?cfg ?entry ?exit]  (method-cfg-entry-exit ?m ?cfg ?entry ?exit))
+    
+   (ekeko* [?m ?cfg ?entry ?exit ?nodebefore ?return]
+           (method-cfg-entry-exit ?m ?cfg ?entry ?exit)
+           (fresh [?beforeReturn ?return]
+                  (project [?cfg]
+                           (qwal ?cfg ?entry ?exit 
+                                 []
+                                 (q=>*)
+                                 (qcurrent [cfgnode]
+                                           (node|cfg-node|ast cfgnode ?nodebefore))
+                                 q=>
+                                 (q? (qcurrent [cfgnode] (node|cfg|syntethic? cfgnode) q=>))
+
+                                 (qcurrent [cfgnode] 
+                                           (node|cfg-node|ast cfgnode ?return)
+                                           (ast :ReturnStatement ?return))
+                                 q=>
+                                 (qcurrent [cfgnode] (node|cfg|syntethic? cfgnode))
+                                 ))))  
+
+   
+   ;following assume whole-program analyses have been enabled on a single project
   (ekeko* [?c] (soot :class ?c))
   
   (ekeko* [?m] (soot :method ?m))

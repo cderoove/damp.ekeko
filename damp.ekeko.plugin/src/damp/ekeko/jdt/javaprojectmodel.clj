@@ -4,10 +4,10 @@
   damp.ekeko.jdt.javaprojectmodel
   (:require [damp.ekeko [ekekomodel :as ekekomodel]])
   (:import 
-    [damp.ekeko JavaProjectModel]
+    [damp.ekeko JavaProjectModel EkekoModel]
     [org.eclipse.core.resources IProject]
     [org.eclipse.jdt.core JavaCore IJavaProject IPackageFragmentRoot IPackageFragment IMember IType ITypeHierarchy]
-    [org.eclipse.jdt.core.dom CompilationUnit IBinding TypeDeclaration MethodDeclaration IMethodBinding 
+    [org.eclipse.jdt.core.dom ASTNode CompilationUnit IBinding TypeDeclaration MethodDeclaration IMethodBinding 
      AnonymousClassDeclaration MethodInvocation SuperMethodInvocation ClassInstanceCreation ConstructorInvocation
      SuperConstructorInvocation]))
 
@@ -31,6 +31,15 @@
   []
   (map (fn [model] (.getJavaProject model))
        (java-project-models)))
+
+(defn
+  javaprojectmodel-for-astnode
+  "Returns the JavaProjectModel to which the given ASTNode belongs."
+  [node]
+  (let [cu (.getRoot ^ASTNode node)]
+    (when-let [el (.getJavaElement ^CompilationUnit cu)]
+      (when-let [ijp (.getJavaProject el)]
+        (.getJavaProjectModel ^EkekoModel (damp.ekeko.ekekomodel/ekeko-model) ijp)))))
 
 ; IJavaProject
 ; ------------

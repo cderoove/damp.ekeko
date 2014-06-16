@@ -61,8 +61,7 @@ Included dependencies:
 * Clojure's applicative logic programming library [core.logic](https://github.com/clojure/core.logic/) (Eclipse Public License)
 * [Reinout Stevens](http://soft.vub.ac.be/soft/members/reinoutstevens)' regular path expression library [damp.qwal](https://github.com/ReinoutStevens/damp.qwal 
 ) (Eclipse Public License)
-* Anders Hessellund's intra-procedural JDT control flow graph [dk.itu.smartemf.ofbiz.analysis.ControlFlowGraph](http://www.itu.dk/people/hessellund/smartemf/index.php
-) (Apache license)
+* The intra-procedural JDT-based control flow graph of the Crystal static  analysis framework [edu.cmu.cs.crystal.cfg.eclipse](https://code.google.com/p/crystalsaf/) (LGPL)
 * [Tim Molderez](http://ansymo.ua.ac.be/people/tim-molderez)' Clojure/Java object inspector [Inspector Jay](https://github.com/timmolderez/inspector-jay) (BSD 3-Clause license) 
 * Sable's Java Optimization Framework [Soot](http://www.sable.mcgill.ca/soot/
 ) (LGPL)

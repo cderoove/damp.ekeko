@@ -726,9 +726,9 @@
    Non-relational."
   [?cfgnode ?astnode]
   (l/all
-    (l/!=
+    (l/!= ?astnode nil)
     (el/equals ?astnode (.getASTNode ^EclipseCFGNode ?cfgnode))))
-  
+
 
 (defn
   node|cfg|syntethic?

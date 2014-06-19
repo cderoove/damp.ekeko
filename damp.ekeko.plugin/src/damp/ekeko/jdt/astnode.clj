@@ -3,6 +3,7 @@
   (:import 
     [java.lang Class]
     [java.lang.reflect Field]
+    [damp.ekeko JavaProjectModel]
     [org.eclipse.jdt.core.dom ASTNode 
                               ASTNode$NodeList 
                               CompilationUnit 
@@ -170,7 +171,7 @@
 ;.-notation works on literals, not on variables holding a java.lang.class instance
 ;can be used as: (damp.ekeko.ast/nodeclass-property-descriptors (class cu)) where cu is a cu node
 (defn nodeclass-property-descriptors [^Class cls]
-  (clojure.lang.Reflector/invokeStaticMethod cls "propertyDescriptors" (to-array [org.eclipse.jdt.core.dom.AST/JLS3])))
+  (clojure.lang.Reflector/invokeStaticMethod cls "propertyDescriptors" (to-array [JavaProjectModel/JLS])))
 
 (def 
   property-descriptors-per-node-class

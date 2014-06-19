@@ -8,6 +8,7 @@
   (:require [damp.ekeko [logic :as el]])
   (:require [damp.ekeko.jdt [astnode :as astnode]])
   (:import 
+    [damp.ekeko JavaProjectModel]
     [org.eclipse.jdt.core IJavaElement]
     [org.eclipse.jdt.core.dom IBinding AST ASTParser SuperConstructorInvocation ConstructorInvocation ClassInstanceCreation SuperMethodInvocation MethodInvocation Expression ImportDeclaration Type TypeDeclaration QualifiedName SimpleName SuperFieldAccess FieldAccess IBinding IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
 
@@ -16,7 +17,7 @@
 ;; ---------------------------------------------------------------
 
 (defn- ibinding-for-ijavaelement [^IJavaElement ijavaelement]
-  (let [^ASTParser parser (ASTParser/newParser AST/JLS4)]                
+  (let [^ASTParser parser (ASTParser/newParser JavaProjectModel/JLS)]                
     (.setProject  parser (.getJavaProject ijavaelement))
     (if-let [bindings (.createBindings parser (into-array IJavaElement [ijavaelement]) nil)]
       (first bindings))))

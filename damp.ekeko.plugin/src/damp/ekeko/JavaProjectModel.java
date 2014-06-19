@@ -215,10 +215,12 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return compilationUnits;
 	}
 	
+	
+	public static int JLS = AST.JLS4;
 		
 	public static CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
 		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
-		ASTParser parser = ASTParser.newParser(AST.JLS4); //seems better than reusing the existing one (ran out of memory on azureus otherwise)			
+		ASTParser parser = ASTParser.newParser(JLS); //seems better than reusing the existing one (ran out of memory on azureus otherwise)			
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setProject(icu.getJavaProject());

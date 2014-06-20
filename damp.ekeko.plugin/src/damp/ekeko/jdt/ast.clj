@@ -405,7 +405,6 @@
       (el/contains declaration-keywords ?key)
       (ast ?key ?ast))))
 
-;TODO: remove pseudo-node keywords 
 (defn 
   ast|fieldaccess
    "Like binary ast/2 predicate, but ensures ?ast is 
@@ -414,13 +413,15 @@
     Note that ?ast can be an instance of FieldAccess, 
     SuperFieldAccess, SimpleName or QualifiedName."
   [?key ?node] 
-  (l/conde [(el/v- ?node)
-          (ast :FieldAccessLike ?node) 
-          (ast ?key ?node)]
-         [(el/v+ ?node) 
-          (l/fresh [?n] 
-                 (ast :FieldAccessLike ?n)
-                 (l/== ?n ?node))]))
+  (let [nodes (nodes-of-type :FieldAccessLike)]
+    (l/all
+      (l/conda
+        [(el/v+ ?node)
+         (l/project [?node]
+                    (l/!= nil (some #{?node} nodes)))] ;cannot use trick of methodinvocationlike because not all names are field accesses
+        [(el/v- ?node)
+         (el/contains nodes ?node)]) 
+      (ast ?key ?node))))
     
 (defn 
   ast|type
@@ -454,20 +455,21 @@
    SuperMethodInvocation, ClassInstanceCreation,
    ConstructorInvocation or SuperConstructorInvocation"
   [?key ?node] 
-  (l/conde [(el/v- ?node)
-          (ast :MethodInvocationLike ?node)
-          (ast ?key ?node)]
-         [(el/v+ ?node)
-          (ast ?key ?node)
-          (l/fresh [?keys]
-                 (el/equals ?keys 
-                     [:MethodInvocation 
-                      :SuperMethodInvocation
-                      :ClassInstanceCreation 
-                      :ConstructorInvocation 
-                      :SuperConstructorInvocation])
-                 (el/contains ?keys ?key)) ;TODO: define a constant for this
-          ]))
+  (l/conda
+    [(el/v- ?node)
+     (ast :MethodInvocationLike ?node)
+     (ast ?key ?node)]
+    [(el/v+ ?node)
+     (ast ?key ?node)
+     (l/fresh [?keys]
+              (el/equals ?keys 
+                         [:MethodInvocation 
+                          :SuperMethodInvocation
+                          :ClassInstanceCreation 
+                          :ConstructorInvocation 
+                          :SuperConstructorInvocation])
+               ;TODO: define a constant for this
+              (el/contains ?keys ?key))]))
  
   
 

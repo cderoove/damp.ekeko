@@ -64,7 +64,14 @@ damp.ekeko.jdt.astbindings
     (l/!= nil ?binding)
     (el/equals ?binding (.resolveBinding ^Name ?name))))
 
-
+(defn
+  ast|localvariable-binding|variable
+  "Relation between a local variable ?ast (either a SimpleName or QualifiedName), 
+   the keyword ?key corresponding to its kind, and the IVariableBinding it resolves to."
+  [?key ?var ?binding]
+  (l/all
+    (ast/ast|localvariable ?key ?var)
+    (ast|name-binding ?key ?var ?binding)))
 
 
 (defn

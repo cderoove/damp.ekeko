@@ -55,9 +55,9 @@
 
 
 (defn
-  ast|fieldaccess-ast|variabledeclarationfragment|referred
+  ast|fieldaccess-ast|variabledeclaration
   "Relation between fieldaccess-like ASTNode (i.e., SimpleName, FieldAccess, QualifiedName)
-   and the VariableDeclarationFragment it refers to lexically."
+   and the VariableDeclaration(Fragment) it refers to lexically."
   [?var ?dec]
   (l/fresh [?k-var ?k-dec ?b] 
            (astbindings/ast|fieldaccess-binding|variable ?k-var ?var ?b)
@@ -66,15 +66,38 @@
 
 (defn
   ast|fieldaccess-ast|referred
-  "Relation between fieldaccess-like ASTNode (i.e., SimpleName, FieldAccess, QualifiedName)
+  "Relation between a fieldaccess-like ASTNode (i.e., SimpleName, FieldAccess, QualifiedName)
    and one of the ASTNodes it refers to lexically (i.e., SimpleName, VariableDeclarationFragment, FieldDeclaration)."
   [?var ?dec]
   (l/fresh [?vardecfragment]
-         (ast|fieldaccess-ast|variabledeclarationfragment|referred ?var ?vardecfragment)
+         (ast|fieldaccess-ast|variabledeclaration ?var ?vardecfragment)
          (l/conde
            [(l/== ?vardecfragment ?dec)]
            [(ast/ast-parent ?vardecfragment ?dec)] ;fielddeclaration
            [(ast/has :name ?vardecfragment ?dec)]))) ;name
+
+(defn
+  ast|localvariable-ast|variabledeclaration 
+  "Relation between a local variable ASTNode (i.e., SimpleName or QualifiedName used as an expression) 
+   and the (Single)VariableDeclaration it refers to lexically."
+  [?var ?dec]
+  (l/fresh [?k-var ?k-dec ?b] 
+           (astbindings/ast|localvariable-binding|variable ?k-var ?var ?b) 
+           (astbindings/ast|declaration-binding ?k-dec ?dec ?b)))
+           
+
+(defn
+  ast|localvariable-ast|referred
+  "Relation between a local variable ASTNode (i.e., SimpleName or QualifiedName used as an expression) 
+   and one of the ASTNodes it refers to lexically (i.e., SimpleName or (Single)VariableDeclaration(Fragment), VariableDeclarationExpression, VariableDeclarationStatement)."
+  [?var ?dec]
+  (l/fresh [?vardec]
+           (ast|localvariable-ast|variabledeclaration ?var ?vardec)
+           (l/conde
+             [(l/== ?vardec ?dec)]
+             [(ast/has :name ?vardec ?dec)]
+             [(ast/ast :VariableDeclarationFragment ?vardec) ;excludes SingleVariableDeclaration, only ok for VariableDeclaraitonFragment
+              (ast/ast-parent ?vardec ?dec)])))
   
 
 (defn 
@@ -90,7 +113,7 @@
                      (bindings/binding-element ?binding ?type))]
            [(el/v+ ?type)
             (l/!= nil ?type)
-            (el/equals ?ast (javaprojectmodel/ielement-to-declaration ?type))
+            (el/equals ?ast (javaprojectmodel/itype-to-declaration ?type))
             (l/!= nil ?ast)]))
 
 (defn 
@@ -142,5 +165,6 @@
     (el/equals ?project (.getJavaProject ^ICompilationUnit (.getJavaElement ^CompilationUnit ?root)))))
 
 
+  
 
 

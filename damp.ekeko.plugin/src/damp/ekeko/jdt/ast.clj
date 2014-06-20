@@ -471,7 +471,27 @@
                ;TODO: define a constant for this
               (el/contains ?keys ?key))]))
  
+
+(defn
+  ast|expression
+  "Relation between an Expression instance ?ast and 
+   the keyword ?key representing its kind."
+  [?key ?ast]
+  (l/all 
+    (ast :Expression ?ast)
+    (ast ?key ?ast)))
   
+
+(defn
+  ast|localvariable
+  "Relation between a local variable ?ast (either a SimpleName or QualifiedName), 
+   used as an expression, 
+   and the keyword ?key corresponding to its kind."
+  [?key ?ast]
+  (l/all
+    (ast :Name ?ast)
+    (ast|expression ?key ?ast))) ;because not all names are expressions
+
 
 (defn 
   ast|expression|reference
@@ -481,10 +501,9 @@
   (l/fresh [?binding]
         ; (ast|expression-binding|type ?keyw ?ast ?binding)
         ;not using this relation to avoid circular dependencies
-        (ast :Expression ?ast)
-        (ast ?keyw ?ast)
+        (ast|expression ?keyw ?ast)
         (el/equals ?binding (.resolveTypeBinding ^Expression ?ast))
-        (el/succeeds (not (.isPrimitive ^ITypeBinding ?binding))))) 
+        (el/succeeds (not (.isPrimitive ^ITypeBinding ?binding)))))
 
 
 (defn 

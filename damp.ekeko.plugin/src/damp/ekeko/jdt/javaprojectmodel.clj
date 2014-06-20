@@ -6,7 +6,7 @@
   (:import 
     [damp.ekeko JavaProjectModel EkekoModel]
     [org.eclipse.core.resources IProject]
-    [org.eclipse.jdt.core JavaCore IJavaProject IPackageFragmentRoot IPackageFragment IMember IType ITypeHierarchy]
+    [org.eclipse.jdt.core JavaCore IJavaProject IPackageFragmentRoot IPackageFragment ICompilationUnit IMember IJavaElement IType ITypeHierarchy]
     [org.eclipse.jdt.core.dom ASTNode CompilationUnit IBinding TypeDeclaration MethodDeclaration IMethodBinding 
      AnonymousClassDeclaration MethodInvocation SuperMethodInvocation ClassInstanceCreation ConstructorInvocation
      SuperConstructorInvocation]))
@@ -116,23 +116,34 @@
   [t]
   (-> t .resolveBinding .getJavaElement))
 
-(defn 
-  ielement-to-declaration 
-  "Returns the ASTNode that declares the given IJavaElement."
-  [^IMember ije] 
-  (when-let [icu (.getCompilationUnit ije)] ;nil if itype came not from source
-    (.findDeclaringNode
-      ^CompilationUnit (icu-to-ast icu)
-      ^String (.getKey ije))))
+(defn-
+  cu-declaration-for-key
+  [^CompilationUnit cu ^String key]
+  (.findDeclaringNode
+    ^CompilationUnit cu
+    ^String key))
 
+(defn-
+  icu-declaration-for-key
+  [^ICompilationUnit icu ^String key]
+  (cu-declaration-for-key (icu-to-ast icu) key))
+
+(defn 
+  itype-to-declaration 
+  "Returns the ASTNode that declares the given IType."
+  [^IType it]
+  (when-let [icu (.getCompilationUnit it)] ;nil if itype came not from source
+    (icu-declaration-for-key icu (.getKey it)))) 
+  
+  
 (defn 
   binding-to-declaration
   "Returns the ASTNode that declares the given IBinding."
   [^IBinding b]
   (when-let [ije (.getJavaElement b)]
-    (ielement-to-declaration ije)))
-
-
+    (when-let [icu (.getCompilationUnit ^IJavaElement ije)]
+      (icu-declaration-for-key icu (.getKey b)))))
+   
 
 ; JDT Type Hierachy
 ; -----------------
@@ -171,7 +182,7 @@
         (mapcat
           ;(apply concat (pmap
           (fn [itype] 
-            (if-let [subclass (ielement-to-declaration itype)]
+            (if-let [subclass (itype-to-declaration itype)]
               (filter 
                 (fn [d] 
                   (println 

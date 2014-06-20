@@ -16,7 +16,9 @@
 ;; Link between IBinding and Element (not to be used by end-users)
 ;; ---------------------------------------------------------------
 
-(defn- ibinding-for-ijavaelement [^IJavaElement ijavaelement]
+(defn-
+  ibinding-for-ijavaelement
+  [^IJavaElement ijavaelement]
   (let [^ASTParser parser (ASTParser/newParser JavaProjectModel/JLS)]                
     (.setProject  parser (.getJavaProject ijavaelement))
     (if-let [bindings (.createBindings parser (into-array IJavaElement [ijavaelement]) nil)]

@@ -52,7 +52,30 @@
    (l/fresh [?binding]
             (astbindings/ast|importdeclaration-binding|package ?import ?binding)
             (bindings/binding-element ?binding ?package)))
-   
+
+
+(defn
+  ast|fieldaccess-ast|variabledeclarationfragment|referred
+  "Relation between fieldaccess-like ASTNode (i.e., SimpleName, FieldAccess, QualifiedName)
+   and the VariableDeclarationFragment it refers to lexically."
+  [?var ?dec]
+  (l/fresh [?k-var ?k-dec ?b] 
+           (astbindings/ast|fieldaccess-binding|variable ?k-var ?var ?b)
+           (astbindings/ast|declaration-binding ?k-dec ?dec ?b)))
+
+
+(defn
+  ast|fieldaccess-ast|referred
+  "Relation between fieldaccess-like ASTNode (i.e., SimpleName, FieldAccess, QualifiedName)
+   and one of the ASTNodes it refers to lexically (i.e., SimpleName, VariableDeclarationFragment, FieldDeclaration)."
+  [?var ?dec]
+  (l/fresh [?vardecfragment]
+         (ast|fieldaccess-ast|variabledeclarationfragment|referred ?var ?vardecfragment)
+         (l/conde
+           [(l/== ?vardecfragment ?dec)]
+           [(ast/ast-parent ?vardecfragment ?dec)] ;fielddeclaration
+           [(ast/has :name ?vardecfragment ?dec)]))) ;name
+  
 
 (defn 
   typedeclaration-type

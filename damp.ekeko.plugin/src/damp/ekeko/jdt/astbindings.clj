@@ -10,7 +10,7 @@ damp.ekeko.jdt.astbindings
   (:require
     [damp.ekeko.jdt [ast :as ast] [bindings :as bindings] [javaprojectmodel :as javaprojectmodel]])
   (:import 
-    [org.eclipse.jdt.core.dom Annotation SuperConstructorInvocation ConstructorInvocation ClassInstanceCreation SuperMethodInvocation MethodInvocation Expression ImportDeclaration Type TypeDeclaration QualifiedName SimpleName SuperFieldAccess FieldAccess IBinding IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
+    [org.eclipse.jdt.core.dom Name Annotation SuperConstructorInvocation ConstructorInvocation ClassInstanceCreation SuperMethodInvocation MethodInvocation Expression ImportDeclaration Type TypeDeclaration QualifiedName SimpleName SuperFieldAccess FieldAccess IBinding IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
 
 
 ;; Relation between ASTNode and IBinding
@@ -50,6 +50,21 @@ damp.ekeko.jdt.astbindings
     (ast/ast|type ?key ?type)
     (l/!= nil ?binding)
     (el/equals ?binding (.resolveBinding ^Type ?type))))
+
+
+(defn
+  ast|name-binding
+  "Relation between a Name ?name, the keyword ?key 
+  corresponding to its kind (SimpleName or QualifiedName),
+  and the IBinding it resolves to."
+  [?key ?name ?binding]
+  (l/all 
+    (ast/ast :Name ?name)
+    (ast/ast ?key ?name) 
+    (l/!= nil ?binding)
+    (el/equals ?binding (.resolveBinding ^Name ?name))))
+
+
 
 
 (defn
@@ -137,12 +152,15 @@ damp.ekeko.jdt.astbindings
   (l/all 
     (l/!= ?binding nil)
     (l/!= ?n nil)
-    (l/conda [(el/v+ ?binding) (l/all
-                            (el/equals ?n (javaprojectmodel/binding-to-declaration ?binding))
-                            (ast/ast ?key ?n))]
-           [(el/v- ?binding) (l/all
-                               (ast/ast|declaration|resolveable ?key ?n)
-                               (el/equals ?binding (.resolveBinding ?n)))]))) ;no type hint possible, no common super class for nodes with such a method
+    (l/conda
+      [(el/v+ ?binding)
+       (l/all
+         (el/equals ?n (javaprojectmodel/binding-to-declaration ?binding))
+         (ast/ast ?key ?n))]
+      [(el/v- ?binding) 
+       (l/all
+         (ast/ast|declaration|resolveable ?key ?n)
+         (el/equals ?binding (.resolveBinding ?n)))]))) ;no type hint possible, no common super class for nodes with such a method
    
 (defprotocol 
   IResolveToMethodBinding

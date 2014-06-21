@@ -20,27 +20,37 @@
 
   See also:
   ast|type-binding|type/3 which resolves a type ASTNode to an ITypeBinding."
-  [?key ?ast ?type]
-  (l/fresh [?binding]
-         (astbindings/ast|type-binding|type ?key ?ast ?binding)
-         (bindings/binding-element ?binding ?type)))
-
+  ([?key ?ast ?type]
+    (l/fresh [?binding]
+             (astbindings/ast|type-binding|type ?key ?ast ?binding)
+             (bindings/binding-element ?binding ?type)))
+  ([?ast ?type]
+    (l/fresh [?key]
+             (ast|type-type ?key ?ast ?type))))
+             
 (defn
   ast|annotation-type 
   "Relation between an Annotation ?ast and the IType ?type it refers to."
-  [?ast ?type]
-  (l/fresh [?abinding ?tbinding]
-    (astbindings/ast|annotation-binding|annotation ?ast ?abinding)
-    (el/equals ?tbinding (.getAnnotationType ?abinding))
-    (bindings/binding-element ?tbinding ?type)))
+  ([?ast ?type]
+    (l/fresh [?abinding ?tbinding]
+             (astbindings/ast|annotation-binding|annotation ?ast ?abinding)
+             (el/equals ?tbinding (.getAnnotationType ?abinding))
+             (bindings/binding-element ?tbinding ?type)))
+  ([?key ?ast ?type]
+    (l/all 
+      (ast|annotation-type ?ast ?type)
+      (ast/ast ?key ?ast))))
 
 (defn
   ast|expression-type 
   "Relation between an Expression ?ast and its declared IType ?type."
-  [?ast ?type]
-  (l/fresh [?key ?tbinding]
-    (astbindings/ast|expression-binding|type ?key ?ast ?tbinding)
-    (bindings/binding-element ?tbinding ?type)))
+  ([?key ?ast ?type]
+    (l/fresh [?tbinding]
+      (astbindings/ast|expression-binding|type ?key ?ast ?tbinding)
+      (bindings/binding-element ?tbinding ?type)))
+  ([?ast ?type]
+    (l/fresh [?key]
+             (ast|expression-type ?key ?ast ?type))))
             
 (defn
    ast|importdeclaration-package

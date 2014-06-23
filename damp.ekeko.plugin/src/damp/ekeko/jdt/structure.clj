@@ -443,7 +443,7 @@
 
 (defn 
   type-type|super+
-  "Successively unifies ?itype with every 
+  "Successively unifies ?super-itype with every 
    supertype of the given IType ?itype, in bottom-up order. 
 
    Note that the JDT does not consider java.lang.Object
@@ -460,7 +460,7 @@
 
 (defn 
   type-type|sub+
-  "Successively unifies ?itype with every 
+  "Successively unifies ?sub-itype with every 
    subtype of the given IType ?itype. 
 
    Note that the JDT does not consider java.lang.Object
@@ -469,8 +469,8 @@
   (l/fresh [?subs]
            (type ?itype)
            (l/!= nil ?sub-itype)
-     (itype-sub-itypes ?itype ?subs)
-     (el/contains  ?subs ?sub-itype)))
+           (itype-sub-itypes ?itype ?subs)
+           (el/contains  ?subs ?sub-itype)))
 
 
   

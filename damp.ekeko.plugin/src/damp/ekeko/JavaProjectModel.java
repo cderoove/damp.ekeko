@@ -112,6 +112,10 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return javaProject;
 	}
 	
+	public Iterable<ICompilationUnit> getICompilationUnits() {
+		return icu2ast.keySet();
+	}
+	
 	public CompilationUnit getCompilationUnit(ICompilationUnit icu) {
 		return icu2ast.get(icu);
 	}
@@ -747,18 +751,29 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 					
 	}
 	
+	
+	public void applyRewrite(ASTRewrite rewrite) throws MalformedTreeException, BadLocationException, JavaModelException{
+		for(ICompilationUnit icu : getICompilationUnits()) {
+			CompilationUnit cu = getCompilationUnit(icu);
+			if(rewrite.getAST().equals(cu.getAST()))
+				applyRewriteToICU(rewrite, icu);
+		}	
+	}
+	
 	public static void applyRewriteToICU(ASTRewrite rewrite, ICompilationUnit icu) throws MalformedTreeException, BadLocationException, JavaModelException{
 		ICompilationUnit workingCopy = icu.getWorkingCopy(null);
 		TextEdit edit = rewrite.rewriteAST();
 		workingCopy.applyTextEdit(edit, null);
 		workingCopy.commitWorkingCopy(false, null);
 		workingCopy.discardWorkingCopy();	
+		
 	}
 	
 	public static void applyRewriteToNode(ASTRewrite rewrite, ASTNode node) throws MalformedTreeException, BadLocationException, JavaModelException{
-		CompilationUnit cu = (CompilationUnit)node.getRoot();
+		CompilationUnit cu = (CompilationUnit) node.getRoot();
 		IJavaElement icu = cu.getJavaElement();
 		applyRewriteToICU(rewrite,(ICompilationUnit)icu);
+		
 	}
 
 	

@@ -19,7 +19,7 @@ Using the optional [damp.ekeko.visualizer](https://github.com/cderoove/damp.ekek
 
 See [Installing New Software](http://help.eclipse.org/juno/topic/org.eclipse.platform.doc.user/tasks/tasks-124.htm) for help on installing Eclipse plugins from an update site. 
 
-Ekeko has been tested against [Eclipse Kepler (4.3)](http://www.eclipse.org)
+Ekeko has been tested against [Eclipse Luna (4.4)](http://www.eclipse.org)
 
 Alternatively, the plugin can also be built from the [damp.ekeko.plugin](https://github.com/cderoove/damp.ekeko/tree/master/damp.ekeko.plugin) project in this repository. Its current build status is:
 

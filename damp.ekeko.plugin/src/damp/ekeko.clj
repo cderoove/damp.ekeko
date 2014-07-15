@@ -6,7 +6,7 @@
   (:use clojure.core.logic)
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.soot soot])
-  (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
+  (:use [damp.ekeko.jdt ast structure aststructure soot convenience rewrites])
   (:use [damp.qwal])
   (:require [damp.ekeko.inspector inspector])
   (:require [damp.ekeko.util [text :as text]])
@@ -226,6 +226,35 @@
                       (= "JHotDraw51" (.getName (.getProject project-model))))
                     (all-project-models)))]
     (ekeko* [?cu] (ast :CompilationUnit ?cu)))
+  
+  
+  
+  ;Ad-hoc program transformation using Ekeko
+    
+  (doseq 
+    [[subject &rest]
+     (ekeko [?subject ?inv ?name] 
+            (ast :MethodInvocation ?inv) 
+            (has :name ?inv ?name)
+            (name|simple-string ?name "setAge")
+            (child :arguments ?inv ?subject)
+            (ast|expression-type|primitive ?subject "int"))]
+    (let [newnode
+          (newast :ClassInstanceCreation
+                  :arguments 
+                  (list subject)
+                  :type
+                  (newast :SimpleType 
+                          :name 
+                          (newast :SimpleName
+                                  :identifier 
+                                  "Integer")))]
+      (replace-node subject newnode)))
+  
+  (println current-rewrites)
+  (apply-and-reset-rewrites)
+
+  
   
   
   

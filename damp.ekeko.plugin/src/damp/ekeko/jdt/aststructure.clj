@@ -43,7 +43,8 @@
 
 (defn
   ast|expression-type 
-  "Relation between an Expression ?ast and its declared IType ?type."
+  "Relation between an Expression ?ast and its declared IType ?type.
+   Fails for primitive-valued expressions."
   ([?key ?ast ?type]
     (l/fresh [?tbinding]
       (astbindings/ast|expression-binding|type ?key ?ast ?tbinding)
@@ -51,6 +52,22 @@
   ([?ast ?type]
     (l/fresh [?key]
              (ast|expression-type ?key ?ast ?type))))
+
+
+(defn
+  ast|expression-type|primitive
+  "Relation or primitive-valued Expression ?ast and a string ?typestring
+   corresponding to the keyword for their primitive type (e.g., int)."
+  ([?ast ?typestring]
+    (l/fresh [?key]
+             (ast|expression-type|primitive ?key ?ast ?typestring)))
+  ([?key ?ast ?typestring]
+     (l/fresh [?tbinding]
+              (astbindings/ast|expression-binding|type ?key ?ast ?tbinding)
+              (bindings/is-typebinding-primitive? ?tbinding)
+              (bindings/typebinding-simplename ?tbinding ?typestring))))
+
+
             
 (defn
    ast|importdeclaration-package

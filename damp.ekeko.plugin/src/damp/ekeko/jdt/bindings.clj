@@ -44,6 +44,10 @@
   "Non-relational. Unifies ?ijavaelement with the IJavaElement
    corresponding to the IBinding ?ibinding, if there is one.
    Not intended for use by end-users.
+ 
+
+  Among others, fails for ITypeBindings for primitive types. 
+
 
   See also:
   Binary predicate element-binding/2" 

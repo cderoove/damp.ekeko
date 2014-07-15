@@ -1,7 +1,6 @@
-# CSMR WCRE Demo 
+# CSMR WCRE 2014 Tool Demo 
 
-Please see the documentation at the top of the [csmrwcre2014.clj](https://github.com/cderoove/damp.ekeko/blob/master/EkekoDemo/src/damp/ekeko/demo/csmrwcre2014.clj
-) file. 
+Please see the documentation at the top of the [csmrwcre2014.clj](https://github.com/cderoove/damp.ekeko/blob/master/damp.ekeko.demo.plugin/src/damp/ekeko/demo/csmrwcre2014.clj) file. 
 
 
 # damp.ekeko.EkekoDemo

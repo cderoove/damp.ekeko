@@ -220,7 +220,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 	
 	
-	public static int JLS = AST.JLS4;
+	public static int JLS = AST.JLS8;
 		
 	public static CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
 		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
@@ -555,8 +555,11 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 		ITypeBinding type = t;
 		//get to the absolute base of the array
-		while(type.isArray())
-			type = type.getComponentType();
+		//while(type.isArray())
+		//	type = type.getComponentType();
+		if(type.isArray())
+			type = type.getElementType();
+	
 		//get rid of anything generic
 		type = type.getErasure();
 		String s;

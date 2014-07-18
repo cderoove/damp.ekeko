@@ -79,7 +79,7 @@
 
 (def 
   node-classes
-  (let [lasttypeint 84]
+  (let [lasttypeint 92]
     (for [i (range 1 (inc lasttypeint))]
       (ASTNode/nodeClassForType i))))
 

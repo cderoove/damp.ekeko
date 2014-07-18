@@ -187,8 +187,8 @@
 (defn index-of-distance
   "Return the 'distance' of x from s,
    or nil if irrelevant." [^String x ^String s]
-  (let [i (.indexOf x s)]
-    (when (not= -1 i) i)))
+  (when x (let [i (.indexOf x s)]
+            (when (not= -1 i) i))))
 
 (defn compose-comparators
   "Create a comparator made of comparators. When called for x & y, 

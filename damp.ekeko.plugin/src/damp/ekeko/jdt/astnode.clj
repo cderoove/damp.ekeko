@@ -170,8 +170,12 @@
 
 ;.-notation works on literals, not on variables holding a java.lang.class instance
 ;can be used as: (damp.ekeko.ast/nodeclass-property-descriptors (class cu)) where cu is a cu node
-(defn nodeclass-property-descriptors [^Class cls]
-  (clojure.lang.Reflector/invokeStaticMethod cls "propertyDescriptors" (to-array [JavaProjectModel/JLS])))
+(defn 
+  nodeclass-property-descriptors 
+  ([^Class cls jls]
+    (clojure.lang.Reflector/invokeStaticMethod cls "propertyDescriptors" (to-array [jls])))
+  ([^Class cls]
+    (nodeclass-property-descriptors cls JavaProjectModel/JLS)))
 
 (def 
   property-descriptors-per-node-class

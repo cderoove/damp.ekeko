@@ -31,7 +31,6 @@
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>false</useUIThread>
 					<argLine>-Xms128m -Xmx2048m ${os-jvm-flags}</argLine>
-                    <showEclipseLog>true</showEclipseLog>
 					<product>org.eclipse.sdk.ide</product>
 					<application>org.eclipse.ui.ide.workbench</application>
 

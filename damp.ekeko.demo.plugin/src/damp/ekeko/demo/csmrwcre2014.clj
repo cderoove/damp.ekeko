@@ -117,7 +117,7 @@
         anno-type-copy (copy-astnode anno-type)
         new-node (create-parameterized-type type-copy)]
     (change-property-node fielddecl :type new-node)
-    (add-node-cu (.getRoot fielddecl) new-node :typeArguments anno-type-copy 0)
+    (add-node (current-rewrite-for-cu (.getRoot fielddecl)) new-node :typeArguments anno-type-copy 0)
     (apply-and-reset-rewrites)
     (reset-and-delete-marker marker)))
 
@@ -252,8 +252,8 @@
    ;;functions for marking solutions in query
    (def
      marked-fields 
-     (map (comp add-annotation-problem-marker first) 
-          (ekeko [?ast] (field-declaration|incorrect ?ast))))
+     (doall (map (comp add-annotation-problem-marker first) 
+                 (ekeko [?ast] (field-declaration|incorrect ?ast)))))
    
    ;;open editor on ReturnStatement
    ;;execute quick fix
@@ -280,7 +280,7 @@
           annotype-copy (copy-astnode annotype)
           new-type (create-parameterized-type fieldtype-copy)]
       (change-property-node field :type new-type)
-      (add-node-cu (.getRoot field) new-type :typeArguments annotype-copy 0)))
+      (add-node (current-rewrite-for-cu (.getRoot field)) new-type :typeArguments annotype-copy 0)))
  
   ;;have scheduled changes
   ;;stil need to apply them

@@ -201,7 +201,7 @@
   ([ast astnode]
     (ASTNode/copySubtree ast astnode))
   ([astnode]
-    (copy-astnode (.getAST astnode))))
+    (copy-astnode (.getAST astnode) astnode)))
 
 (defn 
   create-parameterized-type [type]

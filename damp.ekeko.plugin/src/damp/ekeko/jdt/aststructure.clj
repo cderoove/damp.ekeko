@@ -123,9 +123,8 @@
            (l/conde
              [(l/== ?vardec ?dec)]
              [(ast/has :name ?vardec ?dec)]
-             [(ast/ast :VariableDeclarationFragment ?vardec) ;excludes SingleVariableDeclaration, only ok for VariableDeclaraitonFragment
+             [(ast/ast :VariableDeclarationFragment ?vardec) ;excludes SingleVariableDeclaration, only ok for VariableDeclarationFragment
               (ast/ast-parent ?vardec ?dec)])))
-  
 
 (defn 
   typedeclaration-type

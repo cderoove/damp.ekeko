@@ -6,10 +6,12 @@
   (:import 
     [damp.ekeko JavaProjectModel EkekoModel]
     [org.eclipse.core.resources IProject]
-    [org.eclipse.jdt.core JavaCore IJavaProject IPackageFragmentRoot IPackageFragment ICompilationUnit IMember IJavaElement IType ITypeHierarchy]
+    [org.eclipse.jdt.core JavaCore IJavaProject IPackageFragmentRoot IPackageFragment ICompilationUnit IMember IMethod IJavaElement IType ITypeHierarchy]
     [org.eclipse.jdt.core.dom ASTNode CompilationUnit IBinding TypeDeclaration MethodDeclaration IMethodBinding 
      AnonymousClassDeclaration MethodInvocation SuperMethodInvocation ClassInstanceCreation ConstructorInvocation
-     SuperConstructorInvocation]))
+     SuperConstructorInvocation ITypeBinding]
+    [org.eclipse.jdt.internal.corext.callhierarchy CallHierarchy]
+    ))
 
 
 ;; Ekeko Java Projects
@@ -134,7 +136,15 @@
   [^IType it]
   (when-let [icu (.getCompilationUnit it)] ;nil if itype came not from source
     (icu-declaration-for-key icu (.getKey it)))) 
-  
+
+(defn 
+  imethod-to-declaration 
+  "Returns the ASTNode that declares the given IMethod."
+  [^IMethod it]
+  (when-let [icu (.getCompilationUnit it)] ;nil if imethod came not from source
+    (icu-declaration-for-key icu (.getKey it)))) 
+
+
   
 (defn 
   binding-to-declaration
@@ -172,24 +182,42 @@
 ; JDT Call Graph
 ; --------------
 
+         
 (defn method-overriders
 ;  (memoize 
 ;    (fn  
-      [m] 
+      [^MethodDeclaration m] 
       ;^MethodDeclaration no type argument here because includes org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration
       ;when IMethodBinding.isAnnotationMember returns true (TODO: check this out)
-      (let [mbinding (.resolveBinding m)]
+      (let [mname (.getIdentifier (.getName m))
+            params (.parameters m)
+            paramcount (count params)]
         (mapcat
           ;(apply concat (pmap
           (fn [itype] 
             (if-let [subclass (itype-to-declaration itype)]
               (filter 
                 (fn [d] 
-                  (println 
-                    (.getName (.getParent m))
-                    (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding))
+                  
+                  ;unfortunately, there is a bug in IMethodBinding.overrides(IMethodBinding)
+                  ;cannot use that instead
+                  
+                  ;todo: include return type check and visibility check
                   (and (instance? MethodDeclaration d)
-                       (.overrides ^IMethodBinding (.resolveBinding ^MethodDeclaration d)  mbinding)))
+                       (not (.isConstructor ^MethodDeclaration d))
+                       (= mname (.getIdentifier (.getName ^MethodDeclaration d)))
+                       (let [ps (.parameters d)
+                             pcount (count ps)]
+                         (and (= paramcount pcount)
+                              (loop [superps params
+                                     subps ps]
+                                (or 
+                                  (empty? superps)
+                                  (when-let [^ITypeBinding t1 (-> (first superps) .getType .resolveBinding)]
+                                    (when-let [^ITypeBinding t2 (-> (first subps) .getType .resolveBinding)]
+                                      (and (.isEqualTo (.getErasure t1) (.getErasure t2))
+                                           (recur (rest superps)
+                                                  (rest subps)))))))))))
                 (if
                   (instance? AnonymousClassDeclaration subclass)
                   (.bodyDeclarations ^AnonymousClassDeclaration subclass)

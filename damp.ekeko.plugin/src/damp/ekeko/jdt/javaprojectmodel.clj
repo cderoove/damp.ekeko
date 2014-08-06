@@ -236,7 +236,10 @@
 (defn targets-of-invocation [i]
   (if-let [mb (.resolveMethodBinding i)]
     (if-let [static-target (binding-to-declaration mb)]
-      (conj  (method-overriders static-target) static-target)
+      (if 
+        (instance? MethodDeclaration static-target)
+        (conj  (method-overriders static-target) static-target)
+        [static-target]) ;AnnotationTypeMemberDeclaration
       [])
     []))
 

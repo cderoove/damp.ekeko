@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="libs/guava-11.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/inspector-jay-0.2.5.jar"/>
@@ -19,5 +18,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.8.jar" sourcepath="libs/core.logic-0.8.8-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/guava-18.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

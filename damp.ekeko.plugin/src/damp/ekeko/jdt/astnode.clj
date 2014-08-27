@@ -349,6 +349,16 @@
            
 
 
+;todo: should this not have been defined before?
+(defn 
+  node-poperty-value|reified
+  [node property]
+  ((get 
+     (reifiers node)
+     (ekeko-keyword-for-property-descriptor property))
+    node))
+
+
 ; Bindings
 ; --------
 

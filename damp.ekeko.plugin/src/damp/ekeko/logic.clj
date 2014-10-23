@@ -153,7 +153,10 @@
                                     (== true (.hasNext ^Iterator ?i))
                                     (iterator-element ?i ?e))))))
 
-(def contains contains|iteratorbased)
+(defn contains [?c ?e]
+  "Relation between a collection and one of its elements e.
+   ?c must be bound to a collection."
+  (contains|iteratorbased ?c ?e))
 
 (defmacro
   v+ 

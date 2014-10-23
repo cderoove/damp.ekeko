@@ -1,5 +1,9 @@
 package baristaui.views.queryResult;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -44,7 +48,14 @@ public class SOULLabelProvider extends LabelProvider {
 		}
 		if (object instanceof CompilationUnit) {
 			CompilationUnit cu = (CompilationUnit) object;
-			return cu.getJavaElement().getElementName();
+			IJavaElement el = cu.getJavaElement();
+			if(el != null){
+				return el.getElementName();
+			} else {
+				List types = cu.types();
+				String typeStr = prettyPrint(types.get(0));
+				return "CompilationUnit " + cu.getPackage().getName().getFullyQualifiedName() + "." + typeStr;
+			}
 		}
 		if (object instanceof AbstractTypeDeclaration) {
 			AbstractTypeDeclaration typeDec = (AbstractTypeDeclaration) object;

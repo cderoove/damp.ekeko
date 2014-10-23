@@ -177,6 +177,9 @@
     (el/equals ?n (.getElementName ^IType ?t))))
 
 
+
+;;geeft unresolved types terug, andere zijn wel resolved
+;;zullen niet unificeren!
 (defn-
   auxfor-type-name|qualified|string 
   [n]
@@ -199,15 +202,9 @@
      (el/succeeds (instance? IType ?t))
      (el/equals ?n (.getFullyQualifiedName ^IType ?t))]
     [(el/v- ?t)
-     (l/conda [(el/v- ?n) 
-             (type ?t)
-             (type-name|qualified|string ?t ?n)]
-             [(el/v+ ?n)
-              (l/fresh [?types]
-                     (el/equals ?types (auxfor-type-name|qualified|string  ?n))
-                     (el/contains ?types ?t)
-                     (l/!= nil ?t))])]))
-
+     (type ?t)
+     (type-name|qualified|string ?t ?n)]))
+     
          
 (defn
   type-initializer

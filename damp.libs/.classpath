@@ -23,5 +23,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/damp.libs/libs/guava-18.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/jmetal4.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

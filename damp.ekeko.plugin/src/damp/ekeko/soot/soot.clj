@@ -490,8 +490,18 @@
          (soot :method ?callee) ;application methods only
          ))
 
-
           
+(defn
+  soot|method-soot|method|called+
+  [?m ?callee]
+  (l/fresh [?model ?scene ?callees]
+           (soot-model-scene ?model ?scene)
+           (soot :method ?m)
+           (el/equals ?callees (.allDynamicMethodCalleesCached ^SootProjectModel ?model ?m))
+           (el/contains ?callees ?callee)
+           (soot :method ?callee) ;application methods only
+           ))
+
           
 ;declaratively, same as above
 (defn 

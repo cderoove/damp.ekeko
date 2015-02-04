@@ -2,8 +2,12 @@ package damp.ekeko.soot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
@@ -23,6 +27,8 @@ import soot.jimple.toolkits.callgraph.Edge;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterators;
 
 import damp.ekeko.EkekoPlugin;
@@ -31,9 +37,12 @@ import damp.ekeko.ProjectModel;
 
 public class SootProjectModel extends ProjectModel {
 	
+	private static final int MAX_CACHE_SIZE = 10000;
 	private boolean stale = false;
 	private Scene scene;
 	private IJavaProject javaProject;
+		
+	private Cache<SootMethod, Iterable<SootMethod>> allDynamicMethodCalleesCache;
 	
 	public static final String DEFAULT_SOOTARGS = "-src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true " +
 			"-p cg.spark cs-demand:true -p jap.npc";
@@ -55,6 +64,7 @@ public class SootProjectModel extends ProjectModel {
 	public void clean() {
 		super.clean();
 		stale = false;
+		allDynamicMethodCalleesCache = CacheBuilder.newBuilder().maximumSize(MAX_CACHE_SIZE).build();
 	}
 
 	public void populate(IProgressMonitor monitor) throws CoreException {
@@ -87,6 +97,8 @@ public class SootProjectModel extends ProjectModel {
 		String[] args =  sootMainArguments();
 		EkekoPlugin.getConsoleStream().println("Starting Soot with arguments: " + Arrays.toString(args));
 		EkekoSootMain.main(args);
+		EkekoPlugin.getConsoleStream().println("Completed Soot analyses.");
+
 	}
 	
 	private String[] sootMainArguments() {
@@ -178,6 +190,35 @@ public class SootProjectModel extends ProjectModel {
 			}
 		});
 	}
+	
+	
+	public Iterable<SootMethod> allDynamicMethodCallees(SootMethod m) {
+		Set<SootMethod> callees = new HashSet<>();
+		LinkedList<SootMethod> worklist = new LinkedList<>();
+		worklist.add(m);
+		while(!worklist.isEmpty()) {
+			SootMethod method = worklist.removeFirst();
+			Iterator<SootMethod> dynamicMethodCalleesIt = this.dynamicMethodCallees(method);
+			while(dynamicMethodCalleesIt.hasNext()) {
+				SootMethod callee = dynamicMethodCalleesIt.next();
+				if(!callees.contains(callee)) {
+					callees.add(callee);
+					worklist.add(callee);
+				}
+			}
+		}
+		return callees;
+	}
+	
+	public Iterable<SootMethod> allDynamicMethodCalleesCached(final SootMethod m) throws Exception {
+		return allDynamicMethodCalleesCache.get(m, new Callable<Iterable<SootMethod>>() {
+			@Override
+			public Iterable<SootMethod> call() throws Exception {
+				return allDynamicMethodCallees(m);
+			}
+		});
+	}
+	
 	
 	public Iterator<SootMethod> dynamicUnitCallees(Unit u) {
 		CallGraph graph = getScene().getCallGraph();

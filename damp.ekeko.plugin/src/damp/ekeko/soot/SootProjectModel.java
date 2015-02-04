@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
+import org.eclipse.swt.widgets.Display;
 
 import soot.Scene;
 import soot.SootMethod;
@@ -41,6 +42,8 @@ public class SootProjectModel extends ProjectModel {
 	private boolean stale = false;
 	private Scene scene;
 	private IJavaProject javaProject;
+	
+	private String classpath = ""; 
 		
 	private Cache<SootMethod, Iterable<SootMethod>> allDynamicMethodCalleesCache;
 	
@@ -118,9 +121,12 @@ public class SootProjectModel extends ProjectModel {
 //				+ " " 
 //				+ entryPoint();
 		
+		
+		
+		
 		ArrayList<String> result = new ArrayList<String>();
 		result.add("-soot-classpath");
-		result.add(classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE());
+		result.add(classPathArgument());
 		result.addAll(sootArgs());
 		result.add("on");
 		result.add("-main-class");
@@ -128,6 +134,16 @@ public class SootProjectModel extends ProjectModel {
 		result.add(entryPoint());
 		
 		return result.toArray(new String[result.size()]);
+	}
+
+	private String classPathArgument() {
+		//ugly, but I'm getting JavaRuntime crashes otherwise
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				classpath = classPathForBaseProgram() + getClassPathSeparator() + classPathForJavaRTE();
+			}
+		});
+		return classpath;
 	}
 
 	private String entryPoint() {

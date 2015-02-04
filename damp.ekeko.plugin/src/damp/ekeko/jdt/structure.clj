@@ -427,6 +427,7 @@
   [?itype ?supers]
   (l/fresh [?hierarchy]
          (itype-supertypehierarchy ?itype ?hierarchy)
+         (l/!= nil ?hierarchy)
          (el/equals ?supers (.getAllSupertypes ^ITypeHierarchy ?hierarchy ?itype))))
 
 (defn-

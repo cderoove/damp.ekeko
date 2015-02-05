@@ -2,8 +2,11 @@
   (:require [damp.util [interop :as interop]])
   (:import 
     [java.lang Class]
+    [java.util List]
+    [java.io Writer] 
     [java.lang.reflect Field]
     [damp.ekeko JavaProjectModel]
+    [org.eclipse.jdt.core ICompilationUnit]
     [org.eclipse.jdt.core.dom ASTNode 
                               ASTNode$NodeList 
                               CompilationUnit 
@@ -17,7 +20,24 @@
                               Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
                               DoStatement SynchronizedStatement TryStatement WhileStatement
                               MethodDeclaration]
-                              ))
+                              )
+  (:import
+    [org.eclipse.jdt.core JavaCore]
+    [org.eclipse.jdt.core.dom 
+     AST
+     Expression Statement BodyDeclaration CompilationUnit ImportDeclaration
+     Modifier
+     Modifier$ModifierKeyword
+     PrimitiveType
+     PrimitiveType$Code  
+     InfixExpression$Operator
+     InfixExpression
+     PrefixExpression$Operator
+     PostfixExpression$Operator
+     PostfixExpression
+     PrefixExpression
+     Assignment$Operator
+     Assignment]))
 
 (set! *warn-on-reflection* true)
 
@@ -395,6 +415,348 @@
 
 
 
+;; Identifiers for values from projects and their persistence
+;; ---------------------------------------------------------
+
+;see also damp.ekeko.snippets.persistence!
+
+
+;;(De)serializing of JDT objects
+
+(def 
+  ast-for-newlycreatednodes
+  (AST/newAST JavaProjectModel/JLS))
+
+(defn
+  newnode 
+  "Creates a new ASTNode in the given AST (or in one that is shared by all Ekeko instances)."
+  ([ekekokeyword]
+    (newnode ast-for-newlycreatednodes ekekokeyword))
+  ([ast ekekokeyword]
+    (let [nodeclass
+          (class-for-ekeko-keyword ekekokeyword)]
+      (.createInstance ^AST ast ^java.lang.Class nodeclass))))
+    
+(defn
+  set-property!
+  "Assigns property of ASTNode a given value."
+  [^ASTNode node ^StructuralPropertyDescriptor propertydescriptor value]
+  (.setStructuralProperty node propertydescriptor value))
+  
+(defn
+  newnode-propertyvalues
+  "Creates a new AST node with the given property values."
+  [nodekeyword propertyvalues]
+  (let [node (newnode nodekeyword)]
+    (doseq [[property value] propertyvalues]
+      (if
+        (property-descriptor-list? property)
+        (let [lst
+              (node-property-value node property)]
+          (.addAll ^List lst value))
+        (set-property! node property value)))
+    node))
+
+
+
+(defn
+  class-propertydescriptor-with-id
+  "Returns property descriptor for given identifier and keyword of owner class."
+  [ownerclasskeyword pdid]         
+  (let [clazz
+        (class-for-ekeko-keyword ownerclasskeyword)
+        found 
+        (some (fn [pd]
+                (when (= pdid
+                         (property-descriptor-id pd))
+                  pd))
+              
+              (clojure.set/union
+                (set (nodeclass-property-descriptors clazz AST/JLS4)) ;for older persisted ones
+                (set (nodeclass-property-descriptors clazz))))]
+    (if
+      (nil? found)
+      (throw (Exception. (str "When deserializing, could not find property descriptor: " ownerclasskeyword pdid)))
+      found)))
+
+
+;;duplicates ASTNode on given writer
+(defmethod 
+  clojure.core/print-dup 
+  ASTNode
+  [node w]
+  (let [nodeclass
+        (class node)
+        nodeclasskeyword
+        (ekeko-keyword-for-class nodeclass)]
+    (let [propertyvalues
+          (for [property (node-property-descriptors node)]
+            (let [value (node-property-value node property)]
+              [property
+               (if
+                 (property-descriptor-list? property)
+                 (into [] value)
+                 value)]))]
+      (.write ^Writer w (str "#="
+                             `(newnode-propertyvalues ~nodeclasskeyword ~propertyvalues))))))
+
+;;duplicates StructuralPropertyDescriptor on given writer
+(defmethod
+  clojure.core/print-dup 
+  StructuralPropertyDescriptor
+  [pd w]
+  (let [id 
+        (property-descriptor-id pd)
+        ownerclass
+        (property-descriptor-owner-node-class pd)
+        ownerclass-keyword
+        (ekeko-keyword-for-class ownerclass)
+        ]
+    (.write ^Writer w (str  "#=" `(class-propertydescriptor-with-id ~ownerclass-keyword ~id)))))
+
+
+;;duplicates annoying non-ASTNode subtypes among JDT values
+(defn
+  modifierkeyword-for-flagvalue
+  [flagvalue]
+  (Modifier$ModifierKeyword/fromFlagValue flagvalue))
+
+
+(defmethod 
+  clojure.core/print-dup 
+  Modifier$ModifierKeyword
+  [node w]
+  (let [flagvlue (.toFlagValue ^Modifier$ModifierKeyword node)]
+    (.write ^Writer w (str  "#=" `(modifierkeyword-for-flagvalue ~flagvlue)))))
+
+
+(defn
+  primitivetypecode-for-string
+  [codestr]
+  (PrimitiveType/toCode codestr))
+
+(defmethod 
+  clojure.core/print-dup 
+  PrimitiveType$Code  
+  [node w]
+  (let [codestr (.toString ^PrimitiveType$Code node)]
+    (.write ^Writer w (str  "#=" `(primitivetypecode-for-string ~codestr)))))
+
+(defn
+  infixexpressionoperator-for-string
+  [opstr]
+  (InfixExpression$Operator/toOperator opstr))
+
+
+(defmethod 
+  clojure.core/print-dup 
+  InfixExpression$Operator
+  [node w]
+  (let [codestr (.toString ^InfixExpression$Operator node)]
+    (.write ^Writer w (str  "#=" `(infixexpressionoperator-for-string ~codestr)))))
+
+(defn
+  assignmentoperator-for-string
+  [opstring]
+  (Assignment$Operator/toOperator opstring))
+
+(defmethod 
+  clojure.core/print-dup 
+  Assignment$Operator
+  [node w]
+  (let [codestr (.toString ^Assignment$Operator node)]
+    (.write ^Writer w (str  "#=" `(assignmentoperator-for-string ~codestr)))))
+
+
+(defn
+  prefixexpressionoperator-for-string
+  [opstring]
+  (PrefixExpression$Operator/toOperator opstring))
+
+(defmethod 
+  clojure.core/print-dup 
+  PrefixExpression$Operator
+  [node w]
+  (let [codestr (.toString ^PrefixExpression$Operator node)]
+    (.write ^Writer w (str  "#=" `(prefixexpressionoperator-for-string ~codestr)))))
+
+
+(defn
+  postfixexpressionoperator-for-string
+  [opstring]
+  (PostfixExpression$Operator/toOperator opstring))
+
+(defmethod 
+  clojure.core/print-dup 
+  PostfixExpression$Operator
+  [node w]
+  (let [codestr (.toString ^PostfixExpression$Operator node)]
+    (.write ^Writer w (str  "#=" `(postfixexpressionoperator-for-string ~codestr)))))
+
+
+
+
+;; Unique identifiers for JDT objects in a particular project (won't survice project renames though)
+
+
+(defrecord
+  ProjectRootIdentifier [icuhandle])
+
+(defn
+  make-root-identifier|project
+  [icuhandlestr]
+  (ProjectRootIdentifier. icuhandlestr))
+
+(defmethod 
+  clojure.core/print-dup 
+  ProjectRootIdentifier
+  [identifier w]
+  (.write ^Writer w (str  "#=" `(make-root-identifier|project))))
+
+(defn
+  root-identifier|project
+  [^CompilationUnit cu]
+  (when-let [icu (.getJavaElement cu)]
+    (let [handlestr (.getHandleIdentifier icu)]
+      handlestr)))
+
+(defrecord
+  RelativePropertyValueIdentifier
+  [ownerid
+   property])
+
+(defn
+  make-property-value-identifier
+  [ownerid property]
+  (RelativePropertyValueIdentifier. ownerid property))
+
+(defmethod 
+  clojure.core/print-dup 
+  RelativePropertyValueIdentifier
+  [identifier w]
+  (let [ownerid (:ownerid identifier)
+        property (:property identifier)]
+  (.write ^Writer w (str  "#=" `(make-property-value-identifier ~ownerid ~property)))))
+
+
+(defrecord
+  RelativeListElementIdentifier
+  [listid
+   index
+   ])
+
+(defn
+  make-list-element-identifier
+  [listid index]
+  (RelativeListElementIdentifier. listid index))
+
+(defmethod 
+  clojure.core/print-dup 
+  RelativeListElementIdentifier
+  [identifier w]
+  (let [listid (:listid identifier)
+        index (:index identifier)]
+  (.write ^Writer w (str  "#=" `(make-list-element-identifier ~listid ~index)))))
+
+
+(defn
+  jdt-parse-icu 
+  "Parses the given ICompilationUnit into a CompilationUnit ASTNode.
+   Note that the node will differ from the ones being queried by Ekeko."
+  [^ICompilationUnit icu]
+  (JavaProjectModel/parse icu nil))
+
+(defprotocol 
+  IIdentifiesProjectValue
+  (corresponding-project-value [identifier]
+    "Returns the JDT value corresponding to the given unique identifier (produced before by project-value-indentifier),
+     if it still exists.  Assumes the source project has not been renamed in the mean time."))
+
+(extend-protocol IIdentifiesProjectValue
+  ProjectRootIdentifier
+  (corresponding-project-value [id]
+    (let [^String handle (:icuhandle id)]
+      (if-let [icu (JavaCore/create handle)]
+        (jdt-parse-icu icu) ;these ASTs are different from those queried by Ekeko
+        (throw (Exception. (str "While looking for value in project, could not find its file using handle: " handle))))))
+  RelativePropertyValueIdentifier
+  (corresponding-project-value [id]
+    (let [ownerid (:ownerid id)
+          property (:property id)
+          owner (corresponding-project-value ownerid)]
+        (node-poperty-value|reified owner property)))
+  RelativeListElementIdentifier
+  (corresponding-project-value [id]
+    (let [listid (:listid id)
+          idx (:index id)
+          lst (corresponding-project-value listid)
+          lst-raw (value-unwrapped lst)]
+        (.get ^List lst-raw idx))))
+
+
+
+(defn
+  project-value-identifier
+  "Returns a unique identifier for the given JDT value in the project it originates from."
+  [value]
+  (let [owner (owner value) ;owner of list = node, owner of list element = node (never list)
+        property (owner-property value)]
+    (cond 
+      ;root
+      (instance? org.eclipse.jdt.core.dom.CompilationUnit value)
+      (make-root-identifier|project (root-identifier|project value))
+    
+      ;lists (keep before next clause, do not merge with before-last clause)
+      (lstvalue? value)
+      (make-property-value-identifier 
+        (project-value-identifier owner)
+        property)
+    
+      ;list members
+      (property-descriptor-list? property)
+      (let [lst 
+            (node-poperty-value|reified owner property)
+            lst-raw (value-unwrapped lst)]
+        (make-list-element-identifier 
+          (project-value-identifier lst)
+          (.indexOf ^List lst-raw value)))
+    
+      ;non-list members
+      (or 
+        (ast? value)
+        (nilvalue? value)
+        (primitivevalue? value))
+      (make-property-value-identifier
+        (project-value-identifier owner)
+        property)
+    
+      :else
+      (throw (Exception. (str "Unknown project value to create identifier for:" value))))))
+
+(defn
+  project-tuple-identifier
+  "Returns a seq of identifiers for the given seq of JDT values."
+  [tuple]
+  (map project-value-identifier tuple))
+
+
+(defn
+  astnode-as-persistent-string
+  "Serializes given JDT value to a string."
+  [node]
+  (binding [*print-dup* true]
+    (pr-str node)))
+
+(defn
+  astnode-from-persistent-string
+  "Deserializes  given JDT value from a string."
+  [string]
+  (binding [*read-eval* true]
+    (read-string string)))
+
+
+
+
 ;; Misc
 ;; ----
 
@@ -410,6 +772,42 @@
     (not (lstvalue? snippet-val))
     (when-let [ownerproperty (owner-property snippet-val)]
       (property-descriptor-list? ownerproperty))))
+
+
+
+(comment
+
+  ;;Example uses of project-value-identifier and corresponding-project-value
+  
+  (def m (first (first (damp.ekeko/ekeko [?m] (damp.ekeko.jdt.ast/ast :MethodDeclaration ?m)))))
+  (def mid (project-value-identifier m))
+  (def equivalenttom (corresponding-project-value mid))
+  (= (str m) (str equivalenttom))
+    
+  
+  (reduce (fn [sofar t] 
+             (let [exp (first t)
+                   expid (project-value-identifier exp)
+                   equivalent (corresponding-project-value expid)]
+               (and sofar (= (str exp) (str equivalent)))))
+           (damp.ekeko/ekeko [?e ?key] (damp.ekeko.jdt.ast/ast ?key ?e)))
+  
+  
+  
+  (def serialized
+    (binding [*print-dup* true]
+      (pr-str m)))
+  
+  (def 
+    deserialized
+    (binding [*read-eval* true] 
+      (read-string serialized)))
+  
+
+
+  
+  
+  )
 
 
 

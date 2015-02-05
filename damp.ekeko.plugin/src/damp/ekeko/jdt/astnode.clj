@@ -262,9 +262,6 @@
     (value? value)
     (:value value)))
 
-
-
-
 (def 
   node-ekeko-properties-for-class
   (memoize
@@ -611,7 +608,8 @@
   clojure.core/print-dup 
   ProjectRootIdentifier
   [identifier w]
-  (.write ^Writer w (str  "#=" `(make-root-identifier|project))))
+  (let [icuhandle (:icuhandle identifier)]
+    (.write ^Writer w (str  "#=" `(make-root-identifier|project ~icuhandle)))))
 
 (defn
   root-identifier|project
@@ -705,7 +703,11 @@
       ;root
       (instance? org.eclipse.jdt.core.dom.CompilationUnit value)
       (make-root-identifier|project (root-identifier|project value))
-    
+      
+      (nil? owner) ;not originating from a JDT project
+      nil
+        
+          
       ;lists (keep before next clause, do not merge with before-last clause)
       (lstvalue? value)
       (make-property-value-identifier 

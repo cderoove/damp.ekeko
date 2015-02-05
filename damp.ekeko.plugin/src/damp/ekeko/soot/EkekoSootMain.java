@@ -30,10 +30,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Iterator;
 
+import damp.ekeko.EkekoPlugin;
 import soot.CompilationDeathException;
 import soot.G;
 import soot.Main;
@@ -167,13 +169,18 @@ public class EkekoSootMain {
 
         start = new Date();
 
+        G.v().out = new PrintStream(EkekoPlugin.getConsoleStream());
+
+
         try {
             Timers.v().totalTimer.start();
 
             processCmdLine(cmdLineArgs);
             
             autoSetOptions();
-
+            
+            
+            
             G.v().out.println("Soot started on " + start);
 
             Scene.v().loadNecessaryClasses();

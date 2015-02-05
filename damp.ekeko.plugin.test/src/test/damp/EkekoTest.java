@@ -41,6 +41,13 @@ public class EkekoTest {
 	}
 		
 	
+	@Test 
+	public void testEkekoJDTPersistence() {
+		EkekoTestHelper.testClojureNamespace(myBundle,"test.damp.ekeko.persistence");
+	}
+		
+
+	
 	
 
 

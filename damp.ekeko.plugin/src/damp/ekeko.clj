@@ -224,7 +224,7 @@
             (atom 
               (filter (fn [project-model] 
                       (= "JHotDraw51" (.getName (.getProject project-model))))
-                    (all-project-models)))]
+                    (damp.ekeko.ekekomodel/all-project-models)))]
     (ekeko* [?cu] (ast :CompilationUnit ?cu)))
   
   

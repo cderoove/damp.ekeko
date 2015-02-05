@@ -67,6 +67,12 @@
   [node]
   (instance? Expression node))
 
+
+(defn
+  block?
+  [node]
+  (instance? Block node))
+
 (defn
   statement?
   [node]

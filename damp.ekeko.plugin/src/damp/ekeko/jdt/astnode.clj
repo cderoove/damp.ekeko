@@ -420,15 +420,15 @@
 
 ;;(De)serializing of JDT objects
 
-(def 
-  ast-for-newlycreatednodes
+(def ^:dynamic
+  *ast-for-newlycreatednodes*
   (AST/newAST JavaProjectModel/JLS))
 
 (defn
   newnode 
   "Creates a new ASTNode in the given AST (or in one that is shared by all Ekeko instances)."
   ([ekekokeyword]
-    (newnode ast-for-newlycreatednodes ekekokeyword))
+    (newnode *ast-for-newlycreatednodes* ekekokeyword))
   ([ast ekekokeyword]
     (let [nodeclass
           (class-for-ekeko-keyword ekekokeyword)]

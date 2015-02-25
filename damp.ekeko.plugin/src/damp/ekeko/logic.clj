@@ -13,8 +13,12 @@
 (defn- 
   ekeko-lvar-sym?
   [s]
-  (= (first (str s)) \?))
+  (and (symbol? s)  
+       (= (first (str s)) \?)))
 
+
+;todo: figure out how to properly recognize core.logic variables from an se-expression
+;perhaps by doing it at run-time rather than at read-time
 (defn
   ekeko-extract-vars
   [p]

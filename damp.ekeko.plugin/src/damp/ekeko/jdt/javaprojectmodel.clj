@@ -10,7 +10,6 @@
     [org.eclipse.jdt.core.dom ASTNode CompilationUnit IBinding TypeDeclaration MethodDeclaration IMethodBinding 
      AnonymousClassDeclaration MethodInvocation SuperMethodInvocation ClassInstanceCreation ConstructorInvocation
      SuperConstructorInvocation ITypeBinding]
-    [org.eclipse.jdt.internal.corext.callhierarchy CallHierarchy]
     ))
 
 

@@ -167,10 +167,11 @@
   "Relation between a MethodInvocation ?i and one of the possible MethodDeclarations ?m it may call."
   [?i ?m]
   (l/fresh [?targets]
-    (ast/ast :MethodInvocation ?i)
-    (el/equals ?targets (javaprojectmodel/invocation-targets ?i))
-    (el/contains ?targets ?m)
-    (ast/ast :MethodDeclaration ?m)))
+           (l/conde [(ast/ast :MethodInvocation ?i)]
+                    [(ast/ast :SuperMethodInvocation ?i)])
+           (el/equals ?targets (javaprojectmodel/invocation-targets ?i))
+           (el/contains ?targets ?m)
+           (ast/ast :MethodDeclaration ?m)))
 
 (defn 
   typedeclaration-name|qualified|string

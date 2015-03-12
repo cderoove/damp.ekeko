@@ -67,8 +67,6 @@
               (bindings/is-typebinding-primitive? ?tbinding)
               (bindings/typebinding-simplename ?tbinding ?typestring))))
 
-
-            
 (defn
    ast|importdeclaration-package
    "Relation between an import declaration ASTNode ?import 
@@ -173,6 +171,20 @@
            (el/contains ?targets ?m)
            (ast/ast :MethodDeclaration ?m)))
 
+(defn
+  constructorinvocation-constructordeclaration
+  "Relation between a ClassInstanceCreation, ConstructorInvocation or SuperConstructorInvocation and the constructor declaration they invoke."
+  [?i ?m]
+  (l/fresh [?targets]
+           (l/conde [(ast/ast :ClassInstanceCreation ?i)]
+                    [(ast/ast :ConstructorInvocation ?i)]
+                    [(ast/ast :SuperConstructorInvocation ?i)])
+           (el/equals ?targets (javaprojectmodel/invocation-targets ?i))
+           (el/contains ?targets ?m)
+           (ast/ast :MethodDeclaration ?m)
+           (el/succeeds (.isConstructor ?m))))
+           
+  
 (defn 
   typedeclaration-name|qualified|string
   "Relation between a TypeDeclaration AST  and its qualified name as a string."

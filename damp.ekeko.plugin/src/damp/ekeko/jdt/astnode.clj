@@ -247,13 +247,14 @@
 ;=> false;
 ;but:
 ;(= ((:modifiers (node-ekeko-properties node))) ((:modifiers (node-ekeko-properties node))))
-
-
-(defn
+;;;;;; ==> unless you need to do hashmap lookups
+  
+(def
   make-value
-  [owner property value]
-  {:type :Value
-   :owner owner :property property :value value})
+  (memoize
+    (fn [owner property value]
+      {:type :Value
+       :owner owner :property property :value value})))
 
 (defn
   value-unwrapped

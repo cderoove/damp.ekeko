@@ -28,34 +28,70 @@
   (ws/workspace-wait-for-builds-to-finish)
   (f))
     
+;(defn
+;  against-project
+;  [p enable-soot? f]
+;  (try
+;    (println "Enabling Ekeko nature on project: " p)
+;    (ws/workspace-project-enable-ekeko! p)
+;    (ws/workspace-wait-for-builds-to-finish)
+;    (when 
+;      enable-soot?
+;      (do
+;        (println "Enabling Soot nature on project: " p)
+;        (spm/enable-soot-nature! p)))
+;    (f)
+;    (finally
+;      (println "Disabling Ekeko nature for project: " p)
+;      (when 
+;        enable-soot?
+;        (do
+;          (println "Disabling Soot nature for project: " p)
+;          (spm/disable-soot-nature! p)))
+;      (ws/workspace-project-disable-ekeko! p))))
+
 (defn
-  against-project
-  [p enable-soot? f]
+  against-projects
+  [projects enable-soot? f]
   (try
-    (println "Enabling Ekeko nature on project: " p)
-    (ws/workspace-project-enable-ekeko! p)
-    (ws/workspace-wait-for-builds-to-finish)
-    (when 
-      enable-soot?
-      (do
-        (println "Enabling Soot nature on project: " p)
-        (spm/enable-soot-nature! p)))
-    (f)
-    (finally
-      (println "Disabling Ekeko nature for project: " p)
+    (doseq [p projects]
+      (println "Enabling Ekeko nature on project: " p)
+      (ws/workspace-project-enable-ekeko! p)
+      (ws/workspace-wait-for-builds-to-finish)
       (when 
         enable-soot?
         (do
-          (println "Disabling Soot nature for project: " p)
-          (spm/disable-soot-nature! p)))
-      (ws/workspace-project-disable-ekeko! p))))
+          (println "Enabling Soot nature on project: " p)
+          (spm/enable-soot-nature! p))))
+    (f)
+    (finally
+      (doseq [p projects]
+        (println "Disabling Ekeko nature for project: " p)
+        (when 
+          enable-soot?
+          (do
+            (println "Disabling Soot nature for project: " p)
+            (spm/disable-soot-nature! p)))
+        (ws/workspace-project-disable-ekeko! p)))))
+
+(defn
+  against-project
+  [p enable-soot? f]
+  (against-projects [p] enable-soot? f))
+
+(defn
+  against-projects-named
+  [names enable-soot? f]
+  (println "Testings against projects named " (apply str (interpose ", " names)) ": " f)
+  (against-projects 
+    (map (fn [n] (ws/workspace-project-named n)) names)
+    enable-soot? f))
 
 (defn
   against-project-named
   [n enable-soot? f]
   (println "Testing against project named " n ": " f)
   (against-project (ws/workspace-project-named n) enable-soot? f))
-
 
 ;; Query results
 

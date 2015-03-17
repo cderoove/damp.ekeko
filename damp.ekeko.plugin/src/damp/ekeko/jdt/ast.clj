@@ -245,7 +245,7 @@
   [?val ?raw]
   (l/all
     (value ?val)
-    (el/equals ?raw (:value ?val))))
+    (el/equals ?raw (astnode/value-unwrapped ?val))))
           
 (defn
   ast-parent

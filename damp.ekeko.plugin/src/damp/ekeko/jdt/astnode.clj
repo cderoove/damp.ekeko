@@ -43,44 +43,6 @@
 
 
 
-; Helper Predicates
-; -----------------
-
-(defn 
-  ast?
-  [x]
-  (instance? ASTNode x))
-
-(defn
-  value?
-  [x]
-  (and 
-    (map? x)
-    (= :Value (:type x))))
-
-(defn
-  lstvalue?
-  [x]
-  (and
-    (value? x)
-    (instance? java.util.List (:value x))))
-  
-(defn
-  nilvalue?
-  [x]
-  (and
-    (value? x)
-    (nil? (:value x))))
-
-(defn
-  primitivevalue?
-  [x]
-  (and
-    (value? x)
-    (not (instance? java.util.List (:value x)))
-    (not (nil? (:value x)))))
-
-
   
 (defn
   expression?
@@ -238,31 +200,86 @@
 ;; Ekeko-specific properties
 ;; -------------------------
 
-;TODO: switch to record as soon as core.logic no longer reifies records as maps
-;(defrecord PropertyValueWrapper [owner property value])
+
+(defn 
+  ast?
+  [x]
+  (instance? ASTNode x))
 
 
-;NOTE: not necessary to memoize:
-;(identical? ((:modifiers (node-ekeko-properties node))) ((:modifiers (node-ekeko-properties node))))
-;=> false;
-;but:
-;(= ((:modifiers (node-ekeko-properties node))) ((:modifiers (node-ekeko-properties node))))
-;;;;;; ==> unless you need to do hashmap lookups
-  
-(def
+(defn-
+  valuekind
+  [property]
+  (cond
+    (property-descriptor-list? property) 
+    :list
+    (property-descriptor-simple? property)
+    :primitive))
+
+(defn
   make-value
-  (memoize
-    (fn [owner property value]
-      {:type :Value
-       :owner owner :property property :value value})))
+  [owner property]
+  [(valuekind property) owner property])
 
+(defn
+  make-value|nil
+  [owner property] 
+  [:nil owner property])
+
+  
+(defn
+  value?
+  [x]
+  (vector? x))
+
+
+(defn-
+  valuekind?
+  [valuekeyword value]
+  (= valuekeyword (nth value 0))) 
+
+
+(defn
+  value-property
+  [x]
+  (nth x 2))
+
+(defn
+  value-owner
+  [x]
+  (nth x 1))
+
+
+(defn
+  lstvalue?
+  [x]
+  (and 
+    (value? x)
+    (valuekind? :list x)))
+  
+(defn
+  nilvalue?
+  [x]
+  (and
+    (value? x)
+    (valuekind? :nil x)))
+
+(defn
+  primitivevalue?
+  [x]
+  (and
+    (value? x)
+    ;  (not (instance? java.util.List (:value x)))
+    ;  (not (nil? (:value x)))))
+    (valuekind? :primitive x)))
+  
 (defn
   value-unwrapped
   [value]
-  (when
-    (value? value)
-    (:value value)))
-
+  (if-let [[valuekind owner property] value]
+    (node-property-value owner property) ;;not the reified variant since we need the most primitive one
+    ))      
+              
 (def 
   node-ekeko-properties-for-class
   (memoize
@@ -272,13 +289,18 @@
                        (keyword (property-descriptor-id p)))
                      descriptors)
                 (map (fn [^StructuralPropertyDescriptor p]
-                       (fn [n] 
-                         (let [value (node-property-value n p)]
-                           (if 
-                             (ast? value)
-                             value
-                             (make-value n p value)))))
-                     descriptors))))))
+                       (if 
+                         (property-descriptor-child? p)
+                         (fn [n]
+                           (let [value (node-property-value n p)]
+                             (if 
+                               (ast? value)
+                               value
+                               (make-value|nil n p))))
+                         (fn [n]
+                           (make-value n p))))
+                     descriptors)
+                )))))
 
 (defn
   node-ekeko-properties
@@ -294,8 +316,8 @@
   ASTNode 
   (owner [this] (.getParent ^ASTNode this))
   ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
-  clojure.lang.IPersistentMap
-  (owner [this] (:owner this)))
+  clojure.lang.PersistentVector
+  (owner [this] (value-owner this)))
 
 (defprotocol 
   IValueOfProperty
@@ -307,8 +329,8 @@
   ASTNode 
   (owner-property [this] (.getLocationInParent ^ASTNode this))
   ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
-  clojure.lang.IPersistentMap
-  (owner-property [this] (:property this)))
+  clojure.lang.PersistentVector
+  (owner-property [this] (value-property this)))
 
 (defprotocol 
   IAST
@@ -362,7 +384,7 @@
             (first worklist)
             values  
             (cond (ast? current) (node-propertyvalues current)
-                  (lstvalue? current) (:value current)
+                  (lstvalue? current) (value-unwrapped current)
                   :default [])]
         (recur (concat offspring values)
                (concat (rest worklist) 
@@ -374,13 +396,22 @@
 
 
 ;todo: should this not have been defined before?
+
 (defn 
-  node-poperty-value|reified
-  [node property]
+  node-propertykeyword-value|reified
+  [node propertykeyword]
   ((get 
      (reifiers node)
-     (ekeko-keyword-for-property-descriptor property))
+     propertykeyword)
     node))
+
+(defn 
+  node-property-value|reified
+  [node property]
+  (node-propertykeyword-value|reified
+    node
+    (ekeko-keyword-for-property-descriptor property)))
+    
 
 
 ; Bindings
@@ -683,7 +714,7 @@
     (let [ownerid (:ownerid id)
           property (:property id)
           owner (corresponding-project-value ownerid)]
-        (node-poperty-value|reified owner property)))
+        (node-property-value|reified owner property)))
   RelativeListElementIdentifier
   (corresponding-project-value [id]
     (let [listid (:listid id)
@@ -718,7 +749,7 @@
       ;list members
       (property-descriptor-list? property)
       (let [lst 
-            (node-poperty-value|reified owner property)
+            (node-property-value|reified owner property)
             lst-raw (value-unwrapped lst)]
         (make-list-element-identifier 
           (project-value-identifier lst)

@@ -807,11 +807,11 @@
 (defn
   valuelistmember? 
   "Checks whether value is a member of a list."
-  [snippet-val]
+  [val]
   (and 
-    (not (nil? snippet-val))
-    (not (lstvalue? snippet-val))
-    (when-let [ownerproperty (owner-property snippet-val)]
+    (not (nil? val))
+    (not (lstvalue? val))
+    (when-let [ownerproperty (owner-property val)]
       (property-descriptor-list? ownerproperty))))
 
 

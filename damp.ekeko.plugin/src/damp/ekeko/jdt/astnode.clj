@@ -629,7 +629,10 @@
 
 
 (defrecord
-  ProjectRootIdentifier [icuhandle])
+  ProjectRootIdentifier [icuhandle]
+  clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  (-uninitialized [_]
+    (ProjectRootIdentifier. nil)))
 
 (defn
   make-root-identifier|project
@@ -653,7 +656,10 @@
 (defrecord
   RelativePropertyValueIdentifier
   [ownerid
-   property])
+   property]
+  clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  (-uninitialized [_]
+    (RelativePropertyValueIdentifier. nil nil)))
 
 (defn
   make-property-value-identifier
@@ -673,7 +679,11 @@
   RelativeListElementIdentifier
   [listid
    index
-   ])
+   ]
+   clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  (-uninitialized [_]
+    (RelativeListElementIdentifier. 
+      nil nil)))
 
 (defn
   make-list-element-identifier

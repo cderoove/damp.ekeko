@@ -395,15 +395,15 @@
            
 
 
-;todo: should this not have been defined before?
 
 (defn 
   node-propertykeyword-value|reified
   [node propertykeyword]
-  ((get 
-     (reifiers node)
-     propertykeyword)
-    node))
+  (if-let
+    [reifier (get 
+               (reifiers node)
+               propertykeyword)]
+    (reifier node)))
 
 (defn 
   node-property-value|reified
@@ -655,8 +655,7 @@
 
 (defrecord
   RelativePropertyValueIdentifier
-  [ownerid
-   property]
+  [ownerid property]
   clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
   (-uninitialized [_]
     (RelativePropertyValueIdentifier. nil nil)))
@@ -677,10 +676,8 @@
 
 (defrecord
   RelativeListElementIdentifier
-  [listid
-   index
-   ]
-   clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  [listid index]
+  clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
   (-uninitialized [_]
     (RelativeListElementIdentifier. 
       nil nil)))

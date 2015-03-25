@@ -719,16 +719,15 @@
   RelativePropertyValueIdentifier
   (corresponding-project-value [id]
     (let [ownerid (:ownerid id)
-          property (:property id)
-          owner (corresponding-project-value ownerid)]
-        (node-property-value|reified owner property)))
+          property (:property id)]
+      (if-let [owner (corresponding-project-value ownerid)]
+        (node-property-value|reified owner property))))
   RelativeListElementIdentifier
   (corresponding-project-value [id]
     (let [listid (:listid id)
-          idx (:index id)
-          lst (corresponding-project-value listid)
-          lst-raw (value-unwrapped lst)]
-        (.get ^List lst-raw idx))))
+          idx (:index id)]
+      (if-let [lst (corresponding-project-value listid)]
+        (.get ^List (value-unwrapped lst) idx)))))
 
 
 

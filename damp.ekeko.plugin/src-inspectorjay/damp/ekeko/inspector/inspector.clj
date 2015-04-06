@@ -10,7 +10,7 @@
   (:use [damp.ekeko.jdt ast structure aststructure soot convenience])
   (:use [damp.qwal])
   (:use [inspector-jay.core])
-  (:use [inspector-jay.gui.gui])
+  (:require [inspector-jay.gui.gui :as jay-gui])
   (:require [damp.ekeko.util [text :as text]])
   (:require [damp.ekeko [gui :as gui]]))
 
@@ -24,7 +24,8 @@
         uniqueid (str @inspector-view-cnt)
         viewpart (.showView page viewid uniqueid (org.eclipse.ui.IWorkbenchPage/VIEW_ACTIVATE))]
     (swap! inspector-view-cnt inc)
-    (-> viewpart (.setJPanel (inspector-panel results)))
+    (-> viewpart (.setJPanel (apply jay-gui/inspector-panel results 
+                                    (mapcat identity (vec jay-gui/default-options)))))
     viewpart))
 
 (defn

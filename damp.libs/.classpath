@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/inspector-jay-0.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/inspector-jay-0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="doclibs/codox.core-0.6.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="doclibs/hiccup-1.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="doclibs/java.classpath-0.1.1.jar"/>

@@ -1,26 +1,27 @@
 (ns damp.ekeko.jdt.astnode
   (:require [damp.util [interop :as interop]])
+  (:require [damp.ekeko [logic :as el]]) 
   (:import 
-    [java.lang Class]
-    [java.util List]
-    [java.io Writer] 
-    [java.lang.reflect Field]
-    [damp.ekeko JavaProjectModel]
-    [org.eclipse.jdt.core ICompilationUnit]
-    [org.eclipse.jdt.core.dom ASTNode 
-                              ASTNode$NodeList 
-                              CompilationUnit 
-                              StructuralPropertyDescriptor ChildPropertyDescriptor ChildListPropertyDescriptor SimplePropertyDescriptor
-                              Statement
-                              Expression
-                              Name
-                              QualifiedName
-                              Annotation
-                              IBinding
-                              Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
-                              DoStatement SynchronizedStatement TryStatement WhileStatement
-                              MethodDeclaration]
-                              )
+     [java.lang Class]
+     [java.util List]
+     [java.io Writer] 
+     [java.lang.reflect Field]
+     [damp.ekeko JavaProjectModel]
+     [org.eclipse.jdt.core ICompilationUnit]
+     [org.eclipse.jdt.core.dom ASTNode 
+                               ASTNode$NodeList 
+                               CompilationUnit 
+                               StructuralPropertyDescriptor ChildPropertyDescriptor ChildListPropertyDescriptor SimplePropertyDescriptor
+                               Statement
+                               Expression
+                               Name
+                               QualifiedName
+                               Annotation
+                               IBinding
+                               Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
+                               DoStatement SynchronizedStatement TryStatement WhileStatement
+                               MethodDeclaration]
+                               )
   (:import
     [org.eclipse.jdt.core JavaCore]
     [org.eclipse.jdt.core.dom 
@@ -172,33 +173,51 @@
       (zipmap node-classes
               (map (fn [c] (nodeclass-property-descriptors c))
                    node-classes)))))
-
-(def 
-  owner-properties-per-node-class
-  (let [allproperties (apply concat (vals (property-descriptors-per-node-class)))
-        ownerperclass (atom {})]
-    (doseq [p allproperties] ;not simpelvalue
-      ; (when (not (property-descriptor-simple? p))
-      (swap! ownerperclass (fn [oldmap]
-                             (merge-with concat
-                                         ;concat is to be used when a value already exists for a key
-                                         oldmap
-                                         {((cond
-                                             (property-descriptor-simple? p) property-descriptor-value-class
-                                             (property-descriptor-child? p) property-descriptor-child-node-class
-                                             (property-descriptor-list? p) property-descriptor-element-node-class)
-                                            p) ;key
-                                          [
-                                           ;[(ekeko-keyword-for-property-descriptor p)
-                                           ; (ekeko-keyword-for-class (property-descriptor-owner-node-class p))]
-                                           p
-                                           ] ;value to be concatenated
-                                          }))))
-    @ownerperclass))
   
 
 ;; Ekeko-specific properties
 ;; -------------------------
+
+
+(defrecord
+  EkekoPrimitiveValueWrapper
+  [owner property]
+  clojure.core.logic.protocols/IUninitialized 
+  (-uninitialized [_]
+    (EkekoPrimitiveValueWrapper. nil nil)))
+
+(defrecord
+  EkekoAbsentValueWrapper
+  [owner property]
+  clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  (-uninitialized [_]
+    (EkekoAbsentValueWrapper. nil nil)))
+
+(defrecord
+  EkekoListValueWrapper
+  [owner property]
+  clojure.core.logic.protocols/IUninitialized ;otherwise cannot be bound to logic var
+  (-uninitialized [_]
+    (EkekoListValueWrapper. nil nil)))
+
+
+
+(defn
+  make-value|lst
+  [owner property]
+  (EkekoListValueWrapper. owner property))
+
+(defn
+  make-value|primitive
+  [owner property]
+  (EkekoPrimitiveValueWrapper. owner property))
+
+(defn
+  make-value|nil
+  [owner property] 
+  (EkekoAbsentValueWrapper. owner property))
+
+
 
 
 (defn 
@@ -206,80 +225,63 @@
   [x]
   (instance? ASTNode x))
 
-
-(defn-
-  valuekind
-  [property]
-  (cond
-    (property-descriptor-list? property) 
-    :list
-    (property-descriptor-simple? property)
-    :primitive))
-
-(defn
-  make-value
-  [owner property]
-  [(valuekind property) owner property])
-
-(defn
-  make-value|nil
-  [owner property] 
-  [:nil owner property])
-
-  
 (defn
   value?
   [x]
-  (vector? x))
-
-
-(defn-
-  valuekind?
-  [valuekeyword value]
-  (= valuekeyword (nth value 0))) 
-
-
-(defn
-  value-property
-  [x]
-  (nth x 2))
-
-(defn
-  value-owner
-  [x]
-  (nth x 1))
-
+  (or
+    (instance? EkekoPrimitiveValueWrapper x)
+    (instance? EkekoListValueWrapper x)
+    (instance? EkekoAbsentValueWrapper x)))
 
 (defn
   lstvalue?
   [x]
-  (and 
-    (value? x)
-    (valuekind? :list x)))
-  
+  (instance? EkekoListValueWrapper x))
+ 
 (defn
   nilvalue?
   [x]
-  (and
-    (value? x)
-    (valuekind? :nil x)))
+  (instance? EkekoAbsentValueWrapper x))
 
 (defn
   primitivevalue?
   [x]
-  (and
-    (value? x)
-    ;  (not (instance? java.util.List (:value x)))
-    ;  (not (nil? (:value x)))))
-    (valuekind? :primitive x)))
-  
+  (instance? EkekoPrimitiveValueWrapper x))
+
+
 (defn
   value-unwrapped
-  [value]
-  (if-let [[valuekind owner property] value]
-    (node-property-value owner property) ;;not the reified variant since we need the most primitive one
-    ))      
-              
+  [v]
+  (node-property-value (:owner v)
+                       (:property v)))
+
+(defprotocol
+  IHasOwner
+  (owner [v])
+  (owner-property [v]))
+
+(extend-protocol
+  IHasOwner
+  ASTNode 
+  (owner [this] (.getParent ^ASTNode this))
+  (owner-property [this] (.getLocationInParent ^ASTNode this))
+  EkekoListValueWrapper
+  (owner [this] (:owner this))
+  (owner-property [this] (:property this))
+  EkekoAbsentValueWrapper
+  (owner [this] (:owner this))
+  (owner-property [this] (:property this))
+  EkekoPrimitiveValueWrapper
+  (owner [this] (:owner this))
+  (owner-property [this] (:property this)))
+
+  
+(extend-protocol
+  el/ISupportContains
+  EkekoListValueWrapper
+  (iterator [v]
+    (.iterator ^java.util.List (value-unwrapped v))))
+
 (def 
   node-ekeko-properties-for-class
   (memoize
@@ -289,7 +291,7 @@
                        (keyword (property-descriptor-id p)))
                      descriptors)
                 (map (fn [^StructuralPropertyDescriptor p]
-                       (if 
+                       (cond
                          (property-descriptor-child? p)
                          (fn [n]
                            (let [value (node-property-value n p)]
@@ -297,8 +299,12 @@
                                (ast? value)
                                value
                                (make-value|nil n p))))
+                         (property-descriptor-list? p)
                          (fn [n]
-                           (make-value n p))))
+                           (make-value|lst n p))
+                         :default
+                         (fn [n]
+                          (make-value|primitive n p))))
                      descriptors)
                 )))))
 
@@ -306,31 +312,8 @@
   node-ekeko-properties
   [node]
   (node-ekeko-properties-for-class (class node)))
-
-(defprotocol 
-  IHasOwner
-  (owner [n-or-wrapper]))
           
-(extend-protocol
-  IHasOwner
-  ASTNode 
-  (owner [this] (.getParent ^ASTNode this))
-  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
-  clojure.lang.PersistentVector
-  (owner [this] (value-owner this)))
 
-(defprotocol 
-  IValueOfProperty
-  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps  
-  (owner-property [n-or-wrapper]))
-
-(extend-protocol
-  IValueOfProperty
-  ASTNode 
-  (owner-property [this] (.getLocationInParent ^ASTNode this))
-  ;PropertyValueWrapper ;TODO: switch to record as soon as core.logic no longer reifies records as maps
-  clojure.lang.PersistentVector
-  (owner-property [this] (value-property this)))
 
 (defprotocol 
   IAST

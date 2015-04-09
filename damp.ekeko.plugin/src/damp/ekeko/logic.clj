@@ -114,22 +114,40 @@
   `(equals-without-exception true ~exp))
 
 
-;(defmacro 
-;  is-false? 
-;  [exp]
-;  `(== false ~exp))
+(defprotocol 
+  ISupportContains
+  (iterator [ekeko-nonnode-wrapper]))
+
+(extend-protocol
+  ISupportContains
+  java.lang.Iterable
+  (iterator [s]
+    (.iterator s)))
+
+(defn- 
+  arrayclass-of 
+  [t]
+  (.getClass (java.lang.reflect.Array/newInstance t 0)))
+
+;relied upon by Ekeko for AspectJ/Soot?
+(extend-protocol
+  ISupportContains
+  (arrayclass-of Object)
+  (iterator [array]
+    ;seq on array converts it into an iterable
+    (if-let [asseq (seq array)]
+      (.iterator ^Iterable asseq)
+      ;seq on empty collection (e.g., empty jdt java array) produces nil
+      (proxy [java.util.Iterator] []
+        (hasNext [i] 
+          false)
+        (next [i]
+          (throw (java.util.NoSuchElementException. )))
+        (remove [i]
+          (throw (java.lang.UnsupportedOperationException.)))))))
 
 
-
-(defn
-  contains|memberbased
-  "Relation between a collection (seq c) and one of its elements e."
-  [?c ?e]
-  (fresh [?s]
-    (equals ?s (seq ?c))
-    (membero ?e ?s)))
-   
-
+  
 ;^java.lang.Iterator
 ;for efficiency, assumes i is still a valid iterator
 (defn-
@@ -140,22 +158,17 @@
                   [(== true (.hasNext  ^Iterator i))
                    (iterator-element i e)])))
   
-             
 (defn
   contains|iteratorbased
   "Same as contains|memberbased/2, but uses iterators to obtain the elements of c.
    It is therefore not implemented in terms of membero/2."
   [?c ?e]
-  (fresh [?i ?asseq]  
+  (fresh [?i]
          (project [?c]
-                  (== ?asseq (seq ?c)) ;seq on array converts it into an iterable
-                  (!= nil ?asseq)
-                  (project [?asseq]
-                            ;seq on empty collection (e.g., empty jdt java array) produces nil
-                            (== ?i (.iterator ^Iterable ?asseq))
-                           (project [?i]
-                                    (== true (.hasNext ^Iterator ?i))
-                                    (iterator-element ?i ?e))))))
+                  (== ?i (iterator ?c)) ;?c has to implement ISupportContains protocol
+                  (project [?i]
+                           (== true (.hasNext ^Iterator ?i))
+                           (iterator-element ?i ?e)))))
 
 (defn contains [?c ?e]
   "Relation between a collection and one of its elements e.
@@ -202,6 +215,12 @@
   (all
     (succeeds (samesets ?col1 ?col2))))
     
+
+
+
+
+
+
   
 
 (comment

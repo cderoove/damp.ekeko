@@ -249,11 +249,15 @@
   (instance? EkekoPrimitiveValueWrapper x))
 
 
-(defn
-  value-unwrapped
-  [v]
-  (node-property-value (:owner v)
-                       (:property v)))
+(defprotocol
+  IHasProperties
+  (property-value [n p]))
+
+(extend-protocol
+  IHasProperties
+  ASTNode
+  (property-value [n p] 
+    (node-property-value n p)))
 
 (defprotocol
   IHasOwner
@@ -275,6 +279,11 @@
   (owner [this] (:owner this))
   (owner-property [this] (:property this)))
 
+(defn
+  value-unwrapped
+  [v]
+  (property-value (:owner v)
+                  (:property v)))
   
 (extend-protocol
   el/ISupportContains

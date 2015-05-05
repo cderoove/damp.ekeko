@@ -124,30 +124,42 @@
   (iterator [s]
     (.iterator s)))
 
-(defn- 
+(defn
   arrayclass-of 
   [t]
   (.getClass (java.lang.reflect.Array/newInstance t 0)))
 
-;relied upon by Ekeko for AspectJ/Soot?
-(extend-protocol
-  ISupportContains
-  (arrayclass-of Object)
-  (iterator [array]
-    ;seq on array converts it into an iterable
-    (if-let [asseq (seq array)]
-      (.iterator ^Iterable asseq)
-      ;seq on empty collection (e.g., empty jdt java array) produces nil
-      (proxy [java.util.Iterator] []
-        (hasNext [i] 
-          false)
-        (next [i]
-          (throw (java.util.NoSuchElementException. )))
-        (remove [i]
-          (throw (java.lang.UnsupportedOperationException.)))))))
 
+(def
+  emptyiterator
+;  (proxy [java.util.Iterator] []
+;           (hasNext [i] 
+;             false)
+;           (next [i]
+;             (throw (java.util.NoSuchElementException. )))
+;           (remove [i]
+;             (throw (java.lang.UnsupportedOperationException.)))))
+   (.iterator []))
 
-  
+(defmacro
+  extend-ISupportContains-to-arrays-of-class
+  [class]
+  `(extend-protocol
+     ISupportContains
+     (arrayclass-of ~class)
+     (iterator [array#]
+       ;seq on array converts it into an iterable
+       (if-let [asseq# (seq array#)]
+         (.iterator ^Iterable asseq#)
+         ;seq on empty collection (e.g., empty jdt java array) produces nil
+         emptyiterator))))
+
+(extend-ISupportContains-to-arrays-of-class java.lang.Object)
+(extend-ISupportContains-to-arrays-of-class java.lang.String)
+(extend-ISupportContains-to-arrays-of-class java.lang.Boolean)
+(extend-ISupportContains-to-arrays-of-class java.lang.Integer)
+(extend-ISupportContains-to-arrays-of-class java.lang.Byte)
+
 ;^java.lang.Iterator
 ;for efficiency, assumes i is still a valid iterator
 (defn-

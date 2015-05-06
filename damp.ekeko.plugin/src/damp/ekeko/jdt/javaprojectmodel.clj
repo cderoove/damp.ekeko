@@ -143,7 +143,6 @@
   (when-let [icu (.getCompilationUnit it)] ;nil if imethod came not from source
     (icu-declaration-for-key icu (.getKey it)))) 
 
-
   
 (defn 
   binding-to-declaration
@@ -223,6 +222,14 @@
                   (.getMethods ^TypeDeclaration subclass)))
               []))
           (type-declaration-subclasses-itypes (.getParent m)))))
+
+
+
+;(defn 
+;  method-overriders
+;  [^MethodDeclaration m] 
+;  (let [jpm (javaprojectmodel-for-astnode m)]
+;    (.computeOverridingMethods jpm m)))
 
    
 (defn targets-of-constructor-invocation [n]

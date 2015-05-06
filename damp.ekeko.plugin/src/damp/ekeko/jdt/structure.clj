@@ -13,10 +13,32 @@
   (:import 
     [org.eclipse.core.runtime IProgressMonitor]
     [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
-     IJavaProject WorkingCopyOwner IMethod]
+     IJavaProject WorkingCopyOwner IMethod IPackageFragmentRoot ITypeParameter IInitializer
+    IImportDeclaration IPackageDeclaration ILocalVariable IAnnotation]  
     [org.eclipse.jdt.core.dom TypeDeclaration Name FieldAccess SuperFieldAccess ClassInstanceCreation ConstructorInvocation SuperConstructorInvocation SuperMethodInvocation MethodInvocation QualifiedName  SimpleName Type CompilationUnit ASTNode ASTNode$NodeList ImportDeclaration Modifier IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
 
-  
+ 
+
+
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IJavaElement)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IType)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.ITypeParameter)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IInitializer)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IAnnotation)
+
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.ICompilationUnit)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IClassFile)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IPackageFragment)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IPackageFragmentRoot)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IJavaProject)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IMethod)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.ILocalVariable)
+
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IField)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IImportDeclaration)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IPackageDeclaration)
+
+
 ;; Java Model Reification
 ;; ----------------------
 

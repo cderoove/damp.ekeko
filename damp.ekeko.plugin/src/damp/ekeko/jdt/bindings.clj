@@ -10,7 +10,20 @@
   (:import 
     [damp.ekeko JavaProjectModel]
     [org.eclipse.jdt.core IJavaElement]
-    [org.eclipse.jdt.core.dom IBinding AST ASTParser SuperConstructorInvocation ConstructorInvocation ClassInstanceCreation SuperMethodInvocation MethodInvocation Expression ImportDeclaration Type TypeDeclaration QualifiedName SimpleName SuperFieldAccess FieldAccess IBinding IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
+    [org.eclipse.jdt.core.dom IBinding AST ASTParser SuperConstructorInvocation ConstructorInvocation ClassInstanceCreation SuperMethodInvocation
+     MethodInvocation Expression ImportDeclaration Type TypeDeclaration QualifiedName SimpleName SuperFieldAccess FieldAccess
+     IBinding IPackageBinding ITypeBinding IVariableBinding IMethodBinding IAnnotationBinding IMemberValuePairBinding]))
+
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.ITypeBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IAnnotationBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IPackageBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.ITypeBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IVariableBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IMethodBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IAnnotationBinding)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.dom.IMemberValuePairBinding)
+
 
 
 ;; Link between IBinding and Element (not to be used by end-users)

@@ -31,8 +31,6 @@
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>false</useUIThread>
 					<argLine>-Xms128m -Xmx2048m ${os-jvm-flags}</argLine>
-					<product>org.eclipse.sdk.ide</product>
-					<application>org.eclipse.ui.ide.workbench</application>
 
 
 					<configuration>
@@ -46,6 +44,10 @@
 							<version>${platform-version}</version>
 						</dependency>
 
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.sdk.feature.group</artifactId>
+						</dependency>
 
 						<dependency>
 							<type>eclipse-feature</type>

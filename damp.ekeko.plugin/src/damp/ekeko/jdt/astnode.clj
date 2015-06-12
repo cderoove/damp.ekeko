@@ -20,7 +20,8 @@
                                IBinding
                                Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
                                DoStatement SynchronizedStatement TryStatement WhileStatement
-                               MethodDeclaration]
+                               MethodDeclaration
+                               TypeDeclaration]
                                )
   (:import
     [org.eclipse.jdt.core JavaCore]
@@ -50,6 +51,10 @@
   [node]
   (instance? Expression node))
 
+(defn
+  typedeclaration?
+  [node]
+  (instance? TypeDeclaration node))
 
 (defn
   block?

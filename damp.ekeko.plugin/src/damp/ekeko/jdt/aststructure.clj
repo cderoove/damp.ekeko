@@ -158,9 +158,7 @@
            (l/conde [(ast/ast :MethodDeclaration ?member)]
                     [(ast/ast :FieldDeclaration ?member)])
            (el/equals ?members (javaprojectmodel/all-members ?typedeclaration))
-           (el/contains ?members ?member)
-           (el/succeeds (do (println ?member) true))
-           ))
+           (el/contains ?members ?member)))
 
 (defn
   methoddeclaration-methoddeclaration|overrides

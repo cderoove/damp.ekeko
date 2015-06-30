@@ -181,9 +181,9 @@
 ; --------------
 
          
-(defn method-overriders
-;  (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
-;    (fn  
+(def method-overriders
+  (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
+    (fn  
       [^MethodDeclaration m]
       ;^MethodDeclaration no type argument here because includes org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration
       ;when IMethodBinding.isAnnotationMember returns true (TODO: check this out)
@@ -221,7 +221,7 @@
                   (.bodyDeclarations ^AnonymousClassDeclaration subclass)
                   (.getMethods ^TypeDeclaration subclass)))
               []))
-          (type-declaration-subclasses-itypes (.getParent m)))))
+          (type-declaration-subclasses-itypes (.getParent m)))))))
 
 
 

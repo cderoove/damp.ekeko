@@ -14,13 +14,15 @@
                                StructuralPropertyDescriptor ChildPropertyDescriptor ChildListPropertyDescriptor SimplePropertyDescriptor
                                Statement
                                Expression
+                               ExpressionStatement
                                Name
                                QualifiedName
                                Annotation
                                IBinding
                                Block EnhancedForStatement ForStatement IfStatement LabeledStatement SwitchStatement
                                DoStatement SynchronizedStatement TryStatement WhileStatement
-                               MethodDeclaration]
+                               MethodDeclaration
+                               TypeDeclaration]
                                )
   (:import
     [org.eclipse.jdt.core JavaCore]
@@ -50,6 +52,20 @@
   [node]
   (instance? Expression node))
 
+(defn
+  expressionstmt?
+  [node]
+  (instance? ExpressionStatement node))
+
+(defn
+  typedeclaration?
+  [node]
+  (instance? TypeDeclaration node))
+
+(defn
+  methoddeclaration?
+  [node]
+  (instance? MethodDeclaration node))
 
 (defn
   block?
@@ -216,9 +232,6 @@
   make-value|nil
   [owner property] 
   (EkekoAbsentValueWrapper. owner property))
-
-
-
 
 (defn 
   ast?

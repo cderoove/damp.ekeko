@@ -181,10 +181,10 @@
 ; --------------
 
          
-(defn method-overriders
-;  (memoize 
-;    (fn  
-      [^MethodDeclaration m] 
+(def method-overriders
+  (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
+    (fn  
+      [^MethodDeclaration m]
       ;^MethodDeclaration no type argument here because includes org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration
       ;when IMethodBinding.isAnnotationMember returns true (TODO: check this out)
       (let [mname (.getIdentifier (.getName m))
@@ -195,7 +195,7 @@
           (fn [itype] 
             (if-let [subclass (itype-to-declaration itype)]
               (filter 
-                (fn [d] 
+                (fn [d]
                   
                   ;unfortunately, there is a bug in IMethodBinding.overrides(IMethodBinding)
                   ;cannot use that instead
@@ -221,7 +221,7 @@
                   (.bodyDeclarations ^AnonymousClassDeclaration subclass)
                   (.getMethods ^TypeDeclaration subclass)))
               []))
-          (type-declaration-subclasses-itypes (.getParent m)))))
+          (type-declaration-subclasses-itypes (.getParent m)))))))
 
 
 
@@ -231,6 +231,20 @@
 ;  (let [jpm (javaprojectmodel-for-astnode m)]
 ;    (.computeOverridingMethods jpm m)))
 
+(def all-members
+  ; Retrieve all members of a type, including inherited ones
+  (memoize ; TODO Clear this cache on project changes! 
+    (fn 
+      [^TypeDeclaration cls]
+      (let [h (type-declaration-type-hierarchy cls)
+            super-classes (.getAllSuperclasses h (.getType h))]
+        (concat
+          (.bodyDeclarations cls)
+          (mapcat
+           (fn [itype]
+             (if-let [super-cls (itype-to-declaration itype)]
+               (.bodyDeclarations super-cls)))
+           super-classes))))))
    
 (defn targets-of-constructor-invocation [n]
   (if-let [cb (.resolveConstructorBinding n)]

@@ -127,7 +127,6 @@
 (defn 
   typedeclaration-type
   "Relation between a TypeDeclaration ?ast and the IType ?type it refers to.
-
   See also:
   typedeclaration-binding|type/3 which resolves a type ASTNode to an ITypeBinding."
   [?ast ?type]
@@ -149,6 +148,17 @@
     (typedeclaration-type ?typedeclaration ?type)
     (structure/type-type|super+ ?type ?type|super)
     (typedeclaration-type ?supertypedeclaration ?type|super)))
+
+(defn
+  typedeclaration-member
+  "Relation between and a type declaration and one of its members (includes inherited members)"
+  [?typedeclaration ?member]
+  (l/fresh [?members]
+           (ast/ast :TypeDeclaration ?typedeclaration)
+           (l/conde [(ast/ast :MethodDeclaration ?member)]
+                    [(ast/ast :FieldDeclaration ?member)])
+           (el/equals ?members (javaprojectmodel/all-members ?typedeclaration))
+           (el/contains ?members ?member)))
 
 (defn
   methoddeclaration-methoddeclaration|overrides

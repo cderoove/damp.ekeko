@@ -660,7 +660,7 @@
 (defn- 
   make-soot-icfg-successors 
   "Returns a successor function for SOOT inter-procedural CFGs. 
-   Nodes are of the form {:unit aSootUnit :method aSootMethodForUnit :stack aVector}"
+   Nodes are of the form [ aSootUnit aSootMethodForUnit aVector]"
   []
   (let [;cache avoids multiple cfg instances per method
         method2graph

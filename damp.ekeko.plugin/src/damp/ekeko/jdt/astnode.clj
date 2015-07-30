@@ -799,6 +799,22 @@
   (binding [*read-eval* true]
     (read-string string)))
 
+(defn path-from-root
+  "Produces a list of property descriptors that lead from the root node to the given node"
+  ([root]
+    (path-from-root root []))
+  ([^ASTNode node path]
+    (let [parent (.getParent node)
+          lip (.getLocationInParent node)]
+      (if (nil? parent)
+        path
+        (recur parent (conj path lip))))))
+
+(defn node-from-path [^ASTNode node path]
+  "Find a node, given a starting node and a list of property descriptors"
+  (if (empty? path)
+    node
+    (recur (.getStructuralProperty node (first path)) (rest path))))
 
 
 

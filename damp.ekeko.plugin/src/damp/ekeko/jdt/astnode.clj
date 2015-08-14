@@ -297,7 +297,13 @@
   [v]
   (property-value (:owner v)
                   (:property v)))
-  
+
+(defn
+  root [node]
+  (if (ast? node)
+    (.getRoot ^ASTNode node)
+    (.getRoot ^ASTNode (owner node))))
+
 (extend-protocol
   el/ISupportContains
   EkekoListValueWrapper
@@ -531,8 +537,11 @@
                  (property-descriptor-list? property)
                  (into [] value)
                  value)]))]
+;      (.write ^Writer w (str "#="
+;                             `nil))
       (.write ^Writer w (str "#="
-                             `(newnode-propertyvalues ~nodeclasskeyword ~propertyvalues))))))
+                             `(newnode-propertyvalues ~nodeclasskeyword ~propertyvalues)))
+      )))
 
 ;;duplicates StructuralPropertyDescriptor on given writer
 (defmethod
@@ -698,7 +707,9 @@
   [identifier w]
   (let [listid (:listid identifier)
         index (:index identifier)]
-  (.write ^Writer w (str  "#=" `(make-list-element-identifier ~listid ~index)))))
+  (.write ^Writer w (str  "#=" `(make-list-element-identifier ~listid ~index)))
+;  (.write ^Writer w (str  "#=" `nil))
+  ))
 
 
 (defn
@@ -800,23 +811,50 @@
     (read-string string)))
 
 (defn path-from-root
-  "Produces a list of property descriptors that lead from the root node to the given node"
+  "Produces a list of [property descriptor , index] pairs that lead from the root node to the given node
+   The index is needed in case of list properties."
   ([root]
     (path-from-root root []))
   ([^ASTNode node path]
-    (let [parent (.getParent node)
-          lip (.getLocationInParent node)]
+    (let [^ASTNode parent (owner node)
+          lip (.getLocationInParent node)
+          index (if (instance? ChildListPropertyDescriptor lip)
+                  (.indexOf  ^java.util.AbstractList (.getStructuralProperty parent lip) node))]
       (if (nil? parent)
         path
-        (recur parent (conj path lip))))))
+        (recur parent (cons [lip index] path))))))
 
 (defn node-from-path [^ASTNode node path]
   "Find a node, given a starting node and a list of property descriptors"
   (if (empty? path)
     node
-    (recur (.getStructuralProperty node (first path)) (rest path))))
+    (recur 
+      (let [[prop index] (first path)
+            prop-val (.getStructuralProperty node prop)]
+        (if (instance? ChildListPropertyDescriptor prop)
+          (.get ^java.util.AbstractList prop-val index)
+          prop-val))
+      (rest path))))
 
 
+(defn minimize-node [^ASTNode node-orig]
+  "Makes a minimized copy of this node (i.e. in which all non-mandatory properties are cleared)
+   @see Operation.minimizeNode in ChangeNodes"
+  (let [node (ASTNode/copySubtree (.getAST node-orig) node-orig)]
+    (doseq [^StructuralPropertyDescriptor prop (.structuralPropertiesForType node)]
+      (cond 
+        (.isChildProperty prop)
+        (if (not (.isMandatory ^ChildPropertyDescriptor prop))
+          (.setStructuralProperty node prop nil)
+          (minimize-node (.getStructuralProperty node prop)))
+        
+        (.isSimpleProperty prop)
+        (if (not (.isMandatory ^SimplePropertyDescriptor prop))
+          (.setStructuralProperty node prop nil))
+        
+        (.isChildListProperty ^ChildListPropertyDescriptor prop)
+        (.clear ^List (.getStructuralProperty node prop))))
+    node))
 
 ;; Misc
 ;; ----

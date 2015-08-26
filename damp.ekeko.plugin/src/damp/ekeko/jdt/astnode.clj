@@ -493,7 +493,10 @@
         (property-descriptor-list? property)
         (let [lst
               (node-property-value node property)]
-          (.addAll ^List lst value))
+          (if 
+            (and (= nodekeyword :ArrayType) (= (property-descriptor-id property) "dimensions"))
+            (.addAll ^List lst (drop-last value))
+            (.addAll ^List lst value)))
         (set-property! node property value)))
     node))
 
@@ -502,7 +505,7 @@
 (defn
   class-propertydescriptor-with-id
   "Returns property descriptor for given identifier and keyword of owner class."
-  [ownerclasskeyword pdid]         
+  [ownerclasskeyword pdid]        
   (let [clazz
         (class-for-ekeko-keyword ownerclasskeyword)
         found 

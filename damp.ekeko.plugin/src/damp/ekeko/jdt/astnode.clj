@@ -493,10 +493,8 @@
         (property-descriptor-list? property)
         (let [lst
               (node-property-value node property)]
-          (if 
-            (and (= nodekeyword :ArrayType) (= (property-descriptor-id property) "dimensions"))
-            (.addAll ^List lst (drop-last value))
-            (.addAll ^List lst value)))
+          (.clear ^List lst)
+          (.addAll ^List lst value))
         (set-property! node property value)))
     node))
 

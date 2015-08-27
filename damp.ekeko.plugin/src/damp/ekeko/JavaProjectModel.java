@@ -1,9 +1,12 @@
 package damp.ekeko;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,11 +17,15 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -37,6 +44,7 @@ import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -46,11 +54,14 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.internal.corext.dom.Bindings;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import edu.cmu.cs.crystal.cfg.IControlFlowGraph;
 import edu.cmu.cs.crystal.cfg.eclipse.EclipseCFG;
@@ -101,6 +112,10 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 
 	
 	private ConcurrentHashMap<IType,ITypeHierarchy> itype2typehierarchy;
+
+	//private ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>> methodOverriders;
+
+	//private ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>> methodOverridden;
 	
 	public JavaProjectModel(IProject p) {
 		super(p);
@@ -194,13 +209,17 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	public ITypeHierarchy getTypeHierarchy(IType type) throws JavaModelException {
 		ITypeHierarchy typeHierarchy;
 		if (!itype2typehierarchy.containsKey(type)) {
-			typeHierarchy = type.newTypeHierarchy(null);
+			typeHierarchy = type.newTypeHierarchy(new NullProgressMonitor());
 			addTypeHierarchy(typeHierarchy);
 		}
 		else
 			typeHierarchy = itype2typehierarchy.get(type);
 		return typeHierarchy;
 	}
+	
+
+	
+	
 
 	//no longer called, but kept for the bug information
 	public CompilationUnit[] parse(ICompilationUnit[] icus, IProgressMonitor monitor) {
@@ -280,7 +299,11 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 
 		fieldAccessLikeNodes = java.util.Collections.newSetFromMap(new ConcurrentHashMap<ASTNode,Boolean>());
 		invocationLikeNodes = java.util.Collections.newSetFromMap(new ConcurrentHashMap<ASTNode,Boolean>());
-
+		
+		/*
+		methodOverriders = new ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>>();
+		methodOverridden = new ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>>();
+		*/
 	
 	}
 	
@@ -632,8 +655,10 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 		for(MethodDeclaration m : v.methodDeclarations) {
 			String key = keyForMethodDeclaration(m);
-			if(key != null)
+			if(key != null) {
 				methodDeclarations.put(key,m);
+				//addOverriddenMethods(m);
+			}
 			else 
 				methodDeclarationsWithoutBinding.add(m);			
 		}
@@ -682,7 +707,33 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		
 	}	
 		
+	/*
+	private void addOverriddenMethods(MethodDeclaration m) {
+		Set<MethodDeclaration> overriddenMethods = new HashSet<>(computeOverriddenMethods(m));
+		for(MethodDeclaration overridden : overriddenMethods) {
+			Set<MethodDeclaration> oldOverriders = methodOverriders.get(overridden);
+			if(oldOverriders == null) {
+				oldOverriders = new HashSet<>();
+				methodOverriders.put(overridden, oldOverriders);
+			}
+			oldOverriders.add(m);
+		}
+		methodOverridden.put(m, overriddenMethods);
+	}
+	
+	private void removeOverriddenMethods(MethodDeclaration m) {
+		Set<MethodDeclaration> overriddenMethods = methodOverridden.remove(m);
+		for(MethodDeclaration overridden : overriddenMethods) {
+			Set<MethodDeclaration> oldOverriders = methodOverriders.get(overridden);
+			if(oldOverriders != null) {
+				oldOverriders.remove(m);
+			}
+		}
+	}
 
+	*/
+	
+	
 	protected void addControlFlowGraphInformationForMethodDeclaration(MethodDeclaration m) {
 		//empty because building the new graphs lazily
 	}
@@ -710,6 +761,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			else 
 				methodDeclarationsWithoutBinding.remove(m);
 			controlFlowGraphs.remove(m);			
+			//removeOverriddenMethods(m);
 		}
 		
 		
@@ -755,6 +807,142 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 	
 	
+	
+	public ASTNode getDeclaringASTNode(ICompilationUnit icu, String key) {
+		CompilationUnit cu = getCompilationUnit(icu);
+		return cu.findDeclaringNode(key);
+	}
+	
+	public MethodDeclaration getDeclaringASTNode(IMethod imethod) {
+		ICompilationUnit icu = imethod.getCompilationUnit();
+		if(icu == null) //from source
+			return null;
+		return (MethodDeclaration) getDeclaringASTNode(icu, imethod.getKey());
+	}
+	
+	public FieldDeclaration getDeclaringASTNode(IField ifield) {
+		ICompilationUnit icu = ifield.getCompilationUnit();
+		if(icu == null) //from source
+			return null;
+		return (FieldDeclaration) getDeclaringASTNode(icu, ifield.getKey());
+	}
+	
+	public TypeDeclaration getDeclaringASTNode(IType itype) {
+		ICompilationUnit icu = itype.getCompilationUnit();
+		if(icu == null) //from source
+			return null;
+		return (TypeDeclaration) getDeclaringASTNode(icu, itype.getKey());
+	}
+	
+	
+	public MethodDeclaration getDeclaringASTNode(IMethodBinding ibinding) {
+		IMethod iJavaElement = (IMethod) ibinding.getJavaElement();
+		if(iJavaElement == null)
+			return null;
+		ICompilationUnit icu = iJavaElement.getCompilationUnit();
+		if(icu == null)
+			return null;
+		return (MethodDeclaration) getDeclaringASTNode(icu, ibinding.getKey());
+	}
+	
+	//only for fields
+	public FieldDeclaration getDeclaringASTNode(IVariableBinding ibinding) {
+		if(!ibinding.isField())
+			return null;
+		IField iJavaElement = (IField) ibinding.getJavaElement();
+		if(iJavaElement == null)
+			return null;
+		ICompilationUnit icu = iJavaElement.getCompilationUnit();
+		if(icu == null)
+			return null;
+		return (FieldDeclaration) getDeclaringASTNode(icu, ibinding.getKey());
+	}
+	
+
+	public TypeDeclaration getDeclaringASTNode(ITypeBinding ibinding) {
+		IType iJavaElement = (IType) ibinding.getJavaElement();
+		if(iJavaElement == null)
+			return null;
+		ICompilationUnit icu = iJavaElement.getCompilationUnit();
+		if(icu == null)
+			return null;
+		return (TypeDeclaration) getDeclaringASTNode(icu, ibinding.getKey());
+	}
+
+	
+	public IBinding[] resolveBinding(IJavaElement[] elements) {
+		ASTParser parser = ASTParser.newParser(JLS);
+		parser.setProject(getJavaProject());
+		return parser.createBindings(elements, new NullProgressMonitor());
+	}
+	
+	public IBinding resolveBinding(IJavaElement element) {
+		IJavaElement[] elements = {element};
+		return resolveBinding(elements)[0];
+	}
+	
+	/*
+    public List<IMethodBinding> computeOverridingMethods(IMethodBinding methodBinding) throws JavaModelException  {
+    	if(methodBinding.isConstructor() || Modifier.isStatic(methodBinding.getModifiers())) {
+    		return Collections.EMPTY_LIST;
+    	}
+        ITypeBinding declTypeBinding = methodBinding.getDeclaringClass();
+        IType itype = (IType) declTypeBinding.getJavaElement();
+        IMethod imethod = (IMethod) methodBinding.getJavaElement();
+        ITypeHierarchy hierarchy = itype.newTypeHierarchy(new NullProgressMonitor());
+        IType[] subtypes = hierarchy.getAllSubtypes(itype);
+		ArrayList<IMethod> candidates = new ArrayList<IMethod>();
+        for (IType subtype : subtypes) {
+        	for (IMethod submethod : subtype.getMethods()) {
+        		if (submethod.isSimilar(imethod)) {
+        			candidates.add(submethod);
+        		}
+        	}
+        }
+		ArrayList<IMethodBinding> methods = new ArrayList<IMethodBinding>(candidates.size());
+        for(IBinding binding : resolveBinding(candidates.toArray(new IMethod[candidates.size()]))) {
+        	IMethodBinding submethodbinding = (IMethodBinding) binding;
+        	if(submethodbinding.overrides(methodBinding)) {
+        		methods.add(submethodbinding);
+            }
+        }
+        return methods;
+    }
+ 	
+    
+    public List<MethodDeclaration> computeOverridingMethods(MethodDeclaration methodDeclaration) throws JavaModelException  {
+    	List<IMethodBinding> overridingMethods = computeOverridingMethods(methodDeclaration.resolveBinding());
+    	return Lists.transform(overridingMethods, new Function<IMethodBinding, MethodDeclaration>() {
+			@Override
+			public MethodDeclaration apply(IMethodBinding binding) {
+				return getDeclaringASTNode(binding);
+			}
+		});
+    }
+    
+    public List<MethodDeclaration> computeOverriddenMethods(MethodDeclaration method) {
+    	IMethodBinding binding = method.resolveBinding();
+    	if(method.isConstructor() || Modifier.isStatic(method.getModifiers())) {
+    		return Collections.EMPTY_LIST;
+    	}
+        ArrayList<MethodDeclaration> result= new ArrayList<MethodDeclaration>();
+        ITypeBinding declaringClass= binding.getDeclaringClass();
+        ITypeBinding[] superTypes= Bindings.getAllSuperTypes(declaringClass); 
+        for (ITypeBinding type : superTypes) {
+            for (IMethodBinding inheritedMethod : type.getDeclaredMethods()) {
+                if (binding.overrides(inheritedMethod)) {
+                	MethodDeclaration overridden = getDeclaringASTNode(binding);
+                	if(overridden != null) {
+                		result.add(overridden);
+                	}
+                }
+            }
+        }
+        return result;
+    }
+    	
+    */
+	
 	public void applyRewrite(ASTRewrite rewrite) throws MalformedTreeException, BadLocationException, JavaModelException{
 		for(ICompilationUnit icu : getICompilationUnits()) {
 			CompilationUnit cu = getCompilationUnit(icu);
@@ -793,6 +981,9 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		}
 		return nodesOfType;
 	}
+	
+	
+	
 	
 }
 

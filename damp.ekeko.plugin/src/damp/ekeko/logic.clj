@@ -213,7 +213,7 @@
   "If g succeeds, succeeds once." 
   [g]
   (condu
-    [g succeed]))
+    [g]))
 
 (defn-
   samesets

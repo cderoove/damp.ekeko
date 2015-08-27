@@ -20,12 +20,6 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.swt.widgets.Display;
 
-import soot.Scene;
-import soot.SootMethod;
-import soot.Unit;
-import soot.jimple.toolkits.callgraph.CallGraph;
-import soot.jimple.toolkits.callgraph.Edge;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.cache.Cache;
@@ -35,6 +29,13 @@ import com.google.common.collect.Iterators;
 import damp.ekeko.EkekoPlugin;
 import damp.ekeko.EkekoProjectPropertyPage;
 import damp.ekeko.ProjectModel;
+import damp.ekeko.soot.icfg.Context;
+import damp.ekeko.soot.icfg.Reachability;
+import soot.Scene;
+import soot.SootMethod;
+import soot.Unit;
+import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.jimple.toolkits.callgraph.Edge;
 
 public class SootProjectModel extends ProjectModel {
 	
@@ -93,6 +94,7 @@ public class SootProjectModel extends ProjectModel {
 		startSoot();
 		scene = Scene.v();
 		stale = false;
+		//computeReachability();
 	}
 	
 	private void startSoot() {
@@ -156,13 +158,16 @@ public class SootProjectModel extends ProjectModel {
 	}
 	
 	private List<String> sootArgs() {
-		try {	
-			String args = getProject().getPersistentProperty(EkekoProjectPropertyPage.SOOTARGS_PROPERTY);
-			return Arrays.asList(args.split(" ")); 
-		} catch (Exception e) {
+		String args = null;
+		try {
+			args = getProject().getPersistentProperty(EkekoProjectPropertyPage.SOOTARGS_PROPERTY);
+		} catch (CoreException e) {
 			e.printStackTrace();
-			return Arrays.asList(DEFAULT_SOOTARGS.split(" "));
 		}
+		if(args == null)
+			return Arrays.asList(DEFAULT_SOOTARGS.split(" "));
+		else
+			return Arrays.asList(args.split(" ")); 
 	}
 	
 	private String getClassPathSeparator() {
@@ -266,6 +271,91 @@ public class SootProjectModel extends ProjectModel {
 		});
 	}
 
+	
+	
+	
+	//relied upon by Ekeko for AspectJ, better not use for other purposes
+	
+	/*
+	public boolean preceeds(SootMethod pred, SootMethod succ) {
+		JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG();		
+		Set<Unit> visitedCallSites = new HashSet<>();
+		LinkedList<Unit> worklist = new LinkedList<>();
+		worklist.addAll(icfg.getStartPointsOf(succ));
+		while(!worklist.isEmpty()) {
+			Unit currentUnit = worklist.removeFirst();
+			if(icfg.isCallStmt(currentUnit)) {
+				visitedCallSites.add(currentUnit);
+				SootMethod currentMethod = icfg.getMethodOf(currentUnit);
+				if(pred.equals(currentMethod))
+					return true;
+			}
+			
+			List<Unit> predsOf = icfg.getPredsOf(currentUnit);
+			predsOf.removeAll(visitedCallSites);
+			worklist.addAll(predsOf);
+		}
+		return false;	
+	}
+	
+	public boolean succeeds(SootMethod pred, SootMethod succ) {
+		JimpleBasedInterproceduralCFG icfg = new JimpleBasedInterproceduralCFG();		
+		Set<Unit> visitedCallSites = new HashSet<>();
+		LinkedList<Unit> worklist = new LinkedList<>();
+		worklist.addAll(icfg.getStartPointsOf(pred));
+		while(!worklist.isEmpty()) {
+			Unit currentUnit = worklist.removeFirst();
+			if(icfg.isCallStmt(currentUnit)) {
+				visitedCallSites.add(currentUnit);
+				SootMethod currentMethod = icfg.getMethodOf(currentUnit);
+				if(pred.equals(currentMethod))
+					return true;
+			}
+			
+			List<Unit> succsof = icfg.getSuccsOf(currentUnit);
+			succsof.removeAll(visitedCallSites);
+			worklist.addAll(succsof);
+		}
+		return false;	
+	}
+	*/
+	
+	/*
+	
+	private void computeReachability() {
+		
+		try { ProgramFlowGraph.createInstance(DUAAnalysis.getCFGFactory()); }
+		catch (EntryNotFoundException e) { throw new RuntimeException(e.getMessage()); }
+		
+		List<SootMethod> entryMethods = ProgramFlowGraph.inst().getEntryMethods();
+		ReachabilityAnalysis.computeReachability(entryMethods);
+		EkekoPlugin.getConsoleStream().println("Completed reachability analysis");
+	}
+	
+	
+	public boolean onSamePath(Stmt pred, Stmt succ) {
+		CFGNode predNode = ProgramFlowGraph.inst().getNode(pred);
+		CFGNode succNode = ProgramFlowGraph.inst().getNode(succ);
+		return ReachabilityAnalysis.reachesFromBottom(predNode, succNode, true);		
+	}
+	
+	
+	public boolean onSamePath(SootMethod pred, SootMethod succ) {
+		CFG predCFG = ProgramFlowGraph.inst().getCFG(pred);
+		CFG succCFG = ProgramFlowGraph.inst().getCFG(succ);
+		if(predCFG == null || succCFG == null)
+			return false;
+		CFGNode predNode = predCFG.getFirstRealNode();
+		CFGNode succNode = succCFG.getFirstRealNode();
+		return ReachabilityAnalysis.reachesFromBottom(predNode, succNode, true);		
+	}
+	*/
+	
+	public boolean onSameExecutionPath(SootMethod pred, SootMethod succ) {
+		Reachability reachability = new Reachability(this);
+		Context callstack = reachability.onSameExecutionPath(pred, succ);
+		return callstack != null;
+	}
 	
 	
 	

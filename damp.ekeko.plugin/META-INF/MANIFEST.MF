@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
- libs/tools.nrepl-0.2.3.jar
+ libs/tools.nrepl-0.2.10.jar
 Export-Package: barista,
  baristaui.actions;
   uses:="org.eclipse.ui,
@@ -53,8 +53,12 @@ Export-Package: barista,
  baristaui.views.queryResult.table;uses:="org.eclipse.swt.graphics,org.eclipse.jface.viewers",
  baristaui.views.queryResult.tree;uses:="org.eclipse.swt.graphics,org.eclipse.jface.viewers",
  baristaui.views.queryResult.variableTable;uses:="org.eclipse.jface.viewers",
+ ccw.debug,
  ccw.util;uses:="org.osgi.framework,clojure.lang",
  ccw.util.osgi;uses:="org.osgi.framework",
+ clojure.tools,
+ clojure.tools.nrepl,
+ clojure.tools.nrepl.middleware,
  damp,
  damp.ekeko;
   uses:="org.eclipse.jface.action,
@@ -87,6 +91,7 @@ Export-Package: barista,
    org.eclipse.core.resources,
    damp.ekeko,
    org.eclipse.jface.viewers",
+ damp.ekeko.soot.icfg,
  damp.ekeko.util,
  damp.ekeko.workspace,
  damp.util;uses:="org.eclipse.core.runtime,org.eclipse.core.resources",

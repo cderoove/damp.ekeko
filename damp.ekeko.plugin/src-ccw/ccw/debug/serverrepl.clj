@@ -135,13 +135,13 @@
 ; (remove-ns 'ccw.debug.serverrepl)   
 
 (defn find-symbol [s current-ns qualified-ns]
-  (let [a ((ns-aliases (symbol current-ns)) (symbol qualified-ns))]
-    (map (fn [[k v]] (str v)) (select-keys (meta
-                                             (cond
-                                               (= "null" qualified-ns) ((symbol s) (ns-map (the-ns (symbol current-ns))))
-                                               a (ns-resolve a (symbol s))
-                                               :else (resolve (symbol qualified-ns s))))
-                                [:ns :name :line :file]))))
+  (let [a ((ns-aliases (symbol current-ns)) (symbol qualified-ns))
+        m (meta
+            (cond
+              (= "null" qualified-ns) ((symbol s) (ns-map (the-ns (symbol current-ns))))
+              a (ns-resolve a (symbol s))
+              :else (resolve (symbol qualified-ns s))))]
+    (mapv str ((juxt :file :line :name :ns) m))))
 
 (defn starts-with-filter
   "Filter completions starting with prefix"

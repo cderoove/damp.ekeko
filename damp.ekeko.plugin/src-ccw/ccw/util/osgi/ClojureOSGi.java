@@ -1,44 +1,89 @@
 package ccw.util.osgi;
 
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.osgi.framework.Bundle;
 
+import clojure.java.api.Clojure;
 import clojure.lang.Compiler;
+import clojure.lang.DynamicClassLoader;
 import clojure.lang.IPersistentMap;
 import clojure.lang.RT;
-import clojure.lang.Symbol;
 import clojure.lang.Var;
 import damp.ekeko.EkekoPlugin;
 
 public class ClojureOSGi {
 	private static volatile boolean initialized;
-	private synchronized static void initialize() {
+	private static void initialize() {
 		if (initialized) return;
+		synchronizedInitialize();
+	}
+	private synchronized static void synchronizedInitialize() {
+		if (initialized) return;
+
+		EkekoPlugin plugin = EkekoPlugin.getDefault();
 		
-		System.out.println("ClojureOSGi: Static initialization, loading clojure.core");
-		System.out.flush();
-		ClassLoader loader = new BundleClassLoader(EkekoPlugin.getDefault().getBundle());
+		ClassLoader loader = new BundleClassLoader(plugin.getBundle());
 		ClassLoader saved = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(loader);
 			Class.forName("clojure.lang.RT", true, loader); // very important, uses the right classloader
+			initialized = true;
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"ClojureOSGi: Static initialization, Exception while loading clojure.core", e);
+			throw new RuntimeException("Exception while loading namespace clojure.core", e);
 		} finally {
 			Thread.currentThread().setContextClassLoader(saved);
 		}
-		System.out.println("ClojureOSGi: Static initialization, clojure.core loaded");
-		System.out.flush();
-		
-		initialized = true;
+
 	}
-	public synchronized static Object withBundle(Bundle aBundle, RunnableWithException aCode)
+	public static Object withBundle(Bundle aBundle, RunnableWithException aCode)
 			throws RuntimeException {
+		return withBundle(aBundle, aCode, null);
+	}
+
+	private static final ConcurrentHashMap<Bundle,DynamicClassLoader> bundleClassLoaders = new ConcurrentHashMap<Bundle,DynamicClassLoader>();
+	
+	/**
+	 * Note: if method called with a different list of additionalURLs for same bundle which is already
+	 * cached, the list will not be used...
+	 */
+	private static DynamicClassLoader getDynamicClassLoader(Bundle bundle, List<URL> additionalURLs) {
+		DynamicClassLoader l = bundleClassLoaders.get(bundle);
+		if (l == null) {
+			synchronized (bundleClassLoaders) {
+				l = bundleClassLoaders.get(bundle);
+				if (l == null) {
+					ClassLoader bundleLoader = new BundleClassLoader(bundle);
+					l = new DynamicClassLoader(bundleLoader);
+					if (additionalURLs != null) {
+						for (URL url: additionalURLs) {
+							l.addURL(url);
+						}
+					}
+					bundleClassLoaders.put(bundle, l);
+				}
+			}
+		}
+		return l;
+	}
+	
+	public static Object withBundle(Bundle aBundle, RunnableWithException aCode, List<URL> additionalURLs)
+			throws RuntimeException {
+
+		if (Thread.currentThread().isInterrupted()) {
+			return null;
+		}
 		
 		initialize();
+
+		DynamicClassLoader loader = getDynamicClassLoader(aBundle, additionalURLs);
 		
-		ClassLoader loader = new BundleClassLoader(aBundle);
 		IPersistentMap bindings = RT.map(Compiler.LOADER, loader);
+		bindings = bindings.assoc(RT.USE_CONTEXT_CLASSLOADER, true);
 
 		boolean pushed = true;
 
@@ -46,40 +91,46 @@ public class ClojureOSGi {
 
 		try {
 			Thread.currentThread().setContextClassLoader(loader);
-
 			try {
 				Var.pushThreadBindings(bindings);
 			} catch (RuntimeException aEx) {
 				pushed = false;
 				throw aEx;
 			}
-
 			return aCode.run();
-			
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Exception while calling withBundle(" 
-							+ aBundle.getSymbolicName() + ", aCode)",
-					e);
+			String msg = "Exception while executing code from bundle "
+					+ aBundle.getSymbolicName();
+			throw new RuntimeException(msg, e);
 		} finally {
-			if (pushed)
+			if (pushed) {
 				Var.popThreadBindings();
-
+			}
 			Thread.currentThread().setContextClassLoader(saved);
 		}
 	}
 
+	private static final Set<String> synchronizedAlreadyRequiredNamespaces = new HashSet<String>();
+	
 	public synchronized static void require(final Bundle bundle, final String namespace) {
-		System.out.println("ClojureOSGi.require(" + bundle.getSymbolicName() + ", " 
-				+ namespace + ")");
+		
+		if (synchronizedAlreadyRequiredNamespaces.contains(namespace)) {
+			return;
+		}
+		
 		ClojureOSGi.withBundle(bundle, new RunnableWithException() {
 			@Override
 			public Object run() throws Exception {
 				try {
-					RT.var("clojure.core", "require").invoke(Symbol.intern(namespace));
+					Clojure.var("clojure.core", "require").invoke(Clojure.read(namespace));
+					String msg = "Namespace " + namespace + " loaded from bundle " + bundle.getSymbolicName();
+					System.out.println(msg);
+					synchronizedAlreadyRequiredNamespaces.add(namespace);
 					return null;
 				} catch (Exception e) {
-					throw e;
+					String msg = "Exception loading namespace " + namespace + " from bundle " + bundle.getSymbolicName();
+					System.out.println(msg);
+					throw new RuntimeException(msg, e);
 				}
 			}
 		});

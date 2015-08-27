@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="libs/clojure-1.7.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/clojure-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/soot-trunk.jar" sourcepath="libs/sootsources-trunk.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/qwal-1.0.3-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="doclibs/codox.core-0.6.4.jar"/>

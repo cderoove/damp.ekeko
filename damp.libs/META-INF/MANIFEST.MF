@@ -4,8 +4,8 @@ Bundle-Name: Libraries Shared by Damp Projects
 Bundle-SymbolicName: damp.libs
 Bundle-Version: 2.0.9.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ClassPath: .,
- libs/clojure-1.7.0.jar,
+Bundle-ClassPath: libs/clojure-1.6.0.jar,
+ .,
  libs/soot-trunk.jar,
  libs/qwal-1.0.3-SNAPSHOT.jar,
  doclibs/codox.core-0.6.4.jar,

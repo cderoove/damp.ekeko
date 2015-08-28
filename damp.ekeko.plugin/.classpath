@@ -6,7 +6,6 @@
 	<classpathentry kind="src" path="src-crystal"/>
 	<classpathentry kind="src" path="src-barista"/>
 	<classpathentry kind="src" path="src-ccw"/>
-	<classpathentry kind="src" path="src-inspectorjay"/>
 	<classpathentry exported="true" kind="lib" path="libs/tools.nrepl-0.2.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

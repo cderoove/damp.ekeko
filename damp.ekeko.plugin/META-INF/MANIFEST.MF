@@ -79,7 +79,6 @@ Export-Package: barista,
    org.eclipse.jface.resource,
    org.eclipse.core.resources",
  damp.ekeko.gui;uses:="org.eclipse.ui,baristaui.views.queryResult",
- damp.ekeko.inspector;uses:="org.eclipse.swt.widgets,javax.swing,org.eclipse.ui.part",
  damp.ekeko.jdt,
  damp.ekeko.soot;
   uses:="org.eclipse.ui,

@@ -15,6 +15,5 @@
 	<classpathentry exported="true" kind="lib" path="libs/jmetal4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/guava-18.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/core.logic-0.8.10.jar" sourcepath="libs/core.logic-0.8.10-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/inspector-jay-0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

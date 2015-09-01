@@ -1,10 +1,13 @@
 package damp.ekeko;
 
 
+import java.awt.Checkbox;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -13,11 +16,14 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -37,10 +43,15 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 	public static final QualifiedName SOOTARGS_PROPERTY = new QualifiedName(EkekoPlugin.PLUGIN_ID, "SOOTARGS");
 	private static final String DEFAULT_SOOTARGS = SootProjectModel.DEFAULT_SOOTARGS;
 
+		
+	public static final QualifiedName PROCESSERRORS_PROPERTY = new QualifiedName(EkekoPlugin.PLUGIN_ID, "PROCESSERRORS");
+
+	
 	private static final int TEXT_FIELD_WIDTH = 50;
 
 	private Text entryPointText;
 	private Text sootArgsText;
+	private Button checkIgnoreError;
 
 	private IResource getResource() {
 		IAdaptable e = getElement();
@@ -72,23 +83,32 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		// Label for owner field
 		Label ownerLabel = new Label(composite, SWT.NONE);
 		ownerLabel.setText(ENTRYPOINT_TITLE);
+		
+		GridData ownerLabelGD = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		ownerLabel.setLayoutData(ownerLabelGD);
+		
 
 		// Owner text field
-		entryPointText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		entryPointText.setLayoutData(gd);
+		entryPointText = new Text(composite, SWT.BORDER);
+		GridData entryPointGD = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		
+
+		//entryPointGD.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+		
+		entryPointText.setLayoutData(entryPointGD);
 
 		Button selectButton = new Button(composite, SWT.PUSH);
+		GridData buttonGD = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
+		
+		selectButton.setLayoutData(buttonGD);
 		selectButton.setText("Select...");
 		
+	
 		selectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				handleSearchButtonSelected();
 			}});
 		
-		GridData buttonGD = new GridData();
-		selectButton.setLayoutData(buttonGD);
 		
 		// Populate owner text field
 		try {
@@ -104,12 +124,17 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 
 		Label ownerLabel = new Label(composite, SWT.NONE);
 		ownerLabel.setText(SOOTARGS_TITLE);
+		GridData ownerLabelGD = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		ownerLabel.setLayoutData(ownerLabelGD);
 
-		sootArgsText = new Text(composite, SWT.MULTI | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		gd.heightHint = sootArgsText.getLineHeight()*2;
-		sootArgsText.setLayoutData(gd);
+		sootArgsText = new Text(composite, SWT.BORDER);
+		GridData sootArgsTextGD = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		sootArgsTextGD.horizontalSpan = 2;
+		sootArgsText.setLayoutData(sootArgsTextGD);
+
+		
+		//gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+		//gd.heightHint = sootArgsText.getLineHeight()*2;
 		
 		try {
 			String owner = getResource().getPersistentProperty(SOOTARGS_PROPERTY);
@@ -125,20 +150,58 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 	 */
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL);
-		data.grabExcessHorizontalSpace = true;
-		composite.setLayoutData(data);
+		composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true));
 
-		addEntryPointTextBox(composite);
-		addSeparator(composite, 20);
-		addSootArgsTextBox(composite);
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		layout.fill = true;
+		//layout.pack = false;
+		composite.setLayout(layout);
+		
+		Composite jdtGroup = createGroup(composite, "Structural information obtained from JDT");
+		addIgnoreErrors(jdtGroup);
+		
+		
+		
+		Composite sootGroup = createGroup(composite, "Behavioral information obtained from SOOT");
+		
+		addEntryPointTextBox(sootGroup);
+		addSootArgsTextBox(sootGroup);
+		
+
+		
+		//addSeparator(composite, 20);
 		
 		return composite;
 	}
+	
+	private void addIgnoreErrors(Composite jdtGroup) {
+		checkIgnoreError = new Button(jdtGroup, SWT.CHECK);
+		checkIgnoreError.setText("Include files with compilation errors in queries (not recommended)");
+		checkIgnoreError.setSelection(false);
+		try {
+			String errors = getResource().getPersistentProperty(PROCESSERRORS_PROPERTY);
+			checkIgnoreError.setSelection(Boolean.parseBoolean(errors));
+		} catch (CoreException e) {
+			checkIgnoreError.setSelection(false);
+		}
+	}
+
+	private Composite createGroup(Composite parent, String text) {
+		Group group = new Group(parent, SWT.DEFAULT);
+		group.setText(text);
+		
+		//Composite composite = new Composite(group, SWT.NONE);
+		GridLayout layout = new GridLayout(3,false);
+		group.setLayout(layout);
+		
+		//composite.setLayoutData(data);
+
+		return group;
+	}
+	
 
 	private Composite createDefaultComposite(Composite parent) {
+		/*
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -148,8 +211,8 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		data.verticalAlignment = GridData.FILL;
 		data.horizontalAlignment = GridData.FILL;
 		composite.setLayoutData(data);
-
-		return composite;
+		 */
+		return parent;
 	}
 
 	protected void performDefaults() {
@@ -157,6 +220,7 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		// Populate the owner text field with the default value
 		entryPointText.setText(DEFAULT_ENTRYPOINT);
 		sootArgsText.setText(DEFAULT_SOOTARGS);
+		checkIgnoreError.setSelection(false);
 	}
 
 	public boolean performOk() {
@@ -164,25 +228,17 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 		try {
 			getResource().setPersistentProperty(ENTRYPOINT_PROPERTY, entryPointText.getText());
 			getResource().setPersistentProperty(SOOTARGS_PROPERTY, sootArgsText.getText());
+			getResource().setPersistentProperty(PROCESSERRORS_PROPERTY, Boolean.toString(checkIgnoreError.getSelection()));			
+			for(IProjectModel pm : EkekoModel.getInstance().getProjectModel(getResource())) {
+				pm.clean();
+				pm.populate(new NullProgressMonitor());
+			}
 		} catch (CoreException e) {
 			return false;
 		}
 		return true;
 	}
 	
-	public void addSeparator(Composite parent, int horizontalSpan) {
-		addLabel(parent, horizontalSpan, SWT.SEPARATOR | SWT.HORIZONTAL);
-	}
 	
-	public Label addLabel(Composite parent, int horizontalSpan, int style) {
-		Label label = new Label(parent, style);
-		GridData gd = new GridData();
-		gd.horizontalSpan = horizontalSpan;
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		label.setLayoutData(gd);
-
-		return label;
-	}
 
 }

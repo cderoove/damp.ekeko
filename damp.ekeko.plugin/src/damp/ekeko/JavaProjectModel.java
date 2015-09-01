@@ -102,6 +102,8 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	private Set<Expression> expressions;
 	private Set<ASTNode> nodes;
 
+	private boolean ignoreCompilationErrors = false;
+	
 	
 	private ConcurrentHashMap<IType,ITypeHierarchy> itype2typehierarchy;
 
@@ -211,6 +213,16 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 
 	
+	public boolean retrieveIgnoreCompilationErrors() {
+		String args = null;
+		try {
+			args = getProject().getPersistentProperty(EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return Boolean.parseBoolean(args);
+	}
+	
 	
 
 	//no longer called, but kept for the bug information
@@ -292,6 +304,8 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		fieldAccessLikeNodes = java.util.Collections.newSetFromMap(new ConcurrentHashMap<ASTNode,Boolean>());
 		invocationLikeNodes = java.util.Collections.newSetFromMap(new ConcurrentHashMap<ASTNode,Boolean>());
 		
+		ignoreCompilationErrors = retrieveIgnoreCompilationErrors();
+		
 		/*
 		methodOverriders = new ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>>();
 		methodOverridden = new ConcurrentHashMap<MethodDeclaration, Set<MethodDeclaration>>();
@@ -360,9 +374,14 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	
 	//overridden in PPAJavaProjectModel
 	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
-		EkekoPlugin.getConsoleStream().println("Not parsing compilation unit because of compilation errors: " + icu.getElementName());	
-		monitor.worked(1);
-		return null;
+		if(ignoreCompilationErrors) {
+			EkekoPlugin.getConsoleStream().println("Parsing file with compilation errors (not recommended): " + icu.getElementName());	
+			return parse(icu, monitor);
+		} else {
+			EkekoPlugin.getConsoleStream().println("Not parsing file with compilation errors (configurable in project property page): " + icu.getElementName());	
+			monitor.worked(1);
+			return null;
+		}
 	}
 	
 	protected CompilationUnit parseCompilationUnitWithoutErrors(ICompilationUnit icu, IProgressMonitor monitor) {

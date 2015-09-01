@@ -14,25 +14,28 @@
 		<module>./damp.libs</module>
 		<module>./damp.ekeko.plugin</module>
 		<module>./damp.ekeko.plugin.test</module>
+		<!--
 		<module>./damp.ekeko.feature</module>
+		-->
 		<module>./damp.ekeko.visualizer.plugin</module>
+		<!--
 		<module>./damp.ekeko.visualizer.feature</module>
+		-->
 	</modules>
 
 
-
-
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tycho.version>0.20.0</tycho.version>
-		<tycho-extras.version>0.20.0</tycho-extras.version>
-		<luna-repo.url>http://download.eclipse.org/releases/luna</luna-repo.url>
+			<tycho.version>0.23.0</tycho.version>
+			<tycho-extras.version>0.23.0</tycho-extras.version>
+			<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+			<mars-repo.url>http://download.eclipse.org/releases/mars</mars-repo.url>
 	</properties>
+
 
 	<repositories>
 		<repository>
-			<id>luna</id>
-			<url>${luna-repo.url}</url>
+			<id>mars</id>
+			<url>${mars-repo.url}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
@@ -142,4 +145,4 @@
 
 	</build>
 
-</project> 
+</project>

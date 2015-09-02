@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-
+<project
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+    http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>damp.ekeko</groupId>
 	<artifactId>damp.ekeko</artifactId>
 	<version>2.0.9-SNAPSHOT</version> <!-- bump this -->
-
-
 	<packaging>pom</packaging>
+
 	<modules>
 		<module>./damp.libs</module>
 		<module>./damp.ekeko.plugin</module>
 		<module>./damp.ekeko.plugin.test</module>
-		<!--
 		<module>./damp.ekeko.feature</module>
-		-->
 		<module>./damp.ekeko.visualizer.plugin</module>
-		<!--
 		<module>./damp.ekeko.visualizer.feature</module>
-		-->
-	</modules>
+ </modules>
 
 
 	<properties>
@@ -66,6 +64,8 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+
 				<configuration>
 					<environments>
 						<environment>
@@ -95,7 +95,6 @@
 						</environment>
 					</environments>
 				</configuration>
-				<version>${tycho.version}</version>
 			</plugin>
 
 			<plugin>

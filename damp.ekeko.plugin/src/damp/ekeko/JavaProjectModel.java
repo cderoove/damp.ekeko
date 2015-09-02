@@ -214,9 +214,12 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 
 	
 	public boolean retrieveIgnoreCompilationErrors() {
+		IProject p = getProject();
+		if(p == null)
+			return false;
 		String args = null;
 		try {
-			args = getProject().getPersistentProperty(EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY);
+			args = p.getPersistentProperty(EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

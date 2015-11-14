@@ -122,7 +122,10 @@
   ISupportContains
   java.lang.Iterable
   (iterator [s]
-    (.iterator s)))
+    (.iterator s))
+  nil
+  (iterator [s]
+    (.iterator [])))
 
 (defn
   arrayclass-of 

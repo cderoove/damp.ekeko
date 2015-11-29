@@ -1,11 +1,18 @@
 package baristaui.views.queryResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -18,6 +25,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -490,12 +499,12 @@ public class QueryView extends ViewPart {
 			columns[i].setContentProvider(provider);
 			columns[i].setLabelProvider(labelProvider);
 			columns[i].addDoubleClickListener(new ColumnSelectionListener(columns, i, trcp));
+			
 			final MenuManager menuMgr = new MenuManager();
 			menuMgr.setRemoveAllWhenShown(true);
 			IMenuService menuService = (IMenuService) PlatformUI.getWorkbench().getService(IMenuService.class);
 			menuService.populateContributionManager(menuMgr, "popup:BaristaUI.TreeResultsMenu");
 			columns[i].getControl().setMenu(menuMgr.createContextMenu(columns[i].getControl()));
-
 			getSite().registerContextMenu(menuMgr, columns[i]);
 
 		}
@@ -511,7 +520,7 @@ public class QueryView extends ViewPart {
 		String[] variables = getActiveVariables(results);
 
 		tableViewer = new TableViewer(views, SWT.H_SCROLL | SWT.V_SCROLL | SWT.HIDE_SELECTION | SWT.BORDER);
-
+		
 		Table table = tableViewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -519,7 +528,71 @@ public class QueryView extends ViewPart {
 		tableConf.setViewer(tableViewer);
 
 		tableConf.configureFor(results, variables);
+		
+		addActiveColumnListener(table);
+		addMenu(tableViewer);
 	}
+	
+	// TODO START -- Copy-pasted code from RecommendationEditor in Ekeko/X ; should be refactored?
+	private int activeColumn = -1;
+	
+	private void addActiveColumnListener(final Table table) {
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				int x = 0;
+				for (int i = 0; i < table.getColumnCount(); i++) {
+					x +=table.getColumn(i).getWidth();
+					if (e.x <= x) {
+						activeColumn = i;
+						break;
+					}
+				}
+			}
+		});
+	}
+	
+	private void addMenu(final TableViewer tableViewer) {
+		final Table table = tableViewer.getTable();
+		final MenuManager mgr = new MenuManager();
+
+		final Action revealNode = new Action("Reveal In Editor") {
+			public void run() {
+				revealNode(tableViewer, activeColumn);
+			}
+		};
+
+		mgr.setRemoveAllWhenShown(true);
+		mgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				manager.add(revealNode);
+			}
+		});
+
+		table.setMenu(mgr.createContextMenu(table));
+	}
+	
+	protected void revealNode(TableViewer viewer, int activeColumn) {
+		ISelection selection = viewer.getSelection();
+		IStructuredSelection sel = (IStructuredSelection) selection;
+		if(sel.isEmpty()) 
+			return;
+		Collection tuple = ((HashMap) sel.getFirstElement()).values();
+		Object element = nth(tuple, activeColumn);
+		if(element instanceof ASTNode) {
+			ASTNode astNode = (ASTNode) element;
+			MarkerUtility.getInstance().createMarkerAndGoto(astNode);
+		}
+	}
+	
+	private Object nth(Collection coll, int n) {
+		Iterator iterator = coll.iterator();
+		for(int i=0; i<n; i++){
+			iterator.next();
+		}
+		return iterator.next();
+	}
+	// TODO - END Copy-pasted code
 
 	protected void updateTreeViewWith(Map<String, List<Object>> results) {
 		TreeViewer treeViewer = new TreeViewer(views, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);

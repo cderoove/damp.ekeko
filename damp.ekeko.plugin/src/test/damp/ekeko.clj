@@ -82,7 +82,7 @@
 (defn
   against-projects-named
   [names enable-soot? f]
-  (println "Testings against projects named " (apply str (interpose ", " names)) ": " f)
+  (println "Testing against projects named " (apply str (interpose ", " names)) ": " f)
   (against-projects 
     (map (fn [n] (ws/workspace-project-named n)) names)
     enable-soot? f))

@@ -403,9 +403,6 @@
                                  (or (ast? value)
                                      (lstvalue? value)))
                                values)))))))                   
-           
-
-
 
 (defn 
   node-propertykeyword-value|reified
@@ -873,7 +870,33 @@
     (when-let [ownerproperty (owner-property val)]
       (property-descriptor-list? ownerproperty))))
 
-
+(defn reachable-nodes-of-type
+  [node node-type]
+  (let [walk-node 
+        (fn walk [curnode]
+          (let [props (node-property-descriptors curnode)
+                
+                children 
+                (reduce 
+                  (fn [cur-children prop]
+                    (cond 
+                      (property-descriptor-list? prop)
+                      (concat cur-children (node-property-value curnode prop))
+                      (property-descriptor-child? prop)
+                      (conj cur-children (node-property-value curnode prop))
+                      :rest cur-children))
+                  []
+                  props)]
+            (conj
+              (apply concat 
+                     (map (fn [child] (walk child)) 
+                          (remove nil? children)))
+              curnode))
+          )]
+    (filter 
+      (fn [child]
+        (= (class child) node-type))
+      (walk-node node))))
 
 (comment
 

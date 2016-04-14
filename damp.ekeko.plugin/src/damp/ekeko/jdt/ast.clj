@@ -805,7 +805,7 @@
                (ast :CompilationUnit ?cu)
                (child :package ?cu ?packageDeclaration))))
 
-(defn- nodes-of-type [t]
+(defn nodes-of-type [t]
   (let [models (javaprojectmodel/java-project-models)]
     (case 
       t

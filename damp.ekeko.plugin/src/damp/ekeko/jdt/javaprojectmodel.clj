@@ -178,17 +178,24 @@
   (let [h (type-declaration-type-hierarchy t)]
     (.getSubclasses h (.getType h))))
 
-(defn type-declaration-allsubclasses-itypes
+(def type-declaration-allsubclasses-itypes
   "Return all subtypes (direct or indirect) of a given type"
-  [^TypeDeclaration t]
-  (let [h (type-declaration-type-hierarchy t)]
-    (.getAllSubtypes h (.getType h))))
+  (memoize 
+    (fn [^TypeDeclaration t]
+     (let [h (type-declaration-type-hierarchy t)]
+       (.getAllSubtypes h (.getType h))))))
+
+(def type-declaration-allsuperitypes
+  "Return all supertypes (direct or indirect) of a given type"
+  (memoize 
+    (fn [^TypeDeclaration t]
+     (let [h (type-declaration-type-hierarchy t)]
+       (.getAllSupertypes h (.getType h))))))
 
     
 ; JDT Call Graph
 ; --------------
 
-         
 (def method-overriders
   (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
            (fn  
@@ -230,6 +237,40 @@
                          (.getMethods ^TypeDeclaration subclass)))
                      []))
                  (type-declaration-allsubclasses-itypes (.getParent m)))))))
+         
+(def ancestor-methods ; Inverse of method-overriders ; TODO Pretty much a copy-paste of method-overriders; remove duplication
+  (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
+           (fn  
+             [^MethodDeclaration m]
+             (let [mname (.getIdentifier (.getName m))
+                   params (.parameters m)
+                   paramcount (count params)]
+               (mapcat
+                 (fn [itype] 
+                   (if-let [superclass (itype-to-declaration itype)]
+                     (filter 
+                       (fn [d]
+                         (and (instance? MethodDeclaration d)
+                              (not (.isConstructor ^MethodDeclaration d))
+                              (= mname (.getIdentifier (.getName ^MethodDeclaration d)))
+                              (let [ps (.parameters d)
+                                    pcount (count ps)]
+                                (and (= paramcount pcount)
+                                     (loop [superps params
+                                            subps ps]
+                                       (or 
+                                         (empty? superps)
+                                         (when-let [^ITypeBinding t1 (-> (first superps) .getType .resolveBinding)]
+                                           (when-let [^ITypeBinding t2 (-> (first subps) .getType .resolveBinding)]
+                                             (and (.isEqualTo (.getErasure t1) (.getErasure t2))
+                                                  (recur (rest superps)
+                                                         (rest subps)))))))))))
+                       (if
+                         (instance? AnonymousClassDeclaration superclass)
+                         (.bodyDeclarations ^AnonymousClassDeclaration superclass)
+                         (.getMethods ^TypeDeclaration superclass)))
+                     []))
+                 (type-declaration-allsuperitypes (.getParent m)))))))
 
 
 

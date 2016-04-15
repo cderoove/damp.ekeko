@@ -872,7 +872,8 @@
 
 (defn reachable-nodes-of-type
   [node node-type]
-  (let [walk-node 
+  (if (nil? node) []
+    (let [walk-node 
         (fn walk [curnode]
           (let [props (node-property-descriptors curnode)
                 
@@ -896,7 +897,7 @@
     (filter 
       (fn [child]
         (= (class child) node-type))
-      (walk-node node))))
+      (walk-node node)))))
 
 (comment
 

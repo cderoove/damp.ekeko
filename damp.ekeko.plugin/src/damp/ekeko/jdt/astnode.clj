@@ -870,8 +870,8 @@
     (when-let [ownerproperty (owner-property val)]
       (property-descriptor-list? ownerproperty))))
 
-(defn reachable-nodes-of-type
-  [node node-type]
+(defn reachable-nodes
+  [node]
   (if (nil? node) []
     (let [walk-node ; Returns curnode + all of its descendant nodes
           (fn walk [curnode]
@@ -894,10 +894,7 @@
                             (remove nil? children)))
                 curnode))
             )]
-      (filter 
-        (fn [child]
-          (= (class child) node-type))
-        (walk-node node)))))
+      (walk-node node))))
 
 (comment
 

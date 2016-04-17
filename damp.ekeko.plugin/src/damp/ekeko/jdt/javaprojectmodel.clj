@@ -196,52 +196,10 @@
 ; JDT Call Graph
 ; --------------
 
-(def method-overriders
+(def method-ancestors-or-descendants
   (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
            (fn  
-             [^MethodDeclaration m]
-             ;^MethodDeclaration no type argument here because includes org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration
-             ;when IMethodBinding.isAnnotationMember returns true (TODO: check this out)
-             (let [mname (.getIdentifier (.getName m))
-                   params (.parameters m)
-                   paramcount (count params)]
-               (mapcat
-                 ;(apply concat (pmap
-                 (fn [itype] 
-                   (if-let [subclass (itype-to-declaration itype)]
-                     (filter 
-                       (fn [d]
-                         
-                         ;unfortunately, there is a bug in IMethodBinding.overrides(IMethodBinding)
-                         ;cannot use that instead
-                         
-                         ;todo: include return type check and visibility check
-                         (and (instance? MethodDeclaration d)
-                              (not (.isConstructor ^MethodDeclaration d))
-                              (= mname (.getIdentifier (.getName ^MethodDeclaration d)))
-                              (let [ps (.parameters d)
-                                    pcount (count ps)]
-                                (and (= paramcount pcount)
-                                     (loop [superps params
-                                            subps ps]
-                                       (or 
-                                         (empty? superps)
-                                         (when-let [^ITypeBinding t1 (-> (first superps) .getType .resolveBinding)]
-                                           (when-let [^ITypeBinding t2 (-> (first subps) .getType .resolveBinding)]
-                                             (and (.isEqualTo (.getErasure t1) (.getErasure t2))
-                                                  (recur (rest superps)
-                                                         (rest subps)))))))))))
-                       (if
-                         (instance? AnonymousClassDeclaration subclass)
-                         (.bodyDeclarations ^AnonymousClassDeclaration subclass)
-                         (.getMethods ^TypeDeclaration subclass)))
-                     []))
-                 (type-declaration-allsubclasses-itypes (.getParent m)))))))
-         
-(def ancestor-methods ; Inverse of method-overriders ; TODO Pretty much a copy-paste of method-overriders; remove duplication
-  (memoize ; TODO Clear this cache on project changes! Need to use the clojure/core.memoize funcs for this..
-           (fn  
-             [^MethodDeclaration m]
+             [^MethodDeclaration m ancestors?]
              (let [mname (.getIdentifier (.getName m))
                    params (.parameters m)
                    paramcount (count params)]
@@ -270,15 +228,17 @@
                          (.bodyDeclarations ^AnonymousClassDeclaration superclass)
                          (.getMethods ^TypeDeclaration superclass)))
                      []))
-                 (type-declaration-allsuperitypes (.getParent m)))))))
+                 (if ancestors?
+                   (type-declaration-allsuperitypes (.getParent m))
+                   (type-declaration-allsubclasses-itypes (.getParent m))))))))
 
-
-
-;(defn 
-;  method-overriders
-;  [^MethodDeclaration m] 
-;  (let [jpm (javaprojectmodel-for-astnode m)]
-;    (.computeOverridingMethods jpm m)))
+(defn method-overriders
+  [^MethodDeclaration m]
+  (method-ancestors-or-descendants m false))
+         
+(defn method-ancestors
+  [^MethodDeclaration m]
+  (method-ancestors-or-descendants m true))
 
 (def all-members
   ; Retrieve all members of a type, including inherited ones

@@ -26,14 +26,14 @@
 			<tycho.version>0.23.0</tycho.version>
 			<tycho-extras.version>0.23.0</tycho-extras.version>
 			<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-			<mars-repo.url>http://download.eclipse.org/releases/mars</mars-repo.url>
+			<neon-repo.url>http://download.eclipse.org/releases/neon</neon-repo.url>
 	</properties>
 
 
 	<repositories>
 		<repository>
-			<id>mars</id>
-			<url>${mars-repo.url}</url>
+			<id>neon</id>
+			<url>${neon-repo.url}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>

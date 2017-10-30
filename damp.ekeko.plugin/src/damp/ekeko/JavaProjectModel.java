@@ -1,5 +1,7 @@
 package damp.ekeko;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
@@ -7,6 +9,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -23,6 +27,7 @@ import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.ITypeHierarchyChangedListener;
@@ -996,6 +1001,26 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		return nodesOfType;
 	}
 	
+	/**
+	 * Add a new Java file containing the given ICompilationUnit to the project, in the given path
+	 * @param u
+	 * @param path
+	 * @throws CoreException 
+	 */
+	public void addNewCompilationUnit(CompilationUnit ast) throws CoreException {
+		String packagePath = ast.getPackage().getName().getFullyQualifiedName().replace('.', '/');
+		String fileName = ((TypeDeclaration)(ast.types().get(0))).getName().toString() + ".java";
+		
+		// Assumes a project only has 1 source folder!
+		String srcPath = getJavaProject().getRawClasspath()[0].getPath().removeFirstSegments(1).toPortableString() + "/";
+		
+		IFolder folder  = javaProject.getProject().getFolder(srcPath + packagePath);
+		IFile file = folder.getFile(fileName);
+		
+		byte[] bytes = ast.toString().getBytes();
+	    InputStream source = new ByteArrayInputStream(bytes);
+	    file.create(source, IResource.NONE, null);
+	}
 	
 	
 	

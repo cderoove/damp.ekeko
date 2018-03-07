@@ -28,6 +28,7 @@
 
 (el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.ICompilationUnit)
 (el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IClassFile)
+(el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IOrdinaryClassFile)
 (el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IPackageFragment)
 (el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IPackageFragmentRoot)
 (el/extend-ISupportContains-to-arrays-of-class org.eclipse.jdt.core.IJavaProject)

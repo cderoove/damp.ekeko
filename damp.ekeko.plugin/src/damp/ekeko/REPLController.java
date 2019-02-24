@@ -44,9 +44,9 @@ public class REPLController {
 				if (REPLServerSocket == null) {
 					try {
 						String ekekoBundleName = ekekoBundle.getSymbolicName();
-						Var startServer = BundleUtils.requireAndGetVar(ekekoBundleName, "clojure.tools.nrepl.server/start-server");
-						Object defaultHandler = BundleUtils.requireAndGetVar(ekekoBundleName, "clojure.tools.nrepl.server/default-handler").invoke();
-						Object handler = BundleUtils.requireAndGetVar(ekekoBundleName, "clojure.tools.nrepl.ack/handle-ack").invoke(defaultHandler);
+						Var startServer = BundleUtils.requireAndGetVar(ekekoBundleName, "nrepl.server/start-server");
+						Object defaultHandler = BundleUtils.requireAndGetVar(ekekoBundleName, "nrepl.server/default-handler").invoke();
+						Object handler = BundleUtils.requireAndGetVar(ekekoBundleName, "nrepl.ack/handle-ack").invoke(defaultHandler);
 						REPLServerSocket = (ServerSocket)((Map)startServer.invoke(Keyword.intern("handler"), handler)).get(Keyword.intern("server-socket"));
 						serverPort = REPLServerSocket.getLocalPort();
 						isRunning = true;
@@ -54,9 +54,10 @@ public class REPLController {
 						if(provider != null)
 							provider.update();
 						String url = String.format("nrepl://%s:%s", "localhost", getServerPort());
-						String msg = "Started Ekeko-hosted nREPL server: " + url;
+						String msg = "Started Ekeko-hosted nREPL server: " + url 
+								+ "\nConnect from the command line using: "
+								+ "\nlein repl :connect localhost:" + getServerPort();
 						EkekoPlugin.log(msg);
-						//new ccw should detect the url in console and open the corresponding repl view
 						EkekoPlugin.getConsoleStream().println(msg);
 					} catch (Exception e) {
 						EkekoPlugin.logError("Could not start Ekeko-hosted nREPL server", e);

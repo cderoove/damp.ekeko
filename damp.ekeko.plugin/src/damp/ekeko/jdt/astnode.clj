@@ -84,7 +84,7 @@
 
 (def 
   node-classes
-  (let [lasttypeint 92]
+  (let [lasttypeint 92] ;99 for latest version of Java
     (for [i (range 1 (inc lasttypeint))]
       (ASTNode/nodeClassForType i))))
 

@@ -26,8 +26,6 @@
     <stringAttribute key="pde.version" value="3.3"/>
     <stringAttribute key="product" value="org.eclipse.platform.ide"/>
     <setAttribute key="selected_features">
-        <setEntry value="ccw.feature:default"/>
-        <setEntry value="damp.ekeko.feature:default"/>
         <setEntry value="damp.ekeko.snippets.feature:default"/>
         <setEntry value="damp.ekeko.visualizer.feature:default"/>
         <setEntry value="org.eclipse.e4.rcp.source:default"/>

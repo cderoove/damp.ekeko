@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
- libs/tools.nrepl-0.2.10.jar
+ libs/nrepl-0.6.0.jar
 Export-Package: barista,
  baristaui.actions;
   uses:="org.eclipse.ui,
@@ -56,9 +56,6 @@ Export-Package: barista,
  ccw.debug,
  ccw.util;uses:="org.osgi.framework,clojure.lang",
  ccw.util.osgi;uses:="org.osgi.framework",
- clojure.tools,
- clojure.tools.nrepl,
- clojure.tools.nrepl.middleware,
  damp,
  damp.ekeko;
   uses:="org.eclipse.jface.action,
@@ -97,6 +94,7 @@ Export-Package: barista,
  edu.cmu.cs.crystal.cfg,
  edu.cmu.cs.crystal.cfg.eclipse,
  edu.cmu.cs.crystal.flow,
+ nrepl,
  test.damp;uses:="org.osgi.framework",
  test.damp.ekeko
 Eclipse-BuddyPolicy: registered

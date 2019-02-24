@@ -20,7 +20,7 @@ public class REPLStartHandler extends AbstractHandler {
 			MessageDialog.openInformation(shell, 
 					"Ekeko-hosted nREPL server started", 
 					"Successfully started an Ekeko-hosted nREPL server on port " + REPLController.getCurrent().getServerPort() + ".\n" +
-					"Connect to this repl using the 'Connect to REPL' dialog in the Window menu.");		
+					"Connect to this read-eval-print loop using any of the nREPL clients listed at https://nrepl.org/.");		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

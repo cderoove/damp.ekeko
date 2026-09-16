@@ -251,7 +251,25 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 	
 	
-	public static int JLS = AST.JLS8;
+	// Was AST.JLS8 (fixed at the Java 8 grammar level, from when this
+	// targeted Eclipse Neon-era JDT, whose AST class doesn't go past
+	// JLS8). Newer JDT cores (e.g. the one eclipse.jdt.ls bundles) support
+	// much higher levels via AST.getJLSLatest(), needed to parse modern
+	// Java syntax (records, sealed types, pattern matching, ...). That
+	// method doesn't exist on Neon's AST class, so it can't be referenced
+	// directly here without breaking this project's own Neon-pinned Tycho
+	// build -- resolve it reflectively instead, falling back to JLS8 when
+	// running against a JDT core old enough not to have it.
+	public static int JLS = latestSupportedJLS();
+
+	private static int latestSupportedJLS() {
+		try {
+			java.lang.reflect.Method getJLSLatest = AST.class.getMethod("getJLSLatest");
+			return (Integer) getJLSLatest.invoke(null);
+		} catch (ReflectiveOperationException e) {
+			return AST.JLS8;
+		}
+	}
 		
 	public static CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
 		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)

@@ -5,11 +5,30 @@
   (:refer-clojure :exclude [== type])
   (:use clojure.core.logic)
   (:use [damp.ekeko logic])
-  (:use [damp.ekeko.soot soot])
-  (:use [damp.ekeko.jdt ast structure aststructure soot convenience rewrites])
+  (:use [damp.ekeko.jdt ast structure aststructure convenience rewrites])
   (:use [damp.qwal])
-  (:require [damp.ekeko.util [text :as text]])
-  (:require [damp.ekeko [gui :as gui]]))
+  (:require [damp.ekeko.util [text :as text]]))
+
+;; damp.ekeko.soot's whole-program-analysis relations (and damp.ekeko.jdt.soot,
+;; its JDT-facing counterpart) used to be :use'd here unconditionally, which
+;; meant simply requiring this namespace pulled in Soot and its whole
+;; (large, fairly dated) dependency tree, whether or not any Soot-based
+;; relation was actually used. They're unaffected and still fully available,
+;; just no longer forced onto every consumer of damp.ekeko -- require them
+;; explicitly to use them:
+;;   (require '[damp.ekeko.soot.soot :refer :all])
+;;   (require '[damp.ekeko.jdt.soot :refer :all])
+
+;; damp.ekeko.gui (the Eclipse/SWT results-viewer popup used by ekeko*/
+;; ekeko-n* below) is intentionally not :require'd here either, and is
+;; instead resolved lazily via requiring-resolve inside those two macros.
+;; damp.ekeko.gui only exists as part of the Eclipse plugin UI, so eagerly
+;; requiring it here would make it impossible to load this namespace (and
+;; therefore use the GUI-free `ekeko` macro, or any other relation defined
+;; here) from a host with no Eclipse workbench -- such as a language
+;; server. ekeko*/ekeko-n* remain unchanged for the Eclipse plugin, since
+;; damp.ekeko.gui does get resolved (and its result cached) the first time
+;; either macro's generated code actually runs.
 
 (defmacro 
   ekeko
@@ -50,8 +69,10 @@
                                         ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
-     (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
-      
+     ((requiring-resolve 'damp.ekeko.gui/eclipse-uithread-return)
+      (fn [] ((requiring-resolve 'damp.ekeko.gui/open-barista-results-viewer*)
+              querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+
 ;TODO: eliminate code duplication
 (defmacro 
   ekeko-n* 
@@ -77,7 +98,9 @@
                                         ~@goals)))
          elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
          cnt# (count resultsqc#)]
-     (gui/eclipse-uithread-return (fn [] (gui/open-barista-results-viewer* querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+     ((requiring-resolve 'damp.ekeko.gui/eclipse-uithread-return)
+      (fn [] ((requiring-resolve 'damp.ekeko.gui/open-barista-results-viewer*)
+              querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
 
 
 ;Example repl session

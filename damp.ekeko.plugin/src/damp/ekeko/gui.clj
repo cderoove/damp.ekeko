@@ -1,7 +1,8 @@
-(ns 
+(ns
   ^{:doc "Utility functions for interacting with the Eclipse GUI and opening a Barista view on core.logic results."
     :author "Coen De Roover"}
    damp.ekeko.gui
+   (:require [damp.ekeko.jdt [baristacallbacks]])
    (:import [org.eclipse.ui IWorkbench PlatformUI IWorkbenchPage IWorkingSet IWorkingSetManager]
             [org.eclipse.swt.widgets Display]
             [org.eclipse.jface.window Window]

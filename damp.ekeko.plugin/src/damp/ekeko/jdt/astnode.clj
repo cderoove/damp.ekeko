@@ -933,10 +933,10 @@
 
 
 
-(defn
-  register-callbacks
-  []
-  (set! (baristaui.views.queryResult.SOULLabelProvider/FN_ISWRAPPER) value?)
-  (set! (baristaui.views.queryResult.SOULLabelProvider/FN_GETWRAPPEDVALUE) value-unwrapped))
-
-(register-callbacks)
+;; register-callbacks, wiring value?/value-unwrapped into Barista's SWT
+;; results table (baristaui.views.queryResult.SOULLabelProvider), used to
+;; live here and run unconditionally at namespace load time. Moved to
+;; damp.ekeko.jdt.baristacallbacks so that this namespace -- required by
+;; essentially every other relation namespace -- can be loaded without
+;; baristaui on the classpath (e.g. from a host with no Eclipse workbench).
+;; See that namespace for where it's required from in the Eclipse plugin.

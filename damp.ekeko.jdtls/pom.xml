@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>damp.ekeko</groupId>
+  <artifactId>damp.ekeko.jdtls</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+
+  <name>Ekeko for eclipse.jdt.ls</name>
+  <description>
+    OSGi bundle hosting Ekeko's query engine (reused from damp.ekeko.plugin)
+    inside a running Eclipse JDT Language Server process, contributed via
+    the VS Code "Language Support for Java" (redhat.java) extension's
+    javaExtensions mechanism. Not built with Tycho (unlike damp.ekeko.plugin,
+    which targets a frozen Eclipse Neon p2 repository) because this bundle
+    targets whatever JDT/Eclipse Platform version the current jdt.ls
+    actually bundles; ordinary Maven dependencies on Eclipse Platform's
+    own Maven Central publications track that correctly.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+
+    <!-- Installed locally by install-local-deps.sh from the currently
+         installed redhat.java extension's bundled jdt.ls; not published
+         to any public repository (eclipse.jdt.ls is a Tycho/p2 product,
+         not a set of Maven Central artifacts). Re-run that script and
+         update this if/when the installed redhat.java version changes. -->
+    <jdtls-core.version>1.61.0.202609021834</jdtls-core.version>
+
+    <!-- Eclipse Platform/JDT versions below are pinned to match exactly
+         what the currently installed redhat.java bundles, since these
+         packages are resolved from the running jdt.ls host at runtime
+         (provided scope), not embedded in this bundle. -->
+    <jdt-core.version>3.47.0</jdt-core.version>
+    <core-resources.version>3.24.100</core-resources.version>
+    <core-runtime.version>3.35.0</core-runtime.version>
+    <core-filesystem.version>1.11.500</core-filesystem.version>
+    <core-jobs.version>3.15.900</core-jobs.version>
+    <equinox-common.version>3.21.0</equinox-common.version>
+    <equinox-registry.version>3.12.600</equinox-registry.version>
+    <equinox-preferences.version>3.12.100</equinox-preferences.version>
+    <osgi.version>3.24.300</osgi.version>
+    <eclipse-text.version>3.14.800</eclipse-text.version>
+    <guava.version>33.6.0-jre</guava.version>
+
+    <clojure.version>1.12.6</clojure.version>
+    <core-logic.version>1.1.1</core-logic.version>
+    <spec-alpha.version>0.5.238</spec-alpha.version>
+    <core-specs-alpha.version>0.4.74</core-specs-alpha.version>
+  </properties>
+
+  <repositories>
+    <!-- For nrepl and any other Clojure-community-only libs; not needed
+         by anything in this pom yet. -->
+    <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- Supplied by the running jdt.ls host at runtime; not embedded. -->
+    <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+      <version>${jdt-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>${core-resources.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>${core-runtime.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${core-filesystem.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.jobs</artifactId>
+      <version>${core-jobs.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.common</artifactId>
+      <version>${equinox-common.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.registry</artifactId>
+      <version>${equinox-registry.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.preferences</artifactId>
+      <version>${equinox-preferences.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.osgi</artifactId>
+      <version>${osgi.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.text</artifactId>
+      <version>${eclipse-text.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- Installed locally by install-local-deps.sh; see that script. -->
+      <groupId>org.eclipse.jdt.ls</groupId>
+      <artifactId>org.eclipse.jdt.ls.core</artifactId>
+      <version>${jdtls-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Not present in jdt.ls's runtime; embedded into this bundle (see
+         the maven-bundle-plugin Embed-Dependency instruction below). -->
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>${clojure.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>spec.alpha</artifactId>
+      <version>${spec-alpha.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.specs.alpha</artifactId>
+      <version>${core-specs-alpha.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.logic</artifactId>
+      <version>${core-logic.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Installed locally by install-local-deps.sh; see that script. -->
+      <groupId>damp</groupId>
+      <artifactId>qwal</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- damp.ekeko.plugin/src mixes this bundle's UI-free query engine
+           with the Eclipse-workbench (SWT/JFace) coupled parts of the
+           plugin (the Barista results-table UI, property/preference
+           pages, menu action handlers, the REPL controller) and the
+           Soot/workspace-reification subtrees, in the same directories,
+           so the needed subset can't be selected by pointing at whole
+           subdirectories alone. maven-compiler-plugin's excludes don't
+           apply to source roots added via build-helper-maven-plugin
+           add-source (a known limitation: they only filter the project's
+           primary source directory), so filter by copying the wanted
+           files into a generated-sources staging directory first, then
+           add that as the source root; this keeps the real filtering
+           where excludes actually work (maven-resources-plugin), while
+           still building directly against damp.ekeko.plugin's own source
+           rather than a maintained copy of it. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>stage-damp-ekeko-plugin-java-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>copy-resources</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-sources/damp-ekeko-plugin</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src</directory>
+                  <includes>
+                    <include>**/*.java</include>
+                  </includes>
+                  <excludes>
+                    <exclude>damp/ekeko/EkekoPlugin.java</exclude>
+                    <exclude>damp/ekeko/EkekoProblemFixer.java</exclude>
+                    <exclude>damp/ekeko/EkekoProjectDecorator.java</exclude>
+                    <exclude>damp/ekeko/EkekoProjectPropertyPage.java</exclude>
+                    <exclude>damp/ekeko/ToggleEkekoNatureAction.java</exclude>
+                    <exclude>damp/ekeko/EnableNatureOnAllHandler.java</exclude>
+                    <exclude>damp/ekeko/DisableNatureOnAllHandler.java</exclude>
+                    <exclude>damp/ekeko/REPLController.java</exclude>
+                    <exclude>damp/ekeko/REPLStartHandler.java</exclude>
+                    <exclude>damp/ekeko/REPLStopHandler.java</exclude>
+                    <exclude>damp/ekeko/gui/**</exclude>
+                    <exclude>damp/ekeko/soot/**</exclude>
+                    <exclude>damp/ekeko/workspace/**</exclude>
+                    <exclude>test/**</exclude>
+                  </excludes>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src-crystal</directory>
+                  <includes>
+                    <include>**/*.java</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-damp-ekeko-plugin-clojure-resources</id>
+            <phase>generate-resources</phase>
+            <goals><goal>copy-resources</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src</directory>
+                  <includes>
+                    <include>**/*.clj</include>
+                  </includes>
+                  <excludes>
+                    <exclude>test/**</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>add-staged-damp-ekeko-plugin-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>add-source</goal></goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/damp-ekeko-plugin</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>6.1.2</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>damp.ekeko.jdtls</Bundle-SymbolicName>
+            <Bundle-Activator>damp.ekeko.jdtls.EkekoJdtlsActivator</Bundle-Activator>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-21</Bundle-RequiredExecutionEnvironment>
+            <!-- By default bnd only bundles resources from packages that
+                 also contain at least one compiled class; several of our
+                 packages are pure Clojure source with no .java file at
+                 all (e.g. damp.ekeko.jdt), so without this they get
+                 silently dropped from the final jar. Private-Package
+                 marks every discovered package under our own code as
+                 bundle content; scoped to our own package prefixes
+                 (rather than "*") so it doesn't also pull the embedded
+                 dependencies' own .clj sources loose into the jar;
+                 those stay inside their embedded jars on the
+                 Bundle-ClassPath instead, where Embed-Dependency already
+                 puts them. -->
+            <Private-Package>damp.*,edu.cmu.cs.crystal.*</Private-Package>
+            <!-- Embed the deps not provided by the jdt.ls host. -->
+            <Embed-Dependency>clojure,spec.alpha,core.specs.alpha,core.logic,qwal</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <!-- Most of this bundle's actual JDT/Eclipse/OSGi package
+                 usage lives in the .clj source files bundled as plain
+                 resources above (astnode.clj, ast.clj, structure.clj,
+                 ...), which bnd's bytecode analysis can't see (it only
+                 scans .class files), so a statically computed
+                 Import-Package would be missing most of what this bundle
+                 needs at runtime. DynamicImport-Package tells the OSGi
+                 framework to resolve any package this bundle doesn't
+                 statically import by searching other bundles' exports at
+                 class-load time instead; the standard approach for OSGi
+                 bundles hosting a dynamic/scripted language (Clojure,
+                 Jython, Groovy bundles commonly do the same). -->
+            <DynamicImport-Package>*</DynamicImport-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -66,7 +66,22 @@ import edu.cmu.cs.crystal.cfg.eclipse.EclipseCFG;
 
 
 public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChangedListener {
-	
+
+	// Was EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY (still used as such
+	// below). Defined here instead of read from that class because
+	// EkekoProjectPropertyPage extends org.eclipse.jface.preference.PreferencePage,
+	// so merely referencing it would require org.eclipse.jface/SWT to be on
+	// the classpath just to resolve this persistent-property key, even in a
+	// headless host with no UI. EkekoProjectPropertyPage now reads this
+	// constant from here instead of defining its own, so both sides keep
+	// using the exact same QualifiedName. Uses the literal plugin id
+	// (EkekoPlugin.PLUGIN_ID's value) directly rather than referencing
+	// EkekoPlugin itself, for the same reason -- even a compile-time
+	// constant reference requires the declaring class to be resolvable at
+	// compile time.
+	public static final org.eclipse.core.runtime.QualifiedName PROCESSERRORS_PROPERTY =
+			new org.eclipse.core.runtime.QualifiedName("damp.ekeko.plugin", "PROCESSERRORS");
+
 	protected IJavaProject javaProject;
 	
 	protected ConcurrentHashMap<ICompilationUnit,CompilationUnit> icu2ast;
@@ -224,7 +239,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			return false;
 		String args = null;
 		try {
-			args = p.getPersistentProperty(EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY);
+			args = p.getPersistentProperty(PROCESSERRORS_PROPERTY);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

@@ -46,9 +46,35 @@ initialization option (or `java.reloadBundles`).
   jdt.ls (enables the Ekeko nature on open Java projects).
 - `EkekoCommandHandler` -- the `IDelegateCommandHandler` dispatching
   `workspace/executeCommand` calls (`ekeko.rebuildModel`, `ekeko.startRepl`,
-  `ekeko.stopRepl`), registered via `src/main/resources/plugin.xml`.
+  `ekeko.stopRepl`, `ekeko.runQuery`), registered via
+  `src/main/resources/plugin.xml`.
 - `EkekoReplController` -- starts/stops a plain nREPL server inside this
   bundle's own classloader, for a client (e.g. Calva) to connect to.
+- `EkekoQueryRunner` -- backs `ekeko.runQuery`: evals a query string in the
+  `damp.ekeko` namespace and serializes the result into plain
+  `Map`/`List`/primitives (Gson-friendly), turning any `ASTNode` binding
+  into a `{kind: "code", uri, startOffset, length}` cell the VS Code side
+  can jump to, and everything else into a plain value cell.
+- `EkekoResultsBridge` -- called from this bundle's own
+  `src/main/resources/damp/ekeko/gui.clj` (see below), pushes a query's
+  serialized results to the VS Code extension host as a `workspace/notify`
+  notification (`JavaClientConnection.sendNotification`), which
+  `redhat.java`'s bundled LSP client dispatches as an ordinary
+  `vscode.commands.executeCommand("ekeko.showResults", ...)`.
+
+`src/main/resources/damp/ekeko/gui.clj` is this bundle's own stand-in for
+`damp.ekeko.plugin`'s SWT-based `damp.ekeko.gui` (excluded here -- see
+`pom.xml` -- since it `:import`s SWT/JFace/baristaui classes at namespace-
+load time, none of which are present in jdt.ls's headless runtime).
+`damp/ekeko.clj`'s `ekeko*`/`ekeko-n*` macros already resolve
+`damp.ekeko.gui/eclipse-uithread-return` and
+`damp.ekeko.gui/open-barista-results-viewer*` via `requiring-resolve`
+rather than a static require, specifically so a non-Eclipse host can supply
+its own -- exactly the plug-in point this file uses, calling
+`EkekoResultsBridge.showResults` instead of opening a Barista SWT view.
+This means evaluating `(ekeko* ...)`/`(ekeko-n* ...)` at a REPL connected
+here pops the VS Code results view automatically, same as it pops Barista's
+view in the Eclipse plugin.
 
 The rest of the query engine is built directly from `damp.ekeko.plugin`'s
 own source (see the `maven-resources-plugin`/`build-helper-maven-plugin`

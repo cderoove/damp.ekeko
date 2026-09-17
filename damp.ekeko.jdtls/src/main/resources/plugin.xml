@@ -4,6 +4,8 @@
    <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
       <delegateCommandHandler class="damp.ekeko.jdtls.EkekoCommandHandler">
          <command id="ekeko.rebuildModel" static="true"/>
+         <command id="ekeko.startRepl" static="true"/>
+         <command id="ekeko.stopRepl" static="true"/>
       </delegateCommandHandler>
    </extension>
 

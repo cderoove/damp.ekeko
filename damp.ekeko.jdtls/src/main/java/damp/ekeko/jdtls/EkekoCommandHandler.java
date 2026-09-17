@@ -22,12 +22,19 @@ import damp.util.Natures;
 public class EkekoCommandHandler implements IDelegateCommandHandler {
 
 	private static final String REBUILD_MODEL = "ekeko.rebuildModel";
+	private static final String START_REPL = "ekeko.startRepl";
+	private static final String STOP_REPL = "ekeko.stopRepl";
 
 	@Override
 	public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
 		switch (commandId) {
 		case REBUILD_MODEL:
 			return rebuildModel(monitor);
+		case START_REPL:
+			return EkekoReplController.startRepl();
+		case STOP_REPL:
+			EkekoReplController.stopRepl();
+			return null;
 		default:
 			throw new UnsupportedOperationException("Unsupported command: " + commandId);
 		}

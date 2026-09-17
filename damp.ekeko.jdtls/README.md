@@ -40,11 +40,34 @@ initialization option (or `java.reloadBundles`).
 
 ## Source layout
 
-`src/main/java` holds this module's own code (currently just
-`EkekoJdtlsActivator`, the `BundleActivator` that boots Ekeko inside jdt.ls).
+`src/main/java` holds this module's own code:
+
+- `EkekoJdtlsActivator` -- the `BundleActivator` that boots Ekeko inside
+  jdt.ls (enables the Ekeko nature on open Java projects).
+- `EkekoCommandHandler` -- the `IDelegateCommandHandler` dispatching
+  `workspace/executeCommand` calls (`ekeko.rebuildModel`, `ekeko.startRepl`,
+  `ekeko.stopRepl`), registered via `src/main/resources/plugin.xml`.
+- `EkekoReplController` -- starts/stops a plain nREPL server inside this
+  bundle's own classloader, for a client (e.g. Calva) to connect to.
+
 The rest of the query engine is built directly from `damp.ekeko.plugin`'s
 own source (see the `maven-resources-plugin`/`build-helper-maven-plugin`
 configuration in `pom.xml`), excluding the Eclipse-workbench-coupled parts
 of that plugin that don't apply here (the Barista results-table UI,
 property/preference pages, menu action handlers, the REPL controller, and
 the Soot/workspace-reification subtrees).
+
+## Troubleshooting: stale Equinox bundle cache
+
+Equinox (the OSGi runtime jdt.ls runs on) persists a bundle cache under
+`<redhat.java's globalStorage config dir>/org.eclipse.osgi/`, separate from
+the per-workspace `-data` directory. When iterating on this module locally,
+symptoms like a bundle silently not exposing its `plugin.xml` extensions (no
+warning, or "The bundle is not marked as singleton" even after fixing that),
+or a `FileNotFoundException` for a resource that's verifiably present in the
+jar (e.g. `nrepl/server.clj`) with the exact same classloader on both sides,
+are usually this cache holding onto a bundle registration from a previous,
+different version of the jar at the same install path. Deleting that
+`org.eclipse.osgi` directory (both `config_linux` and `config_ss_linux`, or
+their platform equivalents) and restarting resolves it; clearing just the
+`-data`/workspaceStorage directory is not enough.

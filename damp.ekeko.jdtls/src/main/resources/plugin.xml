@@ -6,6 +6,7 @@
          <command id="ekeko.rebuildModel" static="true"/>
          <command id="ekeko.startRepl" static="true"/>
          <command id="ekeko.stopRepl" static="true"/>
+         <command id="ekeko.runQuery" static="true"/>
       </delegateCommandHandler>
    </extension>
 

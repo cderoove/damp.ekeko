@@ -24,6 +24,7 @@ public class EkekoCommandHandler implements IDelegateCommandHandler {
 	private static final String REBUILD_MODEL = "ekeko.rebuildModel";
 	private static final String START_REPL = "ekeko.startRepl";
 	private static final String STOP_REPL = "ekeko.stopRepl";
+	private static final String RUN_QUERY = "ekeko.runQuery";
 
 	@Override
 	public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
@@ -35,6 +36,8 @@ public class EkekoCommandHandler implements IDelegateCommandHandler {
 		case STOP_REPL:
 			EkekoReplController.stopRepl();
 			return null;
+		case RUN_QUERY:
+			return EkekoQueryRunner.runQuery((String) arguments.get(0));
 		default:
 			throw new UnsupportedOperationException("Unsupported command: " + commandId);
 		}

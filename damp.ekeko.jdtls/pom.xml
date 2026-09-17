@@ -298,6 +298,36 @@
         </executions>
       </plugin>
 
+      <!-- Ekeko's own .clj sources are embedded as plain resources in the
+           bundle jar above (readable by clj-kondo/clojure-lsp directly,
+           the same way they read any library dependency jar on a Clojure
+           project's classpath), but core.logic and qwal, whose macros
+           (fresh/run*/==/conde/qwal/...) damp.ekeko's own macros expand
+           into, are only embedded as *nested* jars on this OSGi bundle's
+           Bundle-ClassPath (Embed-Dependency, above), which clj-kondo
+           can't see inside. Stage plain copies of just those two here so
+           the VS Code extension can point clj-kondo/clojure-lsp's
+           :classpath at real files (via .lsp/config.edn) and resolve
+           Ekeko's/core.logic's own symbols for autocomplete and
+           diagnostics instead of flagging every one as unresolved. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.11.0</version>
+        <executions>
+          <execution>
+            <id>stage-lint-classpath-libs</id>
+            <phase>generate-resources</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lint-libs</outputDirectory>
+              <includeArtifactIds>core.logic,qwal</includeArtifactIds>
+              <stripVersion>false</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

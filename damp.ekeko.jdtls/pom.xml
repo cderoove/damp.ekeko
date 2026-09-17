@@ -53,6 +53,7 @@
     <spec-alpha.version>0.5.238</spec-alpha.version>
     <core-specs-alpha.version>0.4.74</core-specs-alpha.version>
     <nrepl.version>1.7.0</nrepl.version>
+    <cider-nrepl.version>0.62.2</cider-nrepl.version>
   </properties>
 
   <repositories>
@@ -171,6 +172,15 @@
       <groupId>nrepl</groupId>
       <artifactId>nrepl</artifactId>
       <version>${nrepl.version}</version>
+    </dependency>
+    <!-- Middleware for the nREPL server started by EkekoReplController;
+         without it, Calva (and any other cider-nrepl-aware client) warns
+         "The nREPL server does not support cider-nrepl `info` op" and loses
+         completion/eldoc/definition-lookup/test-runner support. -->
+    <dependency>
+      <groupId>cider</groupId>
+      <artifactId>cider-nrepl</artifactId>
+      <version>${cider-nrepl.version}</version>
     </dependency>
   </dependencies>
 
@@ -300,8 +310,13 @@
                  Bundle-ClassPath instead, where Embed-Dependency already
                  puts them. -->
             <Private-Package>damp.*,edu.cmu.cs.crystal.*</Private-Package>
-            <!-- Embed the deps not provided by the jdt.ls host. -->
-            <Embed-Dependency>clojure,spec.alpha,core.specs.alpha,core.logic,qwal,nrepl</Embed-Dependency>
+            <!-- Embed the deps not provided by the jdt.ls host. cider-nrepl's
+                 own dependencies (orchard, logjam, clj-reload, suitable,
+                 compliment) are listed explicitly rather than relied on via
+                 Embed-Transitive: that flag did not pull them into the jar
+                 in practice (verified by inspecting the built jar), so each
+                 is named here. -->
+            <Embed-Dependency>clojure,spec.alpha,core.specs.alpha,core.logic,qwal,nrepl,cider-nrepl,orchard,logjam,clj-reload,suitable,compliment</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <!-- Most of this bundle's actual JDT/Eclipse/OSGi package
                  usage lives in the .clj source files bundled as plain

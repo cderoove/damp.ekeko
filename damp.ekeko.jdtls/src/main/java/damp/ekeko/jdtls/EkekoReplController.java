@@ -3,6 +3,7 @@ package damp.ekeko.jdtls;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Keyword;
+import clojure.lang.Var;
 
 import java.util.Map;
 
@@ -38,9 +39,20 @@ public final class EkekoReplController {
 		try {
 			IFn require = Clojure.var("clojure.core", "require");
 			require.invoke(Clojure.read("nrepl.server"));
-			IFn defaultHandler = Clojure.var("nrepl.server", "default-handler");
+			require.invoke(Clojure.read("cider.nrepl"));
 			IFn startServer = Clojure.var("nrepl.server", "start-server");
-			Object handler = defaultHandler.invoke();
+			// cider.nrepl/cider-nrepl-handler is cider-nrepl's own ready-built
+			// handler: nrepl.server/default-handler (which already merges in
+			// nREPL's own default middleware) applied to cider-middleware's
+			// entries. Reuse it as-is rather than re-deriving it from
+			// cider-middleware directly: that var holds unresolved symbols,
+			// not vars/functions, and needs cider-nrepl's own internal
+			// resolve-or-fail first (an NPE deep in nrepl.server/default-handler
+			// otherwise). Without cider-nrepl's middleware at all, Calva (and
+			// other cider-nrepl-aware clients) connect to a bare nREPL server
+			// lacking the `info`/`complete`/`eldoc`/test-runner ops they
+			// expect, and warn accordingly.
+			Object handler = ((Var) Clojure.var("cider.nrepl", "cider-nrepl-handler")).deref();
 			Object startedServer = startServer.invoke(Keyword.intern("handler"), handler);
 			@SuppressWarnings("unchecked")
 			Map<Object, Object> serverMap = (Map<Object, Object>) startedServer;

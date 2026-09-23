@@ -14,23 +14,14 @@
     OSGi bundle hosting Ekeko's query engine (reused from damp.ekeko.plugin)
     inside a running Eclipse JDT Language Server process, contributed via
     the VS Code "Language Support for Java" (redhat.java) extension's
-    javaExtensions mechanism. Not built with Tycho (unlike damp.ekeko.plugin,
-    which targets a frozen Eclipse Neon p2 repository) because this bundle
-    targets whatever JDT/Eclipse Platform version the current jdt.ls
-    actually bundles; ordinary Maven dependencies on Eclipse Platform's
-    own Maven Central publications track that correctly.
+    javaExtensions mechanism. 
   </description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>21</maven.compiler.release>
 
-    <!-- Installed locally by install-local-deps.sh from the currently
-         installed redhat.java extension's bundled jdt.ls; not published
-         to any public repository (eclipse.jdt.ls is a Tycho/p2 product,
-         not a set of Maven Central artifacts). Re-run that script and
-         update this if/when the installed redhat.java version changes. -->
-    <jdtls-core.version>1.61.0.202609021834</jdtls-core.version>
+    <jdtls-core.version>1.61.0.20260903134612</jdtls-core.version>
 
     <!-- Eclipse Platform/JDT versions below are pinned to match exactly
          what the currently installed redhat.java bundles, since these
@@ -61,6 +52,19 @@
     <repository>
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
+    </repository>
+    <!-- JDTLS is not published to Maven Central, only to the Eclipse Releases Repository -->
+    <repository>
+      <id>eclipse-releases</id>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </repository>
+    <!-- In-project repository for unreleased internal dependencies (qwal) -->
+    <repository>
+      <id>damp-libs-repo</id>
+      <url>file://${project.basedir}/../damp.libs/repo</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -133,7 +137,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <!-- Installed locally by install-local-deps.sh; see that script. -->
       <groupId>org.eclipse.jdt.ls</groupId>
       <artifactId>org.eclipse.jdt.ls.core</artifactId>
       <version>${jdtls-core.version}</version>
@@ -163,7 +166,7 @@
       <version>${core-logic.version}</version>
     </dependency>
     <dependency>
-      <!-- Installed locally by install-local-deps.sh; see that script. -->
+      <!-- Resolved from damp-libs-repo (damp.libs/repo) -->
       <groupId>damp</groupId>
       <artifactId>qwal</artifactId>
       <version>1.0.3-SNAPSHOT</version>

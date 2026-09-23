@@ -16,19 +16,11 @@ doesn't provide them.
 
 ## Building
 
-Two dependencies aren't published to any public repository and must be
-installed into the local Maven repository first:
+Dependencies are resolved automatically by Maven:
+- `org.eclipse.jdt.ls:org.eclipse.jdt.ls.core` is fetched from the Eclipse Releases repository (`repo.eclipse.org`).
+- `damp:qwal` is resolved from the in-tree repository at `damp.libs/repo`.
 
-```sh
-./install-local-deps.sh
-```
-
-This installs `org.eclipse.jdt.ls:org.eclipse.jdt.ls.core` (extracted from
-the currently installed `redhat.java` extension) and `damp:qwal` (from
-`damp.ekeko/damp.libs/libs/qwal-1.0.3-SNAPSHOT.jar`). Re-run it whenever the
-installed `redhat.java` version changes.
-
-Then build normally:
+Build normally with Maven:
 
 ```sh
 mvn verify

@@ -216,8 +216,6 @@
   (-uninitialized [_]
     (EkekoListValueWrapper. nil nil)))
 
-
-
 (defn
   make-value|lst
   [owner property]

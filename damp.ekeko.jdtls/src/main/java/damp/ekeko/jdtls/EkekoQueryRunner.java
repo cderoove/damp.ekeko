@@ -142,6 +142,8 @@ public final class EkekoQueryRunner {
 	}
 
 	private static Map<String, Object> serializeCell(Object binding) {
+        // If the query result is an AST node we serialize it in such a way
+        // that an editor could link it back to its source location.
 		if (binding instanceof ASTNode) {
 			Map<String, Object> location = codeLocation((ASTNode) binding);
 			if (location != null) {
@@ -150,10 +152,39 @@ public final class EkekoQueryRunner {
 				return location;
 			}
 		}
+
 		Map<String, Object> cell = new LinkedHashMap<>();
+
+		// Ekeko wraps a node's non-ASTNode properties (lists, primitives,
+		// absent values) in records that carry only the owner node plus the
+		// property descriptor, so their own toString is an object identity
+		// and the descriptor's is its name -- neither is the value. Resolve
+		// them the same way the Eclipse plugin's Barista view does:
+		// SOULLabelProvider.prettyPrint calls astnode/value? and
+		// astnode/value-unwrapped (injected as FN_ISWRAPPER/FN_GETWRAPPEDVALUE
+		// by damp.ekeko.jdt.baristacallbacks) and renders the unwrapped
+		// value's toString. For a list property that yields the JDT
+		// ASTNode$NodeList, printing as "[int x, int y]".
+		if (isEkekoValueWrapper(binding)) {
+			Object unwrapped = unwrapEkekoValue(binding);
+			cell.put("kind", "value");
+			cell.put("text", unwrapped == null ? "null" : String.valueOf(unwrapped));
+			return cell;
+		}
+
 		cell.put("kind", "value");
 		cell.put("text", String.valueOf(binding));
 		return cell;
+	}
+
+	/** astnode/value? -- true for the list/primitive/absent value wrappers. */
+	private static boolean isEkekoValueWrapper(Object binding) {
+		return Boolean.TRUE.equals(Clojure.var("damp.ekeko.jdt.astnode", "value?").invoke(binding));
+	}
+
+	/** astnode/value-unwrapped -- the wrapper's actual property value. */
+	private static Object unwrapEkekoValue(Object wrapper) {
+		return Clojure.var("damp.ekeko.jdt.astnode", "value-unwrapped").invoke(wrapper);
 	}
 
 	private static String summarize(ASTNode node) {

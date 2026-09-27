@@ -1,5 +1,4 @@
 target/
-.classpath
 
 # Eclipse/jdt.ls build-path metadata, regenerated from pom.xml on import
 # (every entry is maven.pomderived). This module is a plain Maven bundle --

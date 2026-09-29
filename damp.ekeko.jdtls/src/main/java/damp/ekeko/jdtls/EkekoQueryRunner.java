@@ -167,7 +167,7 @@ public final class EkekoQueryRunner {
 		// ASTNode$NodeList, printing as "[int x, int y]".
 		if (isEkekoValueWrapper(binding)) {
 			Object unwrapped = unwrapEkekoValue(binding);
-			cell.put("kind", "value");
+			cell.put("kind", "wrapped-value");
 			cell.put("text", unwrapped == null ? "null" : String.valueOf(unwrapped));
 			return cell;
 		}

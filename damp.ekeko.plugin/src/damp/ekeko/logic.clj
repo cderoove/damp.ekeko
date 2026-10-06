@@ -163,15 +163,25 @@
 (extend-ISupportContains-to-arrays-of-class java.lang.Integer)
 (extend-ISupportContains-to-arrays-of-class java.lang.Byte)
 
+(defn-
+  throw-if-interrupted
+  "Stops the query running on this thread when the thread was interrupted,
+   e.g. by an nREPL \"interrupt\"."
+  []
+  (when (Thread/interrupted)
+    (throw (InterruptedException. "Ekeko query interrupted"))))
+
 ;^java.lang.Iterator
 ;for efficiency, assumes i is still a valid iterator
+;checks for interruption before each element.
 (defn-
   iterator-element
   [i e]
   (project [i]
-           (conde [(== e (.next ^Iterator i))]
-                  [(== true (.hasNext  ^Iterator i))
-                   (iterator-element i e)])))
+           (do (throw-if-interrupted)
+               (conde [(== e (.next ^Iterator i))]
+                      [(== true (.hasNext  ^Iterator i))
+                       (iterator-element i e)]))))
   
 (defn
   contains|iteratorbased

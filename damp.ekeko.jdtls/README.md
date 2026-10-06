@@ -62,12 +62,12 @@ initialization option (or `java.reloadBundles`).
 `damp.ekeko.plugin`'s SWT-based `damp.ekeko.gui` (excluded here -- see
 `pom.xml` -- since it `:import`s SWT/JFace/baristaui classes at namespace-
 load time, none of which are present in jdt.ls's headless runtime).
-`damp/ekeko.clj`'s `ekeko*`/`ekeko-n*` macros already resolve
-`damp.ekeko.gui/eclipse-uithread-return` and
-`damp.ekeko.gui/open-barista-results-viewer*` via `requiring-resolve`
-rather than a static require, specifically so a non-Eclipse host can supply
-its own -- exactly the plug-in point this file uses, calling
-`EkekoResultsBridge.showResults` instead of opening a Barista SWT view.
+`damp/ekeko.clj` requires whichever `damp.ekeko.gui` its host supplies, and
+`ekeko*`/`ekeko-n*` call its `with-query-progress`,
+`eclipse-uithread-return` and `open-barista-results-viewer*`. This bundle's
+version notifies the VS Code extension through `EkekoResultsBridge`: when a
+query starts and finishes (`ekeko.queryStarted`/`ekeko.queryFinished`, shown
+as a progress notification), and with its results (`ekeko.showResults`).
 This means evaluating `(ekeko* ...)`/`(ekeko-n* ...)` at a REPL connected
 here pops the VS Code results view automatically, same as it pops Barista's
 view in the Eclipse plugin.

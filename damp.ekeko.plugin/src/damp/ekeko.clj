@@ -7,7 +7,8 @@
   (:use [damp.ekeko logic])
   (:use [damp.ekeko.jdt ast structure aststructure convenience rewrites])
   (:use [damp.qwal])
-  (:require [damp.ekeko.util [text :as text]]))
+  (:require [damp.ekeko.util [text :as text]]
+            [damp.ekeko.gui :as gui]))
 
 ;; damp.ekeko.soot's whole-program-analysis relations (and damp.ekeko.jdt.soot,
 ;; its JDT-facing counterpart) used to be :use'd here unconditionally, which
@@ -19,16 +20,12 @@
 ;;   (require '[damp.ekeko.soot.soot :refer :all])
 ;;   (require '[damp.ekeko.jdt.soot :refer :all])
 
-;; damp.ekeko.gui (the Eclipse/SWT results-viewer popup used by ekeko*/
-;; ekeko-n* below) is intentionally not :require'd here either, and is
-;; instead resolved lazily via requiring-resolve inside those two macros.
-;; damp.ekeko.gui only exists as part of the Eclipse plugin UI, so eagerly
-;; requiring it here would make it impossible to load this namespace (and
-;; therefore use the GUI-free `ekeko` macro, or any other relation defined
-;; here) from a host with no Eclipse workbench -- such as a language
-;; server. ekeko*/ekeko-n* remain unchanged for the Eclipse plugin, since
-;; damp.ekeko.gui does get resolved (and its result cached) the first time
-;; either macro's generated code actually runs.
+;; damp.ekeko.gui is supplied by the host that runs Ekeko: the Eclipse
+;; plugin's opens Barista views in the SWT UI, while the jdt.ls bundle's
+;; (damp.ekeko.jdtls) has its own damp/ekeko/gui.clj that notifies the VS
+;; Code extension instead. Each host must therefore implement the functions
+;; used below: with-query-progress, eclipse-uithread-return and
+;; open-barista-results-viewer*.
 
 (defmacro 
   ekeko
@@ -49,6 +46,20 @@
                        (equals resultvar# [~@logicvars])
                        ~@goals))))
 
+(defn
+  show-query-results*
+  "Runs a query on behalf of ekeko* and ekeko-n*: calls `run`, which returns
+   the solutions of `query` (a quoted query form) for the variables `vars`,
+   while the host shows that a query is in progress, and then opens a
+   results view on those solutions."
+  [query vars run]
+  (let [querystr (text/pprint-query-str query)
+        start (System/nanoTime)
+        results (gui/with-query-progress querystr run)
+        elapsed (/ (double (- (System/nanoTime) start)) 1000000.0)]
+    (gui/eclipse-uithread-return
+      (fn [] (gui/open-barista-results-viewer* querystr vars results elapsed (count results))))))
+
 (defmacro 
   ekeko*
   "Launches a query like ekeko, but opens an Eclipse view on the solutions. 
@@ -61,19 +72,12 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [vars & goals]
-  `(let [querystr# (text/pprint-query-str '(ekeko* [~@vars] ~@goals))
-         start# (System/nanoTime)
-         resultsqc# (doall (run-nc* [resultvar#] 
-                                 (fresh [~@vars]
-                                        (equals resultvar# [~@vars])
-                                        ~@goals)))
-         elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
-         cnt# (count resultsqc#)]
-     ((requiring-resolve 'damp.ekeko.gui/eclipse-uithread-return)
-      (fn [] ((requiring-resolve 'damp.ekeko.gui/open-barista-results-viewer*)
-              querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+  `(show-query-results* '(ekeko* [~@vars] ~@goals) '(~@vars)
+                        (fn [] (doall (run-nc* [resultvar#]
+                                        (fresh [~@vars]
+                                               (equals resultvar# [~@vars])
+                                               ~@goals))))))
 
-;TODO: eliminate code duplication
 (defmacro 
   ekeko-n* 
   "Equivalent to core.logic's run with disabled occurs check,
@@ -90,17 +94,11 @@
    See also:
    ekeko which doesn't open a view on the solutions"
   [n vars & goals]
-  `(let [querystr# (text/pprint-query-str '(ekeko-n* [~@vars] ~@goals))
-         start# (System/nanoTime)
-         resultsqc# (doall (run-nc ~n [resultvar#] 
-                                 (fresh [~@vars]
-                                        (equals resultvar# [~@vars])
-                                        ~@goals)))
-         elapsed#  (/ (double (- (System/nanoTime) start#)) 1000000.0)
-         cnt# (count resultsqc#)]
-     ((requiring-resolve 'damp.ekeko.gui/eclipse-uithread-return)
-      (fn [] ((requiring-resolve 'damp.ekeko.gui/open-barista-results-viewer*)
-              querystr# '(~@vars) resultsqc# elapsed# cnt#)))))
+  `(show-query-results* '(ekeko-n* [~@vars] ~@goals) '(~@vars)
+                        (fn [] (doall (run-nc ~n [resultvar#]
+                                        (fresh [~@vars]
+                                               (equals resultvar# [~@vars])
+                                               ~@goals))))))
 
 
 ;Example repl session

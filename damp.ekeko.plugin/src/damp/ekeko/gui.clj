@@ -25,6 +25,18 @@
     @result))
 
 
+;; Queries
+;; -------
+
+(defn
+  with-query-progress
+  "Calls `f`, which runs the query `querystr`, and returns its value. A host
+   can use this to show that a query is in progress; damp.ekeko.jdtls's
+   counterpart notifies VS Code. Here, the REPL already shows that."
+  [querystr f]
+  (f))
+
+
 ;; Workbench
 ;; ---------
 

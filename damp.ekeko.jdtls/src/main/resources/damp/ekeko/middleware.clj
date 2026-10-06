@@ -7,6 +7,7 @@
          preceded by an explanatory message on :err."}
   damp.ekeko.middleware
   (:require [nrepl.middleware :as middleware]
+            [nrepl.middleware.interruptible-eval :as interruptible-eval]
             [nrepl.transport :as t])
   (:import (java.util.concurrent Executors ScheduledExecutorService ThreadFactory TimeUnit)))
 
@@ -61,21 +62,27 @@
    it is still queued behind another evaluation in its session
    (`interrupt-id-mismatch`), or when it has not even reached the session
    yet (`session-idle`), e.g. while cider-nrepl lazily loads its middleware
-   on the first request."
-  [handler msg timeout-ms done? timer]
+   on the first request. Sets `expired` to `timeout-ms` when the request is
+   interrupted."
+  [handler msg timeout-ms done? timer expired]
   (reset! timer
           (schedule timeout-ms
                     (fn []
                       (when-not @done?
+                        ;; Set before interrupting, so that the evaluation
+                        ;; sees it as soon as it is interrupted.
+                        (reset! expired timeout-ms)
                         (let [statuses (interrupt-eval! handler msg timeout-ms)]
-                          (when (and (some statuses ["interrupt-id-mismatch" "session-idle"])
-                                     (not @done?))
-                            (arm-timeout! handler msg timeout-ms done? timer))))))))
+                          (when (some statuses ["interrupt-id-mismatch" "session-idle"])
+                            (reset! expired nil)
+                            (when-not @done?
+                              (arm-timeout! handler msg timeout-ms done? timer expired)))))))))
 
 (defn- timed-eval
   [handler {:keys [transport] :as msg} timeout-ms]
   (let [done? (atom false)
         timer (atom nil)
+        expired (atom nil)
         watching (reify t/Transport
                    (recv [_] (t/recv transport))
                    (recv [_ timeout] (t/recv transport timeout))
@@ -86,8 +93,15 @@
                        (some-> ^java.util.concurrent.Future @timer (.cancel false)))
                      (t/send transport response)
                      this))]
-    (arm-timeout! handler msg timeout-ms done? timer)
-    (handler (assoc msg :transport watching))))
+    (arm-timeout! handler msg timeout-ms done? timer expired)
+    (handler (assoc msg :transport watching ::expired expired))))
+
+(defn expired-timeout
+  "When called from an evaluation that wrap-eval-timeout interrupted because
+   it ran too long, returns that timeout in milliseconds; nil otherwise,
+   e.g. when it was interrupted by the client, or outside an nREPL eval."
+  []
+  (some-> interruptible-eval/*msg* ::expired deref))
 
 (defn wrap-eval-timeout
   "Returns an nREPL middleware that interrupts \"eval\" requests still

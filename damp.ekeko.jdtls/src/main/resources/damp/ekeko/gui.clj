@@ -1,14 +1,26 @@
 (ns
   ^{:doc "This bundle's own stand-in for the Eclipse plugin's SWT-based
           damp.ekeko.gui (damp.ekeko.plugin/src/damp/ekeko/gui.clj, excluded
-          from this bundle -- see pom.xml). damp/ekeko.clj's ekeko*/ekeko-n*
-          macros resolve damp.ekeko.gui/eclipse-uithread-return and
-          damp.ekeko.gui/open-barista-results-viewer* via requiring-resolve
-          rather than a static require specifically so a host with no
-          Eclipse workbench (this one) can supply its own; unchanged
-          otherwise, this is that plug-in point, pushing results to the VS
-          Code results webview instead of opening a Barista SWT view."}
-  damp.ekeko.gui)
+          from this bundle -- see pom.xml). damp.ekeko requires whichever
+          damp.ekeko.gui its host supplies; this one notifies the VS Code
+          extension instead of opening Barista SWT views."}
+  damp.ekeko.gui
+  (:require [damp.ekeko.middleware :as middleware])
+  (:import (damp.ekeko.jdtls EkekoResultsBridge)))
+
+(defn with-query-progress
+  "Calls `f`, which runs the query `querystr`, and returns its value. Tells
+   the VS Code extension when the query starts and when it ends (normally,
+   by an exception or by being interrupted), so it can show it is running
+   and warn when it was stopped by the REPL's eval timeout. See
+   EkekoResultsBridge.queryStarted/queryFinished."
+  [querystr f]
+  (let [id (str (java.util.UUID/randomUUID))]
+    (EkekoResultsBridge/queryStarted id querystr)
+    (try
+      (f)
+      (finally
+        (EkekoResultsBridge/queryFinished id (middleware/expired-timeout))))))
 
 (defn eclipse-uithread-return
   "The Eclipse plugin's counterpart runs its argument on the mandatory SWT
@@ -19,10 +31,8 @@
 
 (defn open-barista-results-viewer*
   "The Eclipse plugin's counterpart opens a Barista SWT view on the
-   results. Pushes the same data to the VS Code extension host instead (a
-   fire-and-forget workspace/notify, per JavaClientConnection/
-   ExecuteCommandProposedClient), which opens/updates the results webview
-   there -- see EkekoResultsBridge.showResults and ekeko.showResults in
-   ekeko-vscode/src/extension.ts."
+   results. Pushes the same data to the VS Code extension host instead,
+   which opens/updates the results webview there -- see
+   EkekoResultsBridge.showResults."
   [querystr vars results elapsed cnt]
-  (damp.ekeko.jdtls.EkekoResultsBridge/showResults querystr vars results elapsed cnt))
+  (EkekoResultsBridge/showResults querystr vars results elapsed cnt))

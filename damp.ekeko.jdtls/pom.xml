@@ -283,15 +283,12 @@
                          classes at namespace-load time (not just when its
                          functions are called), none of which are present
                          in jdt.ls's headless runtime, so loading it here
-                         would throw ClassNotFoundException the moment
-                         ekeko*/ekeko-n* first resolve it. This bundle
-                         provides its own damp/ekeko/gui.clj instead (see
-                         src/main/resources), implementing the same
-                         eclipse-uithread-return/open-barista-results-viewer*
-                         contract those macros already call via
-                         requiring-resolve, but pushing results to the VS
-                         Code results webview instead of opening a Barista
-                         SWT view. -->
+                         would throw ClassNotFoundException as soon as
+                         damp.ekeko requires it. This bundle provides its
+                         own damp/ekeko/gui.clj instead (see
+                         src/main/resources), implementing the same functions
+                         but notifying the VS Code extension instead of
+                         opening Barista SWT views. -->
                     <exclude>damp/ekeko/gui.clj</exclude>
                   </excludes>
                 </resource>

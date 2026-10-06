@@ -4,6 +4,7 @@
    damp.ekeko.logic 
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic])
+  (:require [clojure.core.logic.protocols :as lp])
   (:import [java.util Iterator]
            [java.lang Iterable]) 
   )
@@ -171,17 +172,30 @@
   (when (Thread/interrupted)
     (throw (InterruptedException. "Ekeko query interrupted"))))
 
+;; Makes every core.logic query interruptible. core.logic's search never
+;; checks for interruption itself, so an interrupted query would otherwise
+;; keep running until it is done, unless its thread is forcibly stopped.
+;; core.logic (1.1.1) represents each suspended step of a search (created
+;; by fresh, conde, recursive goals, ...) as a function, and advances the
+;; search by calling take* on it. Replaces core.logic's own take* for
+;; functions by one that checks for interruption before each such step and
+;; otherwise does the same. Applies to all core.logic queries in this JVM.
+(extend-type clojure.lang.Fn
+  lp/ITake
+  (take* [this]
+    (lazy-seq
+      (throw-if-interrupted)
+      (lp/take* (this)))))
+
 ;^java.lang.Iterator
 ;for efficiency, assumes i is still a valid iterator
-;checks for interruption before each element.
 (defn-
   iterator-element
   [i e]
   (project [i]
-           (do (throw-if-interrupted)
-               (conde [(== e (.next ^Iterator i))]
-                      [(== true (.hasNext  ^Iterator i))
-                       (iterator-element i e)]))))
+           (conde [(== e (.next ^Iterator i))]
+                  [(== true (.hasNext  ^Iterator i))
+                   (iterator-element i e)])))
   
 (defn
   contains|iteratorbased

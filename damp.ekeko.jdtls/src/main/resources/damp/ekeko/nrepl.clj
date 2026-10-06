@@ -8,11 +8,22 @@
      not block its REPL session (see damp.ekeko.middleware)."
   (:require [cider.nrepl]
             [damp.ekeko.middleware :refer [wrap-eval-timeout]]
+            [nrepl.config]
             [nrepl.server]))
 
 ;; The running server (as returned by nrepl.server/start-server), or nil.
 ;; Start/stop lock on the atom itself so that two servers are never started concurrently. 
 (defonce ^:private server (atom nil))
+
+(defn- disable-jvmti-agent-on-windows!
+  "nREPL force-stops an interrupted evaluation that keeps running with a
+   native JVMTI agent, but only ships one for Linux and macOS: on Windows it
+   tries to load the Linux one, which fails. Turns the agent off there (as
+   nREPL's own :enable-jvmti-agent config option would), so such an
+   evaluation is only interrupted, never forcibly stopped."
+  []
+  (when (re-find #"(?i)windows" (System/getProperty "os.name"))
+    (alter-var-root #'nrepl.config/config assoc :enable-jvmti-agent false)))
 
 (defn start-repl
   "Starts an nREPL server inside this JVM (unless one is already running)
@@ -31,6 +42,7 @@
        ;; middleware's "interrupt" op, so it has to wrap the complete
        ;; handler stack.
        (let [handler ((wrap-eval-timeout timeout-ms) cider.nrepl/cider-nrepl-handler)
+             _ (disable-jvmti-agent-on-windows!)
              started (nrepl.server/start-server :handler handler)]
          (reset! server started)
          (:port started))))))

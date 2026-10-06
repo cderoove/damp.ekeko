@@ -40,8 +40,12 @@ initialization option (or `java.reloadBundles`).
   `workspace/executeCommand` calls (`ekeko.rebuildModel`, `ekeko.startRepl`,
   `ekeko.stopRepl`, `ekeko.runQuery`), registered via
   `src/main/resources/plugin.xml`.
-- `EkekoReplController` -- starts/stops a plain nREPL server inside this
-  bundle's own classloader, for a client (e.g. Calva) to connect to.
+- `EkekoReplController` -- starts/stops an nREPL server (with cider-nrepl's
+  middleware) inside this bundle's own classloader, for a client (e.g.
+  Calva) to connect to. The server itself is managed by
+  `src/main/resources/damp/ekeko/nrepl.clj`. `ekeko.startRepl` takes an
+  optional eval timeout in milliseconds as its first argument; evaluations
+  running longer are interrupted (`damp/ekeko/middleware.clj`).
 - `EkekoQueryRunner` -- backs `ekeko.runQuery`: evals a query string in the
   `damp.ekeko` namespace and serializes the result into plain
   `Map`/`List`/primitives (Gson-friendly), turning any `ASTNode` binding

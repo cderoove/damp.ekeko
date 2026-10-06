@@ -2,15 +2,14 @@ package damp.ekeko.jdtls;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
-import clojure.lang.Keyword;
-import clojure.lang.Var;
-
-import java.util.Map;
+import clojure.lang.RT;
 
 /**
  * Starts/stops an nREPL server inside this bundle's own JVM/classloader, so
  * a connected client (e.g. Calva) can evaluate Clojure code with full,
  * direct access to the live Ekeko query engine and JDT model running here.
+ * The actual work (and the server state) lives in damp/ekeko/nrepl.clj;
+ * this class only bridges to it from Java.
  *
  * damp.ekeko.plugin's own REPLController did the equivalent via
  * Counterclockwise's ClojureOSGi.withBundle/BundleUtils, which aren't
@@ -23,68 +22,46 @@ import java.util.Map;
  */
 public final class EkekoReplController {
 
-	private static Object server;
-	private static int port = -1;
+	private static final String NREPL_NS = "damp.ekeko.nrepl";
 
 	private EkekoReplController() {
 	}
 
-	public static synchronized int startRepl() throws Exception {
-		if (server != null) {
-			return port;
-		}
-		ClassLoader previous = Thread.currentThread().getContextClassLoader();
-		ClassLoader bundleLoader = EkekoReplController.class.getClassLoader();
-		Thread.currentThread().setContextClassLoader(bundleLoader);
-		try {
-			IFn require = Clojure.var("clojure.core", "require");
-			require.invoke(Clojure.read("nrepl.server"));
-			require.invoke(Clojure.read("cider.nrepl"));
-			IFn startServer = Clojure.var("nrepl.server", "start-server");
-			// cider.nrepl/cider-nrepl-handler is cider-nrepl's own ready-built
-			// handler: nrepl.server/default-handler (which already merges in
-			// nREPL's own default middleware) applied to cider-middleware's
-			// entries. Reuse it as-is rather than re-deriving it from
-			// cider-middleware directly: that var holds unresolved symbols,
-			// not vars/functions, and needs cider-nrepl's own internal
-			// resolve-or-fail first (an NPE deep in nrepl.server/default-handler
-			// otherwise). Without cider-nrepl's middleware at all, Calva (and
-			// other cider-nrepl-aware clients) connect to a bare nREPL server
-			// lacking the `info`/`complete`/`eldoc`/test-runner ops they
-			// expect, and warn accordingly.
-			Object handler = ((Var) Clojure.var("cider.nrepl", "cider-nrepl-handler")).deref();
-			Object startedServer = startServer.invoke(Keyword.intern("handler"), handler);
-			@SuppressWarnings("unchecked")
-			Map<Object, Object> serverMap = (Map<Object, Object>) startedServer;
-			port = (Integer) serverMap.get(Keyword.intern("port"));
-			server = startedServer;
-			return port;
-		} finally {
-			Thread.currentThread().setContextClassLoader(previous);
-		}
+	public static int startRepl() throws Exception {
+		return startRepl(null);
 	}
 
-	public static synchronized void stopRepl() throws Exception {
-		if (server == null) {
-			return;
-		}
+	/**
+	 * @param timeoutMs milliseconds after which a still running "eval"
+	 *                  request is interrupted; {@code null} or non-positive
+	 *                  for no timeout. Ignored when a server is already
+	 *                  running.
+	 */
+	public static int startRepl(Long timeoutMs) throws Exception {
+		return ((Number) invoke("start-repl", timeoutMs)).intValue();
+	}
+
+	public static void stopRepl() throws Exception {
+		invoke("stop-repl");
+	}
+
+	public static boolean isRunning() {
+		return (Boolean) invoke("running?");
+	}
+
+	public static int getPort() {
+		return ((Number) invoke("port")).intValue();
+	}
+
+	private static Object invoke(String fnName, Object... args) {
 		ClassLoader previous = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(EkekoReplController.class.getClassLoader());
 		try {
-			IFn stopServer = Clojure.var("nrepl.server", "stop-server");
-			stopServer.invoke(server);
+			IFn require = Clojure.var("clojure.core", "require");
+			require.invoke(Clojure.read(NREPL_NS));
+			return Clojure.var(NREPL_NS, fnName).applyTo(RT.seq(args));
 		} finally {
 			Thread.currentThread().setContextClassLoader(previous);
-			server = null;
-			port = -1;
 		}
-	}
-
-	public static synchronized boolean isRunning() {
-		return server != null;
-	}
-
-	public static synchronized int getPort() {
-		return port;
 	}
 }

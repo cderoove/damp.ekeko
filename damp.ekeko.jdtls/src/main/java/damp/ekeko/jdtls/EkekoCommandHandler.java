@@ -1,5 +1,6 @@
 package damp.ekeko.jdtls;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class EkekoCommandHandler implements IDelegateCommandHandler {
 		case REBUILD_MODEL:
 			return rebuildModel(monitor);
 		case START_REPL:
-			return EkekoReplController.startRepl();
+			return EkekoReplController.startRepl(timeoutArgument(arguments));
 		case STOP_REPL:
 			EkekoReplController.stopRepl();
 			return null;
@@ -41,6 +42,18 @@ public class EkekoCommandHandler implements IDelegateCommandHandler {
 		default:
 			throw new UnsupportedOperationException("Unsupported command: " + commandId);
 		}
+	}
+
+	/**
+	 * Parses the optional first argument of {@link #START_REPL} from the string version of the GSON
+     * JSON element to a numer.	
+     */
+	private static Long timeoutArgument(List<Object> arguments) {
+		if (arguments == null || arguments.isEmpty() || arguments.get(0) == null) {
+			return null;
+		}
+		String timeout = arguments.get(0).toString().replace("\"", "");
+		return timeout.equals("null") ? null : new BigDecimal(timeout).longValue();
 	}
 
 	private Object rebuildModel(IProgressMonitor monitor) throws Exception {

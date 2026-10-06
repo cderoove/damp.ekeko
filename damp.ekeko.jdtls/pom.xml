@@ -45,6 +45,8 @@
     <core-specs-alpha.version>0.4.74</core-specs-alpha.version>
     <nrepl.version>1.7.0</nrepl.version>
     <cider-nrepl.version>0.62.2</cider-nrepl.version>
+    <!-- Qualifier of the bundle's version, see Bundle-Version below. -->
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
   </properties>
 
   <repositories>
@@ -444,6 +446,7 @@
                  bundle's plugin.xml extensions at all (delegateCommandHandler
                  included); without it they're silently ignored. -->
             <Bundle-SymbolicName>damp.ekeko.jdtls;singleton:=true</Bundle-SymbolicName>
+            <Bundle-Version>1.0.0.${maven.build.timestamp}</Bundle-Version>
             <Bundle-Activator>damp.ekeko.jdtls.EkekoJdtlsActivator</Bundle-Activator>
             <Bundle-RequiredExecutionEnvironment>JavaSE-21</Bundle-RequiredExecutionEnvironment>
             <!-- By default bnd only bundles resources from packages that

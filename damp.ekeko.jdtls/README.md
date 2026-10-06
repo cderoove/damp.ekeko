@@ -38,7 +38,7 @@ initialization option (or `java.reloadBundles`).
   jdt.ls (enables the Ekeko nature on open Java projects).
 - `EkekoCommandHandler` -- the `IDelegateCommandHandler` dispatching
   `workspace/executeCommand` calls (`ekeko.rebuildModel`, `ekeko.startRepl`,
-  `ekeko.stopRepl`, `ekeko.runQuery`), registered via
+  `ekeko.stopRepl`, `ekeko.runQuery`, `ekeko.cancelQuery`), registered via
   `src/main/resources/plugin.xml`.
 - `EkekoReplController` -- starts/stops an nREPL server (with cider-nrepl's
   middleware) inside this bundle's own classloader, for a client (e.g.
@@ -68,6 +68,9 @@ load time, none of which are present in jdt.ls's headless runtime).
 version notifies the VS Code extension through `EkekoResultsBridge`: when a
 query starts and finishes (`ekeko.queryStarted`/`ekeko.queryFinished`, shown
 as a progress notification), and with its results (`ekeko.showResults`).
+`ekeko.cancelQuery` (given the id from `ekeko.queryStarted`) interrupts the
+nREPL evaluation running that query, e.g. from the progress notification's
+cancel button.
 This means evaluating `(ekeko* ...)`/`(ekeko-n* ...)` at a REPL connected
 here pops the VS Code results view automatically, same as it pops Barista's
 view in the Eclipse plugin.

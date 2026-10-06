@@ -8,23 +8,12 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin;
 
+import clojure.java.api.Clojure;
+
 /**
- * Called from this bundle's own {@code damp.ekeko.gui} namespace (see
- * {@code src/main/resources/damp/ekeko/gui.clj}) -- the jdt.ls-side stand-in
- * for the Eclipse plugin's SWT-based {@code damp.ekeko.gui}, resolved the
- * same way via {@code requiring-resolve} from {@code ekeko*}/{@code
- * ekeko-n*} in {@code damp/ekeko.clj}, unchanged there. Instead of opening a
- * Barista SWT view, pushes the finished query's results to the VS Code
- * extension host as a {@code workspace/notify} notification (fire-and-
- * forget, per {@code JavaClientConnection.sendNotification}/{@code
- * ExecuteCommandProposedClient}), where {@code ekeko.showResults} opens/
- * updates the results webview -- reachable from any client-registered VS
- * Code command, not just ones jdt.ls itself advertises, since the LSP
- * client library dispatches {@code workspace/notify} via a plain {@code
- * vscode.commands.executeCommand}.
+ * Bridge to show the query results from ekeko. 
  *
- * {@link #queryStarted}/{@link #queryFinished} likewise notify the extension
- * host around each query, so it can show that one is running.
+ * Called from within Ekeko itself (see {@code src/main/resources/damp/ekeko/gui.clj}).
  */
 public final class EkekoResultsBridge {
 
@@ -58,6 +47,22 @@ public final class EkekoResultsBridge {
 			notifyClient("ekeko.queryFinished", id);
 		} else {
 			notifyClient("ekeko.queryFinished", id, expiredTimeoutMs);
+		}
+	}
+
+	/**
+	 * Interrupts the nREPL evaluation running the query with the given id,
+	 * as given to {@link #queryStarted}. 
+	 * @return whether that query was still running and has been cancelled
+	 */
+	public static boolean cancelQuery(String id) {
+		ClassLoader previous = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(EkekoResultsBridge.class.getClassLoader());
+		try {
+			Clojure.var("clojure.core", "require").invoke(Clojure.read("damp.ekeko.gui"));
+			return Boolean.TRUE.equals(Clojure.var("damp.ekeko.gui", "cancel-query").invoke(id));
+		} finally {
+			Thread.currentThread().setContextClassLoader(previous);
 		}
 	}
 

@@ -8,19 +8,35 @@
   (:require [damp.ekeko.middleware :as middleware])
   (:import (damp.ekeko.jdtls EkekoResultsBridge)))
 
+;; Cancels each running query (as a no-argument function), by its id.
+(defonce ^:private cancellers (atom {}))
+
 (defn with-query-progress
   "Calls `f`, which runs the query `querystr`, and returns its value. Tells
    the VS Code extension when the query starts and when it ends (normally,
    by an exception or by being interrupted), so it can show it is running
    and warn when it was stopped by the REPL's eval timeout. See
-   EkekoResultsBridge.queryStarted/queryFinished."
+   EkekoResultsBridge.queryStarted/queryFinished. While it runs, the query
+   can be cancelled by its id, see cancel-query."
   [querystr f]
   (let [id (str (java.util.UUID/randomUUID))]
+    (when-let [cancel (middleware/cancel-current-eval)]
+      (swap! cancellers assoc id cancel))
     (EkekoResultsBridge/queryStarted id querystr)
     (try
       (f)
       (finally
+        (swap! cancellers dissoc id)
         (EkekoResultsBridge/queryFinished id (middleware/expired-timeout))))))
+
+(defn cancel-query
+  "Interrupts the nREPL evaluation running the query with the id given to
+   it by with-query-progress, in the background. Returns whether that query
+   was still running and has been cancelled."
+  [id]
+  (if-let [cancel (get @cancellers id)]
+    (do (future (cancel)) true)
+    false))
 
 (defn eclipse-uithread-return
   "The Eclipse plugin's counterpart runs its argument on the mandatory SWT

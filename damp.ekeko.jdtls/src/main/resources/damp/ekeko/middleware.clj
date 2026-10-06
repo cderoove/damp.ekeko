@@ -34,16 +34,16 @@
 (defn- interrupt-eval!
   "Asks the session that runs the eval request `msg` to interrupt it.
    Responses to the interrupt request itself are captured and returned (as
-   a set of statuses); the `interrupted` notification for the eval request
-   is forwarded to the client, preceded by a message explaining why."
-  [handler {:keys [id session transport] :as msg} timeout-ms]
+   a set of statuses), waiting at most `wait-ms` for them; the `interrupted`
+   notification for the eval request is forwarded to the client, preceded
+   by the message `reason` explaining why."
+  [handler {:keys [id session transport] :as msg} reason wait-ms]
   (let [interrupt-statuses (promise)
         relay (t/fn-transport
                 (constantly nil)
                 (fn [response]
                   (if (= (:id response) id)
-                    (do (t/respond-to msg :err (str "Evaluation timed out after "
-                                                    timeout-ms " ms and was interrupted.\n"))
+                    (do (t/respond-to msg :err reason)
                         (t/send transport response))
                     (when (contains? (status-set response) "done")
                       (deliver interrupt-statuses (status-set response))))))]
@@ -52,7 +52,7 @@
               :session session
               :interrupt-id id
               :transport relay})
-    (deref interrupt-statuses timeout-ms #{})))
+    (deref interrupt-statuses wait-ms #{})))
 
 (defn- arm-timeout!
   "Schedules the interruption of the eval request `msg` once `timeout-ms`
@@ -72,11 +72,24 @@
                         ;; Set before interrupting, so that the evaluation
                         ;; sees it as soon as it is interrupted.
                         (reset! expired timeout-ms)
-                        (let [statuses (interrupt-eval! handler msg timeout-ms)]
+                        (let [statuses (interrupt-eval! handler msg
+                                                        (str "Evaluation timed out after "
+                                                             timeout-ms " ms and was interrupted.\n")
+                                                        timeout-ms)]
                           (when (some statuses ["interrupt-id-mismatch" "session-idle"])
                             (reset! expired nil)
                             (when-not @done?
                               (arm-timeout! handler msg timeout-ms done? timer expired)))))))))
+
+(def ^:private cancel-wait-ms
+  "How long a cancellation waits for the session to answer its interrupt."
+  5000)
+
+(defn- with-cancel
+  "Gives the eval request `msg` a function that interrupts it, for
+   cancel-current-eval to return."
+  [handler msg]
+  (assoc msg ::cancel #(interrupt-eval! handler msg "Evaluation was cancelled.\n" cancel-wait-ms)))
 
 (defn- timed-eval
   [handler {:keys [transport] :as msg} timeout-ms]
@@ -94,7 +107,9 @@
                      (t/send transport response)
                      this))]
     (arm-timeout! handler msg timeout-ms done? timer expired)
-    (handler (assoc msg :transport watching ::expired expired))))
+    ;; Cancelling through the watching transport lets it see the request
+    ;; is done, so the timeout is not re-armed for a cancelled request.
+    (handler (with-cancel handler (assoc msg :transport watching ::expired expired)))))
 
 (defn expired-timeout
   "When called from an evaluation that wrap-eval-timeout interrupted because
@@ -103,10 +118,19 @@
   []
   (some-> interruptible-eval/*msg* ::expired deref))
 
+(defn cancel-current-eval
+  "When called from an nREPL evaluation, returns a no-argument function
+   that interrupts it (from another thread), as if the client had sent an
+   \"interrupt\" for it; nil outside an nREPL eval."
+  []
+  (some-> interruptible-eval/*msg* ::cancel))
+
 (defn wrap-eval-timeout
   "Returns an nREPL middleware that interrupts \"eval\" requests still
    running after `timeout-ms` milliseconds. A nil or non-positive
-   `timeout-ms` disables the timeout. Other ops pass through unchanged.
+   `timeout-ms` disables the timeout. Whether or not a timeout applies,
+   evaluations can also be cancelled, see cancel-current-eval. Other ops
+   pass through unchanged.
 
    Interruption relies on nREPL's session middleware: evaluations outside
    of a session (ephemeral ones) cannot be interrupted and simply run to
@@ -118,9 +142,10 @@
   (with-meta
     (fn [handler]
       (fn [{:keys [op] :as msg}]
-        (if (and (= op "eval") timeout-ms (pos? timeout-ms))
-          (timed-eval handler msg timeout-ms)
-          (handler msg))))
+        (cond
+          (not= op "eval") (handler msg)
+          (and timeout-ms (pos? timeout-ms)) (timed-eval handler msg timeout-ms)
+          :else (handler (with-cancel handler msg)))))
     {::middleware/descriptor {:requires #{}
                               :expects #{"eval" "interrupt"}
                               :handles {}}}))

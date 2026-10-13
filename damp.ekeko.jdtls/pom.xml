@@ -37,6 +37,7 @@
     <equinox-preferences.version>3.12.100</equinox-preferences.version>
     <osgi.version>3.24.300</osgi.version>
     <eclipse-text.version>3.14.800</eclipse-text.version>
+    <lsp4j.version>1.0.0</lsp4j.version>
     <guava.version>33.6.0-jre</guava.version>
 
     <clojure.version>1.12.6</clojure.version>
@@ -142,6 +143,12 @@
       <groupId>org.eclipse.jdt.ls</groupId>
       <artifactId>org.eclipse.jdt.ls.core</artifactId>
       <version>${jdtls-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.lsp4j</groupId>
+      <artifactId>org.eclipse.lsp4j</artifactId>
+      <version>${lsp4j.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -343,6 +350,30 @@
               <outputDirectory>${project.build.directory}/lint-libs</outputDirectory>
               <includeArtifactIds>core.logic,qwal</includeArtifactIds>
               <stripVersion>false</stripVersion>
+            </configuration>
+          </execution>
+          <!-- The sources of the JDT DOM (AST node and binding classes, the
+               values most queries return), for the results view to show
+               their Javadoc on hover (see EkekoClassDocumentation): jdt.ls
+               only finds documentation for classes on the classpath of a
+               workspace project, which JDT's own normally aren't. Unpacked
+               under this bundle's own package prefix so Private-Package
+               (below) includes them as plain resources. -->
+          <execution>
+            <id>unpack-jdt-dom-sources</id>
+            <phase>generate-resources</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.jdt</groupId>
+                  <artifactId>org.eclipse.jdt.core</artifactId>
+                  <version>${jdt-core.version}</version>
+                  <classifier>sources</classifier>
+                  <includes>org/eclipse/jdt/core/dom/*.java</includes>
+                  <outputDirectory>${project.build.outputDirectory}/damp/ekeko/jdtls/sources</outputDirectory>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>

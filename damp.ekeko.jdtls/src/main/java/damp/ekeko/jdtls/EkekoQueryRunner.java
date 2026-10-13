@@ -149,6 +149,7 @@ public final class EkekoQueryRunner {
 			if (location != null) {
 				location.put("kind", "code");
 				location.put("text", summarize((ASTNode) binding));
+				putClassName(location, binding);
 				return location;
 			}
 		}
@@ -169,12 +170,24 @@ public final class EkekoQueryRunner {
 			Object unwrapped = unwrapEkekoValue(binding);
 			cell.put("kind", "wrapped-value");
 			cell.put("text", unwrapped == null ? "null" : String.valueOf(unwrapped));
+			putClassName(cell, unwrapped);
 			return cell;
 		}
 
 		cell.put("kind", "value");
 		cell.put("text", String.valueOf(binding));
+		putClassName(cell, binding);
 		return cell;
+	}
+
+	/**
+	 * Adds the class of the value a cell shows (e.g. for the results view to
+	 * show on hover); none for {@code null}.
+	 */
+	private static void putClassName(Map<String, Object> cell, Object value) {
+		if (value != null) {
+			cell.put("className", value.getClass().getName());
+		}
 	}
 
 	/** astnode/value? -- true for the list/primitive/absent value wrappers. */

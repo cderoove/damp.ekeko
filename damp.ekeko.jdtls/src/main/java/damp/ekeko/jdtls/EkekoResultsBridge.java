@@ -71,7 +71,9 @@ public final class EkekoResultsBridge {
 		Map<String, Object> payload = new LinkedHashMap<>();
 		payload.put("query", queryText);
 		payload.put("vars", vars);
-		payload.put("rows", EkekoQueryRunner.serializeRows(results));
+		List<List<Map<String, Object>>> rows = EkekoQueryRunner.serializeRows(results);
+		payload.put("rows", rows);
+		payload.put("classDocs", EkekoClassDocumentation.classDocs(rows));
 		payload.put("elapsedMs", elapsedMs);
 		payload.put("count", count);
 		notifyClient("ekeko.showResults", payload);

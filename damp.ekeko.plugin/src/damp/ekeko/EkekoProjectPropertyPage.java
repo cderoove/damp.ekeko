@@ -44,7 +44,9 @@ public class EkekoProjectPropertyPage extends PropertyPage {
 	private static final String DEFAULT_SOOTARGS = SootProjectModel.DEFAULT_SOOTARGS;
 
 		
-	public static final QualifiedName PROCESSERRORS_PROPERTY = new QualifiedName(EkekoPlugin.PLUGIN_ID, "PROCESSERRORS");
+	// Moved to JavaProjectModel so it can be referenced from there without
+	// pulling in this (SWT-based) class -- see the comment on that field.
+	public static final QualifiedName PROCESSERRORS_PROPERTY = JavaProjectModel.PROCESSERRORS_PROPERTY;
 
 	
 	private static final int TEXT_FIELD_WIDTH = 50;

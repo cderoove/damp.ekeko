@@ -39,11 +39,12 @@ public class EkekoPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		EkekoLog.setStream(getConsoleStream());
 		EkekoModel.registerDefaultFactories();
 		this.registerContributedFactories();
-		startClojureCode(context);		
+		startClojureCode(context);
 		EkekoModel.getInstance().populate();
-	
+
 	}
 
 	public void stop(BundleContext context) throws Exception {

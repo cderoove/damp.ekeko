@@ -1,7 +1,8 @@
-(ns 
+(ns
   ^{:doc "Utility functions for interacting with the Eclipse GUI and opening a Barista view on core.logic results."
     :author "Coen De Roover"}
    damp.ekeko.gui
+   (:require [damp.ekeko.jdt [baristacallbacks]])
    (:import [org.eclipse.ui IWorkbench PlatformUI IWorkbenchPage IWorkingSet IWorkingSetManager]
             [org.eclipse.swt.widgets Display]
             [org.eclipse.jface.window Window]
@@ -22,6 +23,18 @@
   (let [result (atom nil)]
     (eclipse-uithread-do (fn [] (reset! result (runnable))))
     @result))
+
+
+;; Queries
+;; -------
+
+(defn
+  with-query-progress
+  "Calls `f`, which runs the query `querystr`, and returns its value. A host
+   can use this to show that a query is in progress; damp.ekeko.jdtls's
+   counterpart notifies VS Code. Here, the REPL already shows that."
+  [querystr f]
+  (f))
 
 
 ;; Workbench

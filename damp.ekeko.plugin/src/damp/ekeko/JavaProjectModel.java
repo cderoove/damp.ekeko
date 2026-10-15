@@ -66,7 +66,22 @@ import edu.cmu.cs.crystal.cfg.eclipse.EclipseCFG;
 
 
 public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChangedListener {
-	
+
+	// Was EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY (still used as such
+	// below). Defined here instead of read from that class because
+	// EkekoProjectPropertyPage extends org.eclipse.jface.preference.PreferencePage,
+	// so merely referencing it would require org.eclipse.jface/SWT to be on
+	// the classpath just to resolve this persistent-property key, even in a
+	// headless host with no UI. EkekoProjectPropertyPage now reads this
+	// constant from here instead of defining its own, so both sides keep
+	// using the exact same QualifiedName. Uses the literal plugin id
+	// (EkekoPlugin.PLUGIN_ID's value) directly rather than referencing
+	// EkekoPlugin itself, for the same reason -- even a compile-time
+	// constant reference requires the declaring class to be resolvable at
+	// compile time.
+	public static final org.eclipse.core.runtime.QualifiedName PROCESSERRORS_PROPERTY =
+			new org.eclipse.core.runtime.QualifiedName("damp.ekeko.plugin", "PROCESSERRORS");
+
 	protected IJavaProject javaProject;
 	
 	protected ConcurrentHashMap<ICompilationUnit,CompilationUnit> icu2ast;
@@ -224,7 +239,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 			return false;
 		String args = null;
 		try {
-			args = p.getPersistentProperty(EkekoProjectPropertyPage.PROCESSERRORS_PROPERTY);
+			args = p.getPersistentProperty(PROCESSERRORS_PROPERTY);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -251,7 +266,25 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	}
 	
 	
-	public static int JLS = AST.JLS8;
+	// Was AST.JLS8 (fixed at the Java 8 grammar level, from when this
+	// targeted Eclipse Neon-era JDT, whose AST class doesn't go past
+	// JLS8). Newer JDT cores (e.g. the one eclipse.jdt.ls bundles) support
+	// much higher levels via AST.getJLSLatest(), needed to parse modern
+	// Java syntax (records, sealed types, pattern matching, ...). That
+	// method doesn't exist on Neon's AST class, so it can't be referenced
+	// directly here without breaking this project's own Neon-pinned Tycho
+	// build -- resolve it reflectively instead, falling back to JLS8 when
+	// running against a JDT core old enough not to have it.
+	public static int JLS = latestSupportedJLS();
+
+	private static int latestSupportedJLS() {
+		try {
+			java.lang.reflect.Method getJLSLatest = AST.class.getMethod("getJLSLatest");
+			return (Integer) getJLSLatest.invoke(null);
+		} catch (ReflectiveOperationException e) {
+			return AST.JLS8;
+		}
+	}
 		
 	public static CompilationUnit parse(ICompilationUnit icu, IProgressMonitor monitor) {
 		//Removing the next three calls to parser results in null-bindings (even though already set in constructor)
@@ -325,7 +358,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	public void populate(IProgressMonitor monitor) throws CoreException {
 		super.populate(monitor);
 		String msg = "Populating JavaProjectModel for: " + javaProject.getElementName();
-		EkekoPlugin.getConsoleStream().println(msg);
+		EkekoLog.println(msg);
 		IPackageFragment[] packageFragments = javaProject.getPackageFragments();
 	    SubMonitor sub = SubMonitor.convert(monitor, msg, packageFragments.length);
 		for(IPackageFragment frag : packageFragments) {
@@ -383,10 +416,10 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 	//overridden in PPAJavaProjectModel
 	protected CompilationUnit parseCompilationUnitWithErrors(ICompilationUnit icu, IProgressMonitor monitor) {
 		if(ignoreCompilationErrors) {
-			EkekoPlugin.getConsoleStream().println("Parsing file with compilation errors (not recommended): " + icu.getElementName());	
+			EkekoLog.println("Parsing file with compilation errors (not recommended): " + icu.getElementName());	
 			return parse(icu, monitor);
 		} else {
-			EkekoPlugin.getConsoleStream().println("Not parsing file with compilation errors (configurable in project property page): " + icu.getElementName());	
+			EkekoLog.println("Not parsing file with compilation errors (configurable in project property page): " + icu.getElementName());	
 			monitor.worked(1);
 			return null;
 		}
@@ -402,7 +435,7 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 		for(CompilationUnit cu : getCompilationUnits()) 	
 			addInformationFromVisitor(visitCompilationUnitForInformation(cu));
 		final long duration = System.currentTimeMillis() - startTime;
-		EkekoPlugin.getConsoleStream().println("Gathered information from JDT compilation units in " + duration + "ms");	
+		EkekoLog.println("Gathered information from JDT compilation units in " + duration + "ms");	
 	}
 
 	
@@ -444,15 +477,15 @@ public class JavaProjectModel extends ProjectModel implements ITypeHierarchyChan
 				ICompilationUnit icu = (ICompilationUnit) element;
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Added ICompilationUnit");
+					EkekoLog.println("Processing Java Project Delta: Added ICompilationUnit");
 					processNewCompilationUnit(icu);
 					break;
 				case IResourceDelta.REMOVED:
-					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Removed ICompilationUnit");
+					EkekoLog.println("Processing Java Project Delta: Removed ICompilationUnit");
 					processRemovedCompilationUnit(icu);
 					break;
 				case IResourceDelta.CHANGED:
-					EkekoPlugin.getConsoleStream().println("Processing Java Project Delta: Changed ICompilationUnit");
+					EkekoLog.println("Processing Java Project Delta: Changed ICompilationUnit");
 					processChangedCompilationUnit(icu);
 					break;
 				}

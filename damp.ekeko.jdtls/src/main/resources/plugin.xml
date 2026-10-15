@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
+      <delegateCommandHandler class="damp.ekeko.jdtls.EkekoCommandHandler">
+         <command id="ekeko.rebuildModel" static="true"/>
+         <command id="ekeko.startRepl" static="true"/>
+         <command id="ekeko.stopRepl" static="true"/>
+         <command id="ekeko.runQuery" static="true"/>
+         <command id="ekeko.cancelQuery" static="true"/>
+      </delegateCommandHandler>
+   </extension>
+
+   <!-- Same ids damp.ekeko.plugin's own plugin.xml uses, matching the
+        literal NATURE_ID/BUILDER_ID constants in the vendored
+        EkekoNature/EkekoBuilder source (fully-qualified ids, so they
+        resolve as given rather than being prefixed with this bundle's own
+        symbolic name). Without these, EkekoNature is an "unknown
+        referenced nature" to the resources framework and
+        Natures.addNature fails. -->
+   <extension
+         id="damp.ekeko.plugin.ekekoNature"
+         name="Ekeko Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="damp.ekeko.EkekoNature"/>
+      </runtime>
+      <builder id="damp.ekeko.plugin.ekekoBuilder"/>
+   </extension>
+   <extension
+         id="damp.ekeko.plugin.ekekoBuilder"
+         name="Ekeko Java Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder hasNature="true">
+         <run class="damp.ekeko.EkekoBuilder"/>
+      </builder>
+   </extension>
+</plugin>

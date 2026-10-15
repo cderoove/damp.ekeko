@@ -6,9 +6,8 @@
     [org.eclipse.jdt.core  IMember IJavaElement ITypeHierarchy JavaCore IType IJavaModel IJavaProject IPackageFragment ICompilationUnit]
     [org.eclipse.jdt.core.dom ConstructorInvocation SuperConstructorInvocation ClassInstanceCreation SuperMethodInvocation IMethodBinding AnonymousClassDeclaration IBinding MethodDeclaration MethodInvocation ASTParser AST ASTRequestor CompilationUnit ASTNode TypeDeclaration]
     [damp.ekeko EkekoModel JavaProjectModel ProjectModel])
-  (:import 
+  (:import
     [org.eclipse.jdt.core.dom ASTNode]
-    [baristaui.util MarkerUtility]
     [damp.ekeko IEkekoModelUpdateListener EkekoModelRemovedEvent]))
 
 
@@ -94,8 +93,10 @@
                              (.removeListener (ekeko-model) this)))
                          (execute-upon-change model))))
 
-(defn-
+(defn
   incremental-node-manager
+  "Was private (defn-); made public so damp.ekeko.baristamarkers (split out
+   from this namespace, see below) can build on it."
   [node-retrieval-function
    nodes-added-function 
    nodes-removed-function]
@@ -116,58 +117,32 @@
     (fn [removed] (println "Found "  (count removed) " removed nodes."))))
 
 
-(defn
-  marker-utility
-  []
-  (MarkerUtility/getInstance))
-
-
-(defn
-  incremental-marker-updater
-  [node-retrieval-function]
-  (let [node-to-marker (atom {})]
-    (incremental-node-manager 
-      node-retrieval-function
-      (fn [added]
-        (swap!
-         node-to-marker
-         merge
-         (zipmap
-           added
-           (map (fn [n]
-                  (.tempNewMarker ^MarkerUtility (marker-utility) n))
-                added))))
-      (fn [removed]
-        (doseq [n removed]
-          (let [marker (get @node-to-marker n)]
-            (when
-              (.exists marker)
-              (.delete marker))))))))
-
-(defn
-  incremental-node-marker
-  [node-retrieval-function]
-  (let [update-markers
-        (incremental-marker-updater node-retrieval-function)]
-    (fn [model]
-      (update-markers model))))
+;; marker-utility, incremental-marker-updater and incremental-node-marker
+;; used to live here, placing Eclipse IMarkers (squiggly underlines) on
+;; nodes as they enter/leave a query's result set, backed by
+;; baristaui.util.MarkerUtility. Moved to damp.ekeko.baristamarkers so that
+;; this namespace -- required by the query engine's model-access layer --
+;; can be loaded without baristaui (and therefore an Eclipse workbench)
+;; present. incremental-node-manager/incremental-node-printer above (which
+;; don't depend on it) are unaffected.
 
 (comment
-  
-  (def 
+
+  (require '[damp.ekeko.baristamarkers :refer [incremental-node-marker]])
+  (def
     listener
-    (model-update-listener 
+    (model-update-listener
       (incremental-node-marker
         (fn []
-          (map first 
-            (damp.ekeko/ekeko [?m] 
+          (map first
+            (damp.ekeko/ekeko [?m]
              (damp.ekeko.jdt.ast/ast :MethodDeclaration ?m)))))))
-  
+
   (register-listener listener)
   ;change file
   (unregister-listener listener)
-   
-  
+
+
   )
 
 

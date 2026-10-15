@@ -1,0 +1,8 @@
+target/
+
+# Eclipse/jdt.ls build-path metadata, regenerated from pom.xml on import
+# (every entry is maven.pomderived). This module is a plain Maven bundle --
+# no PDE/ccw natures to lose, unlike the Tycho modules' .project files.
+.classpath
+.project
+.settings/

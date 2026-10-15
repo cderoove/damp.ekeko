@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>damp.ekeko</groupId>
+  <artifactId>damp.ekeko.jdtls</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+
+  <name>Ekeko for eclipse.jdt.ls</name>
+  <description>
+    OSGi bundle hosting Ekeko's query engine (reused from damp.ekeko.plugin)
+    inside a running Eclipse JDT Language Server process, contributed via
+    the VS Code "Language Support for Java" (redhat.java) extension's
+    javaExtensions mechanism. 
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+
+    <jdtls-core.version>1.61.0.20260903134612</jdtls-core.version>
+
+    <!-- Eclipse Platform/JDT versions below are pinned to match exactly
+         what the currently installed redhat.java bundles, since these
+         packages are resolved from the running jdt.ls host at runtime
+         (provided scope), not embedded in this bundle. -->
+    <jdt-core.version>3.47.0</jdt-core.version>
+    <core-resources.version>3.24.100</core-resources.version>
+    <core-runtime.version>3.35.0</core-runtime.version>
+    <core-filesystem.version>1.11.500</core-filesystem.version>
+    <core-jobs.version>3.15.900</core-jobs.version>
+    <equinox-common.version>3.21.0</equinox-common.version>
+    <equinox-registry.version>3.12.600</equinox-registry.version>
+    <equinox-preferences.version>3.12.100</equinox-preferences.version>
+    <osgi.version>3.24.300</osgi.version>
+    <eclipse-text.version>3.14.800</eclipse-text.version>
+    <lsp4j.version>1.0.0</lsp4j.version>
+    <guava.version>33.6.0-jre</guava.version>
+
+    <clojure.version>1.12.6</clojure.version>
+    <core-logic.version>1.1.1</core-logic.version>
+    <spec-alpha.version>0.5.238</spec-alpha.version>
+    <core-specs-alpha.version>0.4.74</core-specs-alpha.version>
+    <nrepl.version>1.7.0</nrepl.version>
+    <cider-nrepl.version>0.62.2</cider-nrepl.version>
+    <!-- Qualifier of the bundle's version, see Bundle-Version below. -->
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+  </properties>
+
+  <repositories>
+    <!-- nrepl isn't published to Maven Central, only Clojars. -->
+    <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+    </repository>
+    <!-- JDTLS is not published to Maven Central, only to the Eclipse Releases Repository -->
+    <repository>
+      <id>eclipse-releases</id>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </repository>
+    <!-- In-project repository for unreleased internal dependencies (qwal) -->
+    <repository>
+      <id>damp-libs-repo</id>
+      <url>file://${project.basedir}/../damp.libs/repo</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- Supplied by the running jdt.ls host at runtime; not embedded. -->
+    <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+      <version>${jdt-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>${core-resources.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>${core-runtime.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${core-filesystem.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.jobs</artifactId>
+      <version>${core-jobs.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.common</artifactId>
+      <version>${equinox-common.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.registry</artifactId>
+      <version>${equinox-registry.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.equinox.preferences</artifactId>
+      <version>${equinox-preferences.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.osgi</artifactId>
+      <version>${osgi.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.text</artifactId>
+      <version>${eclipse-text.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jdt.ls</groupId>
+      <artifactId>org.eclipse.jdt.ls.core</artifactId>
+      <version>${jdtls-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.lsp4j</groupId>
+      <artifactId>org.eclipse.lsp4j</artifactId>
+      <version>${lsp4j.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Not present in jdt.ls's runtime; embedded into this bundle (see
+         the maven-bundle-plugin Embed-Dependency instruction below). -->
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>${clojure.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>spec.alpha</artifactId>
+      <version>${spec-alpha.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.specs.alpha</artifactId>
+      <version>${core-specs-alpha.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.logic</artifactId>
+      <version>${core-logic.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Resolved from damp-libs-repo (damp.libs/repo) -->
+      <groupId>damp</groupId>
+      <artifactId>qwal</artifactId>
+      <version>1.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>nrepl</groupId>
+      <artifactId>nrepl</artifactId>
+      <version>${nrepl.version}</version>
+    </dependency>
+    <!-- Middleware for the nREPL server started by EkekoReplController;
+         without it, Calva (and any other cider-nrepl-aware client) warns
+         "The nREPL server does not support cider-nrepl `info` op" and loses
+         completion/eldoc/definition-lookup/test-runner support. -->
+    <dependency>
+      <groupId>cider</groupId>
+      <artifactId>cider-nrepl</artifactId>
+      <version>${cider-nrepl.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- damp.ekeko.plugin/src mixes this bundle's UI-free query engine
+           with the Eclipse-workbench (SWT/JFace) coupled parts of the
+           plugin (the Barista results-table UI, property/preference
+           pages, menu action handlers, the REPL controller) and the
+           Soot/workspace-reification subtrees, in the same directories,
+           so the needed subset can't be selected by pointing at whole
+           subdirectories alone. maven-compiler-plugin's excludes don't
+           apply to source roots added via build-helper-maven-plugin
+           add-source (a known limitation: they only filter the project's
+           primary source directory), so filter by copying the wanted
+           files into a generated-sources staging directory first, then
+           add that as the source root; this keeps the real filtering
+           where excludes actually work (maven-resources-plugin), while
+           still building directly against damp.ekeko.plugin's own source
+           rather than a maintained copy of it. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>stage-damp-ekeko-plugin-java-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>copy-resources</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-sources/damp-ekeko-plugin</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src</directory>
+                  <includes>
+                    <include>**/*.java</include>
+                  </includes>
+                  <excludes>
+                    <exclude>damp/ekeko/EkekoPlugin.java</exclude>
+                    <exclude>damp/ekeko/EkekoProblemFixer.java</exclude>
+                    <exclude>damp/ekeko/EkekoProjectDecorator.java</exclude>
+                    <exclude>damp/ekeko/EkekoProjectPropertyPage.java</exclude>
+                    <exclude>damp/ekeko/ToggleEkekoNatureAction.java</exclude>
+                    <exclude>damp/ekeko/EnableNatureOnAllHandler.java</exclude>
+                    <exclude>damp/ekeko/DisableNatureOnAllHandler.java</exclude>
+                    <exclude>damp/ekeko/REPLController.java</exclude>
+                    <exclude>damp/ekeko/REPLStartHandler.java</exclude>
+                    <exclude>damp/ekeko/REPLStopHandler.java</exclude>
+                    <exclude>damp/ekeko/gui/**</exclude>
+                    <exclude>damp/ekeko/soot/**</exclude>
+                    <exclude>damp/ekeko/workspace/**</exclude>
+                    <exclude>test/**</exclude>
+                  </excludes>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src-crystal</directory>
+                  <includes>
+                    <include>**/*.java</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stage-damp-ekeko-plugin-clojure-sources-for-aot</id>
+            <phase>generate-sources</phase>
+            <goals><goal>copy-resources</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/clojure-aot-sources</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src</directory>
+                  <includes>
+                    <include>damp/util/interop.clj</include>
+                    <include>damp/ekeko/logic.clj</include>
+                    <include>damp/ekeko/jdt/astnode.clj</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-damp-ekeko-plugin-clojure-resources</id>
+            <phase>generate-resources</phase>
+            <goals><goal>copy-resources</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../damp.ekeko.plugin/src</directory>
+                  <includes>
+                    <include>**/*.clj</include>
+                  </includes>
+                  <excludes>
+                    <exclude>test/**</exclude>
+                    <!-- damp/ekeko/gui.clj :imports SWT/JFace/baristaui
+                         classes at namespace-load time (not just when its
+                         functions are called), none of which are present
+                         in jdt.ls's headless runtime, so loading it here
+                         would throw ClassNotFoundException as soon as
+                         damp.ekeko requires it. This bundle provides its
+                         own damp/ekeko/gui.clj instead (see
+                         src/main/resources), implementing the same functions
+                         but notifying the VS Code extension instead of
+                         opening Barista SWT views. -->
+                    <exclude>damp/ekeko/gui.clj</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>add-staged-damp-ekeko-plugin-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>add-source</goal></goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/damp-ekeko-plugin</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Ekeko's own .clj sources are embedded as plain resources in the
+           bundle jar above (readable by clj-kondo/clojure-lsp directly,
+           the same way they read any library dependency jar on a Clojure
+           project's classpath), but core.logic and qwal, whose macros
+           (fresh/run*/==/conde/qwal/...) damp.ekeko's own macros expand
+           into, are only embedded as *nested* jars on this OSGi bundle's
+           Bundle-ClassPath (Embed-Dependency, above), which clj-kondo
+           can't see inside. Stage plain copies of just those two here so
+           the VS Code extension can point clj-kondo/clojure-lsp's
+           :classpath at real files (via .lsp/config.edn) and resolve
+           Ekeko's/core.logic's own symbols for autocomplete and
+           diagnostics instead of flagging every one as unresolved. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.11.0</version>
+        <executions>
+          <execution>
+            <id>stage-lint-classpath-libs</id>
+            <phase>generate-resources</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lint-libs</outputDirectory>
+              <includeArtifactIds>core.logic,qwal</includeArtifactIds>
+              <stripVersion>false</stripVersion>
+            </configuration>
+          </execution>
+          <!-- The sources of the JDT DOM (AST node and binding classes, the
+               values most queries return), for the results view to show
+               their Javadoc on hover (see EkekoClassDocumentation): jdt.ls
+               only finds documentation for classes on the classpath of a
+               workspace project, which JDT's own normally aren't. Unpacked
+               under this bundle's own package prefix so Private-Package
+               (below) includes them as plain resources. -->
+          <execution>
+            <id>unpack-jdt-dom-sources</id>
+            <phase>generate-resources</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.jdt</groupId>
+                  <artifactId>org.eclipse.jdt.core</artifactId>
+                  <version>${jdt-core.version}</version>
+                  <classifier>sources</classifier>
+                  <includes>org/eclipse/jdt/core/dom/*.java</includes>
+                  <outputDirectory>${project.build.outputDirectory}/damp/ekeko/jdtls/sources</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- This module's own Java code wants to refer to classes generated by
+           damp.ekeko.plugin's Clojure code by name Those classes
+           only come into existence when the namespace is loaded, so
+           without ahead-of-time compilation javac has nothing to compile
+           against.
+
+           Here we explicitly compile some Clojure sources ahead of time so 
+           that they can be used from the Java code.
+
+             1. compile-staged-damp-ekeko-plugin-sources (this plugin,
+                generate-resources) — javac over the staged
+                damp.ekeko.plugin sources only. Nothing there refers to the
+                Clojure-generated classes, so it stands alone.
+             2. clojure:compile (process-sources) — AOT, against the classes
+                from pass 1 plus the provided-scope Eclipse/JDT jars.
+             3. default-compile (compile) — this module's own src/main/java,
+                now able to resolve damp.ekeko.jdt.astnode.*.
+
+           Pass 1 is scoped with <includes> to the staged directory's own
+           package roots so the default-compile pass stays responsible for
+           src/main/java; both passes write to the same target/classes, so
+           the staged classes are not compiled twice (javac's own staleness
+           check skips them in pass 3). -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-staged-damp-ekeko-plugin-sources</id>
+            <phase>process-resources</phase>
+            <goals><goal>compile</goal></goals>
+            <configuration>
+              <excludes>
+                <exclude>damp/ekeko/jdtls/**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Only the namespaces actually needed are listed: AOT loads each
+           namespace it compiles (and everything it requires), and much of
+           damp.ekeko.plugin's source can't load in this headless,
+           non-workbench build — damp.ekeko.gui :imports SWT/JFace at
+           namespace-load time, and the damp.ekeko.soot/workspace subtrees
+           aren't staged here at all (see the maven-resources-plugin
+           excludes above). Compiling the whole tree would fail on those.
+
+           The .clj sources stay in the bundle as plain resources as well
+           (see add-damp-ekeko-plugin-clojure-resources above) — the AOT
+           classes are an addition, not a replacement: the REPL and
+           clj-kondo still read the source, and every namespace not listed
+           here still loads from it at runtime.
+
+           sourceDirectories points at target/classes, where the staged
+           .clj files already are, and must stay *relative*: the plugin
+           resolves these against ${project.basedir} when building the
+           forked JVM's classpath, so an absolute path (or
+           ${project.build.outputDirectory}) yields a mangled
+           basedir-plus-absolute-path entry and it silently finds no
+           namespaces to compile. -->
+      <plugin>
+        <groupId>com.theoryinpractise</groupId>
+        <artifactId>clojure-maven-plugin</artifactId>
+        <version>1.9.4</version>
+        <executions>
+          <execution>
+            <id>aot-compile-damp-ekeko-plugin-namespaces</id>
+            <phase>process-resources</phase>
+            <goals><goal>compile</goal></goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceDirectories>
+            <sourceDirectory>target/clojure-aot-sources</sourceDirectory>
+          </sourceDirectories>
+          <namespaces>
+            <namespace>damp.util.interop</namespace>
+            <namespace>damp.ekeko.logic</namespace>
+            <namespace>damp.ekeko.jdt.astnode</namespace>
+          </namespaces>
+          <!-- Compile exactly the namespaces listed above, not every
+               namespace discovered under the source directory. -->
+          <compileDeclaredNamespaceOnly>true</compileDeclaredNamespaceOnly>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>6.1.2</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <!-- singleton:=true is required for Equinox to process this
+                 bundle's plugin.xml extensions at all (delegateCommandHandler
+                 included); without it they're silently ignored. -->
+            <Bundle-SymbolicName>damp.ekeko.jdtls;singleton:=true</Bundle-SymbolicName>
+            <Bundle-Version>1.0.0.${maven.build.timestamp}</Bundle-Version>
+            <Bundle-Activator>damp.ekeko.jdtls.EkekoJdtlsActivator</Bundle-Activator>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-21</Bundle-RequiredExecutionEnvironment>
+            <!-- By default bnd only bundles resources from packages that
+                 also contain at least one compiled class; several of our
+                 packages are pure Clojure source with no .java file at
+                 all (e.g. damp.ekeko.jdt), so without this they get
+                 silently dropped from the final jar. Private-Package
+                 marks every discovered package under our own code as
+                 bundle content; scoped to our own package prefixes
+                 (rather than "*") so it doesn't also pull the embedded
+                 dependencies' own .clj sources loose into the jar;
+                 those stay inside their embedded jars on the
+                 Bundle-ClassPath instead, where Embed-Dependency already
+                 puts them. -->
+            <Private-Package>damp.*,edu.cmu.cs.crystal.*</Private-Package>
+            <!-- Embed the deps not provided by the jdt.ls host. cider-nrepl's
+                 own dependencies (orchard, logjam, clj-reload, suitable,
+                 compliment) are listed explicitly rather than relied on via
+                 Embed-Transitive: that flag did not pull them into the jar
+                 in practice (verified by inspecting the built jar), so each
+                 is named here. -->
+            <Embed-Dependency>clojure,spec.alpha,core.specs.alpha,core.logic,qwal,nrepl,cider-nrepl,orchard,logjam,clj-reload,suitable,compliment</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <!-- Most of this bundle's actual JDT/Eclipse/OSGi package
+                 usage lives in the .clj source files bundled as plain
+                 resources above (astnode.clj, ast.clj, structure.clj,
+                 ...), which bnd's bytecode analysis can't see (it only
+                 scans .class files), so a statically computed
+                 Import-Package would be missing most of what this bundle
+                 needs at runtime. DynamicImport-Package tells the OSGi
+                 framework to resolve any package this bundle doesn't
+                 statically import by searching other bundles' exports at
+                 class-load time instead; the standard approach for OSGi
+                 bundles hosting a dynamic/scripted language (Clojure,
+                 Jython, Groovy bundles commonly do the same). -->
+            <DynamicImport-Package>*</DynamicImport-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
